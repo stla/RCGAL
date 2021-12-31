@@ -30,6 +30,7 @@ typedef CGAL::Surface_mesh<IPoint3> Mesh;
 // typedef Surface_mesh::Vertex_range Vertex_range;
 typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
+typedef Mesh::Face_index face_descriptor;
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix test() {
@@ -109,8 +110,9 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
   Mesh mesh;
   CGAL::convex_hull_3(points.begin(), points.end(), mesh, CHT(Pmap()));
 
-  size_t nvertices = num_vertices(mesh);
-  size_t nedges = num_edges(mesh);
+  size_t nvertices = num_vertices(mesh);  // or number_of_vertices
+  size_t nedges = num_edges(mesh);        // or number_of_edges
+  size_t nfaces = num_faces(mesh);
 
   // Rcpp::NumericMatrix chull(nvertices, 3);
 
@@ -153,7 +155,7 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
       vertex_descriptor t = target(ed, mesh);
       edges(i, 0) = ids[s];
       edges(i, 1) = ids[t];
-      i ++;
+      i++;
     }
   }
   //  int i = 0;
@@ -166,10 +168,23 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
   //    Rcpp::Rcout << "info : " << v(0)->info() << "\n";
   //    i++;
   //  }
-  Rcpp::List out = Rcpp::List::create(
-    Rcpp::Named("vertices") = vertices,
-    Rcpp::Named("edges") = edges
-  );
+  Rcpp::IntegerMatrix faces(nfaces, 3);
+  {
+    size_t i = 0;
+    for(face_descriptor fa : mesh.faces()) {
+      size_t j = 0
+      for(vertex_descriptor vd : vertices_around_face(mesh.halfedge(fa), mesh)) {
+        IPoint3 ivertex = mesh.point(vd);
+        faces(i, j) = ivertex.second;
+        j++;
+      }
+      i++;
+    }
+  }
+
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("vertices") = vertices,
+                                      Rcpp::Named("edges") = edges,
+                                      Rcpp::Named("faces") = faces);
 
   return out;
 }
