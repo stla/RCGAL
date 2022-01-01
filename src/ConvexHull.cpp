@@ -2,6 +2,7 @@
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins(cpp14)]]
+#define CGAL_EIGEN3_ENABLED
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/convex_hull_2.h>
@@ -14,12 +15,19 @@
 
 #include <CGAL/Vector_3.h>
 
+#include <CGAL/Object.h>
+
 //#include <CGAL/Unique_hash_map.h>
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <vector>
 #include <array>
+
+#include <CGAL/Polygon_mesh_processing/locate.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/boost/graph/helpers.h>
+#include <CGAL/Dynamic_property_map.h>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Polyhedron_3<K> Polyhedron3;
@@ -34,10 +42,18 @@ typedef CGAL::Extreme_points_traits_adapter_3<Pmap,
                                               CGAL::Convex_hull_traits_3<K> >
     CHT;
 typedef CGAL::Surface_mesh<IPoint3> Mesh;
+typedef CGAL::Surface_mesh<Point3> Mesh0;
 // typedef Surface_mesh::Vertex_range Vertex_range;
 typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
 typedef Mesh::Face_index face_descriptor;
+
+
+typedef K::FT FT;
+namespace PMP = CGAL::Polygon_mesh_processing;
+typedef PMP::Barycentric_coordinates<FT>                                Barycentric_coordinates;
+typedef PMP::Face_location<Mesh, FT>                                    Face_location;
+typedef typename boost::graph_traits<Mesh>::face_descriptor             face_descro;
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix test() {
@@ -109,14 +125,19 @@ Rcpp::NumericMatrix cxhull3d0(Rcpp::NumericMatrix pts) {
 Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
 
   size_t npoints = pts.nrow();
+  std::vector<Point3> points0(npoints);
   std::vector<IPoint3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
+    points0[i] = Point3(pts(i, 0), pts(i, 1), pts(i, 2));
     points[i] = std::make_pair(Point3(pts(i, 0), pts(i, 1), pts(i, 2)), i + 1);
   }
 
   // define surface mesh to hold convex hull
   Mesh mesh;
   CGAL::convex_hull_3(points.begin(), points.end(), mesh, CHT(Pmap()));
+
+  Mesh0 mesh0;
+  CGAL::convex_hull_3(points0.begin(), points0.end(), mesh0);
 
   size_t nvertices = num_vertices(mesh);  // or number_of_vertices
   size_t nedges = num_edges(mesh);        // or number_of_edges
@@ -152,6 +173,17 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
 
       Mesh::Halfedge_index h0 = mesh.halfedge(ed, 0);
       Mesh::Face_index face0 = mesh.face(h0);
+      face_descro f0 = mesh.face(h0);
+
+      Point3 source_pt = mesh.point(s).first;
+      Point3 target_pt = mesh.point(t).first;
+      const Point3 middle_edge = CGAL::midpoint(source_pt, target_pt);
+      Rcpp::Rcout << "SSSSSSSSSSSSS : " << source_pt.x() << "\n";
+      //face_descriptor fd = mesh.face(mesh.edge(ed));
+      Face_location query_location = PMP::locate(middle_edge, mesh0);
+      Rcpp::Rcout << "Is it on the face's border? " << (PMP::is_on_mesh_border(query_location, mesh0) ? "Yes" : "No") << "\n\n";
+
+
       std::array<unsigned, 3> vids0;
       std::array<Point3, 3> vpoints0;
       unsigned counter0 = 0;
@@ -211,6 +243,30 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
 
   Rcpp::List out = Rcpp::List::create(Rcpp::Named("vertices") = vertices,
                                       Rcpp::Named("edges") = edges,
+                                      Rcpp::Named("faces") = faces);
+
+  return out;
+}
+
+
+// [[Rcpp::export]]
+Rcpp::List cxhull3dObj(Rcpp::NumericMatrix pts) {
+
+  size_t npoints = pts.nrow();
+  std::vector<Point3> points(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    points[i] = Point3(pts(i, 0), pts(i, 1), pts(i, 2));
+  }
+
+  // define object to hold convex hull
+  CGAL::Object obj;
+  CGAL::convex_hull_3(points.begin(), points.end(), obj);
+  const Polyhedron3* mesh = CGAL::object_cast<Polyhedron3>(&obj);
+  Rcpp::Rcout << "Polyhedron\n " << *mesh << "\n";
+
+  Rcpp::IntegerMatrix faces(2, 3);
+
+  Rcpp::List out = Rcpp::List::create(//Rcpp::Named("nedges") = edges.size(),
                                       Rcpp::Named("faces") = faces);
 
   return out;
