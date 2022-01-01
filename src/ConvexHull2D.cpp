@@ -10,9 +10,14 @@
 #include <CGAL/Extreme_points_traits_adapter_3.h>
 #include <CGAL/Surface_mesh.h>
 
+#include <CGAL/Kernel/global_functions.h>
+
+//#include <CGAL/Unique_hash_map.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <vector>
+#include <array>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Polyhedron_3<K> Polyhedron3;
@@ -129,6 +134,8 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
   //    Rcpp::Rcout << *vb << "\n";
   //  }
 
+//  CGAL::Unique_hash_map<unsigned, Point3> hash;
+
   Rcpp::List vertices(nvertices);
   std::vector<unsigned> ids(nvertices);
   {
@@ -141,13 +148,14 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
       vertex[2] = ivertex.first.z();
       unsigned id = ivertex.second;
       ids[i] = id;
+//      hash[id] = ivertex.first;
       Rcpp::List L = Rcpp::List::create(Rcpp::Named("id") = id,
                                         Rcpp::Named("point") = vertex);
       vertices[i] = L;
       i++;
     }
   }
-  Rcpp::IntegerMatrix edges(nedges, 2);
+  Rcpp::IntegerMatrix edges(nedges, 3);
   {
     size_t i = 0;
     for(edge_descriptor ed : mesh.edges()) {
@@ -155,6 +163,54 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
       vertex_descriptor t = target(ed, mesh);
       edges(i, 0) = ids[s];
       edges(i, 1) = ids[t];
+      Mesh::Halfedge_index h0 = mesh.halfedge(ed, 0);
+      Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
+      Mesh::Face_index face0 = mesh.face(h0);
+      Mesh::Face_index face1 = mesh.face(h1);
+//      CGAL::Vertex_around_face_circulator<Mesh> vbegin(mesh.halfedge(face0),mesh), done(vbegin);
+//      do {
+//        std::cout << *vbegin++ << std::endl;
+//      } while(vbegin != done);
+      std::array<unsigned, 3> vids;
+      std::array<Point3, 3> vpoints;
+      unsigned counter = 0;
+      for(vertex_descriptor vd :
+            vertices_around_face(mesh.halfedge(face0), mesh)) {
+        IPoint3 ivertex = mesh.point(vd);
+        vids[counter] = ivertex.second;
+        vpoints[counter] = ivertex.first;
+        counter++;
+        Rcpp::Rcout << "face0 : " << ivertex.second << "\n";
+      }
+      CGAL::Vector_3<K> normal0 = CGAL::normal(
+        vpoints[0], vpoints[1], vpoints[2]
+      );
+      Rcpp::Rcout << "normal0 : " << normal0 << "\n";
+      std::array<unsigned, 3> vids1;
+      std::array<Point3, 3> vpoints1;
+      unsigned counter1 = 0;
+      for(vertex_descriptor vd :
+            vertices_around_face(mesh.halfedge(face1), mesh)) {
+        IPoint3 ivertex = mesh.point(vd);
+        vids1[counter1] = ivertex.second;
+        vpoints1[counter1] = ivertex.first;
+        counter1++;
+        Rcpp::Rcout << "face1 : " << ivertex.second << "\n";
+        // unsigned id = ivertex.second;
+        // if(id != vids[0] && id != vids[1] && id != vids[2]){
+        //   vids[3] = id;
+        //   vpoints[3] = ivertex.first;
+        // }
+      }
+      CGAL::Vector_3<K> normal1 = CGAL::normal(
+        vpoints1[0], vpoints1[1], vpoints1[2]
+      );
+      Rcpp::Rcout << "normal1 : " << normal1 << "\n";
+      // for(size_t w=0; w < 4; w++){
+      //   Rcpp::Rcout << "theface : " << vids[w] << "\n";
+      // }
+      edges(i, 2) = normal0 == normal1 ? 0 : 1;
+//                        : 1; //  Mesh::is_border(halfedge(ed, 0))
       i++;
     }
   }
@@ -172,8 +228,9 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
   {
     size_t i = 0;
     for(face_descriptor fa : mesh.faces()) {
-      size_t j = 0
-      for(vertex_descriptor vd : vertices_around_face(mesh.halfedge(fa), mesh)) {
+      size_t j = 0;
+      for(vertex_descriptor vd :
+          vertices_around_face(mesh.halfedge(fa), mesh)) {
         IPoint3 ivertex = mesh.point(vd);
         faces(i, j) = ivertex.second;
         j++;
