@@ -12,6 +12,8 @@
 
 #include <CGAL/Kernel/global_functions.h>
 
+#include <CGAL/Vector_3.h>
+
 //#include <CGAL/Unique_hash_map.h>
 
 #include <Rcpp.h>
@@ -78,7 +80,7 @@ Rcpp::NumericMatrix cxhull2d(Rcpp::NumericMatrix pts) {
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix cxhull3d(Rcpp::NumericMatrix pts) {
+Rcpp::NumericMatrix cxhull3d0(Rcpp::NumericMatrix pts) {
   std::vector<Point3> points;
   // define polyhedron to hold convex hull
   Polyhedron3 poly;
@@ -104,7 +106,8 @@ Rcpp::NumericMatrix cxhull3d(Rcpp::NumericMatrix pts) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
+Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
+
   size_t npoints = pts.nrow();
   std::vector<IPoint3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -119,23 +122,6 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
   size_t nedges = num_edges(mesh);        // or number_of_edges
   size_t nfaces = num_faces(mesh);
 
-  // Rcpp::NumericMatrix chull(nvertices, 3);
-
-  //  Surface_mesh::Vertex_range::iterator  vb, ve;
-  //  Surface_mesh::Vertex_range r = sm.vertices();
-  // The iterators can be accessed through the C++ range API
-  //  vb = r.begin();
-  //  ve = r.end();
-  // or the boost Range API
-  // vb = boost::begin(r);
-  // ve = boost::end(r);
-  // or with boost::tie, as the CGAL range derives from std::pair
-  //  for(boost::tie(vb, ve) = sm.vertices(); vb != ve; ++vb){
-  //    Rcpp::Rcout << *vb << "\n";
-  //  }
-
-//  CGAL::Unique_hash_map<unsigned, Point3> hash;
-
   Rcpp::List vertices(nvertices);
   std::vector<unsigned> ids(nvertices);
   {
@@ -148,13 +134,13 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
       vertex[2] = ivertex.first.z();
       unsigned id = ivertex.second;
       ids[i] = id;
-//      hash[id] = ivertex.first;
       Rcpp::List L = Rcpp::List::create(Rcpp::Named("id") = id,
                                         Rcpp::Named("point") = vertex);
       vertices[i] = L;
       i++;
     }
   }
+
   Rcpp::IntegerMatrix edges(nedges, 3);
   {
     size_t i = 0;
@@ -163,29 +149,27 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
       vertex_descriptor t = target(ed, mesh);
       edges(i, 0) = ids[s];
       edges(i, 1) = ids[t];
+
       Mesh::Halfedge_index h0 = mesh.halfedge(ed, 0);
-      Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
       Mesh::Face_index face0 = mesh.face(h0);
-      Mesh::Face_index face1 = mesh.face(h1);
-//      CGAL::Vertex_around_face_circulator<Mesh> vbegin(mesh.halfedge(face0),mesh), done(vbegin);
-//      do {
-//        std::cout << *vbegin++ << std::endl;
-//      } while(vbegin != done);
-      std::array<unsigned, 3> vids;
-      std::array<Point3, 3> vpoints;
-      unsigned counter = 0;
+      std::array<unsigned, 3> vids0;
+      std::array<Point3, 3> vpoints0;
+      unsigned counter0 = 0;
       for(vertex_descriptor vd :
             vertices_around_face(mesh.halfedge(face0), mesh)) {
         IPoint3 ivertex = mesh.point(vd);
-        vids[counter] = ivertex.second;
-        vpoints[counter] = ivertex.first;
-        counter++;
+        vids0[counter0] = ivertex.second;
+        vpoints0[counter0] = ivertex.first;
+        counter0++;
         Rcpp::Rcout << "face0 : " << ivertex.second << "\n";
       }
       CGAL::Vector_3<K> normal0 = CGAL::normal(
-        vpoints[0], vpoints[1], vpoints[2]
+        vpoints0[0], vpoints0[1], vpoints0[2]
       );
       Rcpp::Rcout << "normal0 : " << normal0 << "\n";
+
+      Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
+      Mesh::Face_index face1 = mesh.face(h1);
       std::array<unsigned, 3> vids1;
       std::array<Point3, 3> vpoints1;
       unsigned counter1 = 0;
@@ -196,34 +180,20 @@ Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts) {
         vpoints1[counter1] = ivertex.first;
         counter1++;
         Rcpp::Rcout << "face1 : " << ivertex.second << "\n";
-        // unsigned id = ivertex.second;
-        // if(id != vids[0] && id != vids[1] && id != vids[2]){
-        //   vids[3] = id;
-        //   vpoints[3] = ivertex.first;
-        // }
       }
       CGAL::Vector_3<K> normal1 = CGAL::normal(
         vpoints1[0], vpoints1[1], vpoints1[2]
       );
       Rcpp::Rcout << "normal1 : " << normal1 << "\n";
-      // for(size_t w=0; w < 4; w++){
-      //   Rcpp::Rcout << "theface : " << vids[w] << "\n";
-      // }
+
+      Rcpp::Rcout << "directionnormal1 : " << normal1.direction() << "\n";
+
       edges(i, 2) = normal0 == normal1 ? 0 : 1;
-//                        : 1; //  Mesh::is_border(halfedge(ed, 0))
+
       i++;
     }
   }
-  //  int i = 0;
-  //  Vertex_range vrange = sm.vertices();
-  //  for(auto v = vrange.begin(); v != vrange.end();
-  //      ++v) {
-  //    chull(i, 0) = v.point().x();
-  //    chull(i, 1) = v->point().y();
-  //    chull(i, 2) = v->point().z();
-  //    Rcpp::Rcout << "info : " << v(0)->info() << "\n";
-  //    i++;
-  //  }
+
   Rcpp::IntegerMatrix faces(nfaces, 3);
   {
     size_t i = 0;
