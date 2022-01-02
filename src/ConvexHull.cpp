@@ -24,8 +24,8 @@
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include <vector>
 #include <array>
+#include <vector>
 
 // #include <CGAL/Polygon_mesh_processing/locate.h>
 // #include <CGAL/AABB_traits.h>
@@ -45,17 +45,17 @@ typedef CGAL::Extreme_points_traits_adapter_3<Pmap,
                                               CGAL::Convex_hull_traits_3<K> >
     CHT;
 typedef CGAL::Surface_mesh<IPoint3> Mesh;
-//typedef CGAL::Surface_mesh<Point3> Mesh0;
+// typedef CGAL::Surface_mesh<Point3> Mesh0;
 // typedef Surface_mesh::Vertex_range Vertex_range;
 typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
 typedef Mesh::Face_index face_descriptor;
 
-typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K>    Vb;
-typedef CGAL::Triangulation_data_structure_2<Vb>                    Tds;
+typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb;
+typedef CGAL::Triangulation_data_structure_2<Vb> Tds;
 typedef CGAL::Delaunay_triangulation_2<K, Tds> DT2;
 typedef std::pair<Point2, unsigned> IPoint2;
-//typedef CGAL::First_of_pair_property_map<IPoint2> Pmap2;
+// typedef CGAL::First_of_pair_property_map<IPoint2> Pmap2;
 // typedef CGAL::Extreme_points_traits_adapter_2<Pmap,
 //                                               CGAL::Convex_hull_traits_3<K> >
 //   CHT;
@@ -63,9 +63,9 @@ typedef CGAL::Surface_mesh<Point2> Mesh2;
 
 // typedef K::FT FT;
 // namespace PMP = CGAL::Polygon_mesh_processing;
-// typedef PMP::Barycentric_coordinates<FT>                                Barycentric_coordinates;
-// typedef PMP::Face_location<Mesh, FT>                                    Face_location;
-// typedef typename boost::graph_traits<Mesh>::face_descriptor             face_descro;
+// typedef PMP::Barycentric_coordinates<FT> Barycentric_coordinates; typedef
+// PMP::Face_location<Mesh, FT> Face_location; typedef typename
+// boost::graph_traits<Mesh>::face_descriptor             face_descro;
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix test() {
@@ -135,12 +135,11 @@ Rcpp::NumericMatrix cxhull3d0(Rcpp::NumericMatrix pts) {
 
 // [[Rcpp::export]]
 Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
-
   size_t npoints = pts.nrow();
-//  std::vector<Point3> points0(npoints);
+  //  std::vector<Point3> points0(npoints);
   std::vector<IPoint3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
-//    points0[i] = Point3(pts(i, 0), pts(i, 1), pts(i, 2));
+    //    points0[i] = Point3(pts(i, 0), pts(i, 1), pts(i, 2));
     points[i] = std::make_pair(Point3(pts(i, 0), pts(i, 1), pts(i, 2)), i + 1);
   }
 
@@ -148,8 +147,8 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
   Mesh mesh;
   CGAL::convex_hull_3(points.begin(), points.end(), mesh, CHT(Pmap()));
 
-  //Mesh0 mesh0;
-  //CGAL::convex_hull_3(points0.begin(), points0.end(), mesh0);
+  // Mesh0 mesh0;
+  // CGAL::convex_hull_3(points0.begin(), points0.end(), mesh0);
 
   size_t nvertices = num_vertices(mesh);  // or number_of_vertices
   size_t nedges = num_edges(mesh);        // or number_of_edges
@@ -193,23 +192,23 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
       // Rcpp::Rcout << "SSSSSSSSSSSSS : " << source_pt.x() << "\n";
       // //face_descriptor fd = mesh.face(mesh.edge(ed));
       // Face_location query_location = PMP::locate(middle_edge, mesh0);
-      // Rcpp::Rcout << "Is it on the face's border? " << (PMP::is_on_mesh_border(query_location, mesh0) ? "Yes" : "No") << "\n\n";
-
+      // Rcpp::Rcout << "Is it on the face's border? " <<
+      // (PMP::is_on_mesh_border(query_location, mesh0) ? "Yes" : "No") <<
+      // "\n\n";
 
       std::array<unsigned, 3> vids0;
       std::array<Point3, 3> vpoints0;
       unsigned counter0 = 0;
       for(vertex_descriptor vd :
-            vertices_around_face(mesh.halfedge(face0), mesh)) {
+          vertices_around_face(mesh.halfedge(face0), mesh)) {
         IPoint3 ivertex = mesh.point(vd);
         vids0[counter0] = ivertex.second;
         vpoints0[counter0] = ivertex.first;
         counter0++;
         Rcpp::Rcout << "face0 : " << ivertex.second << "\n";
       }
-      CGAL::Vector_3<K> normal0 = CGAL::normal(
-        vpoints0[0], vpoints0[1], vpoints0[2]
-      );
+      CGAL::Vector_3<K> normal0 =
+          CGAL::normal(vpoints0[0], vpoints0[1], vpoints0[2]);
       Rcpp::Rcout << "normal0 : " << normal0 << "\n";
 
       Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
@@ -218,16 +217,15 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
       std::array<Point3, 3> vpoints1;
       unsigned counter1 = 0;
       for(vertex_descriptor vd :
-            vertices_around_face(mesh.halfedge(face1), mesh)) {
+          vertices_around_face(mesh.halfedge(face1), mesh)) {
         IPoint3 ivertex = mesh.point(vd);
         vids1[counter1] = ivertex.second;
         vpoints1[counter1] = ivertex.first;
         counter1++;
         Rcpp::Rcout << "face1 : " << ivertex.second << "\n";
       }
-      CGAL::Vector_3<K> normal1 = CGAL::normal(
-        vpoints1[0], vpoints1[1], vpoints1[2]
-      );
+      CGAL::Vector_3<K> normal1 =
+          CGAL::normal(vpoints1[0], vpoints1[1], vpoints1[2]);
       Rcpp::Rcout << "normal1 : " << normal1 << "\n";
 
       Rcpp::Rcout << "directionnormal1 : " << normal1.direction() << "\n";
@@ -260,10 +258,8 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
   return out;
 }
 
-
 // [[Rcpp::export]]
 Rcpp::List cxhull3dObj(Rcpp::NumericMatrix pts) {
-
   size_t npoints = pts.nrow();
   std::vector<Point3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -278,16 +274,14 @@ Rcpp::List cxhull3dObj(Rcpp::NumericMatrix pts) {
 
   Rcpp::IntegerMatrix faces(2, 3);
 
-  Rcpp::List out = Rcpp::List::create(//Rcpp::Named("nedges") = edges.size(),
-                                      Rcpp::Named("faces") = faces);
+  Rcpp::List out = Rcpp::List::create(  // Rcpp::Named("nedges") = edges.size(),
+      Rcpp::Named("faces") = faces);
 
   return out;
 }
 
-
 // [[Rcpp::export]]
 Rcpp::List del2d(Rcpp::NumericMatrix pts) {
-
   size_t npoints = pts.nrow();
   std::vector<IPoint2> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -297,19 +291,32 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
   // define surface mesh to hold convex hull
   DT2 mesh(points.begin(), points.end());
 
-  for (DT2::Finite_faces_iterator it = mesh.finite_faces_begin(); it != mesh.finite_faces_end(); it++)
-  {
+  const unsigned nfaces = mesh.number_of_faces();
+
+  for(DT2::Finite_faces_iterator it = mesh.finite_faces_begin();
+      it != mesh.finite_faces_end(); it++) {
     Rcpp::Rcout << it->vertex(0)->point() << " -- ";
     Rcpp::Rcout << it->vertex(1)->point() << " -- ";
     Rcpp::Rcout << it->vertex(2)->point() << "\n";
     Rcpp::Rcout << it->vertex(0)->info() << "\n";
   }
 
+  Rcpp::Rcout << "**********************************" << "\n";
+
+  for(DT2::Finite_edges_iterator eit = mesh.finite_edges_begin();
+      eit != mesh.finite_edges_end(); eit++) {
+    const Point2 a = eit->first->vertex(0)->point();
+    const Point2 b = eit->first->vertex(1)->point();
+    Rcpp::Rcout << a << " -- ";
+    Rcpp::Rcout << b << "\n";
+    Rcpp::Rcout << eit->first->vertex(0)->info() << " -- ";
+    Rcpp::Rcout << eit->first->vertex(1)->info() << "\n";
+  }
 
   Rcpp::IntegerMatrix faces(2, 3);
 
-  Rcpp::List out = Rcpp::List::create(//Rcpp::Named("nedges") = edges.size(),
-    Rcpp::Named("faces") = faces);
+  Rcpp::List out = Rcpp::List::create(  // Rcpp::Named("nedges") = edges.size(),
+      Rcpp::Named("faces") = faces);
 
   return out;
 }
