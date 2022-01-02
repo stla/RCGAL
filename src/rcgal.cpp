@@ -5,7 +5,10 @@
 //#define CGAL_EIGEN3_ENABLED
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Polyhedron_3.h>
+#include <CGAL/Convex_hull_traits_adapter_2.h>
 #include <CGAL/convex_hull_2.h>
+#include <CGAL/property_map.h>
+
 #include <CGAL/convex_hull_3.h>
 
 #include <CGAL/Extreme_points_traits_adapter_3.h>
@@ -27,17 +30,22 @@
 #include <array>
 #include <vector>
 
-
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+
 typedef K::Point_2 Point2;
 typedef K::Point_3 Point3;
 typedef std::vector<Point2> Points2;
-
 typedef std::pair<Point3, unsigned> IPoint3;
+
+typedef CGAL::
+    Convex_hull_traits_adapter_2<K, CGAL::Pointer_property_map<Point2>::type>
+        CHT2;
+
 typedef CGAL::First_of_pair_property_map<IPoint3> Pmap;
 typedef CGAL::Extreme_points_traits_adapter_3<Pmap,
-                                              CGAL::Convex_hull_traits_3<K> >
+                                              CGAL::Convex_hull_traits_3<K>>
     CHT;
+
 typedef CGAL::Surface_mesh<IPoint3> Mesh;
 
 typedef Mesh::Vertex_index vertex_descriptor;
@@ -49,27 +57,31 @@ typedef CGAL::Triangulation_data_structure_2<Vb> Tds;
 typedef CGAL::Delaunay_triangulation_2<K, Tds> DT2;
 typedef std::pair<Point2, unsigned> IPoint2;
 
-
 // [[Rcpp::export]]
 Rcpp::NumericMatrix cxhull2d(Rcpp::NumericMatrix pts) {
-  Points2 points, result;
 
+  Points2 points;
   for(int i = 0; i < pts.nrow(); i++) {
     points.push_back(Point2(pts(i, 0), pts(i, 1)));
   }
 
-  CGAL::convex_hull_2(points.begin(), points.end(), std::back_inserter(result));
+  std::vector<std::size_t> indices(points.size()), out;
+  std::iota(indices.begin(), indices.end(), 0);
+  CGAL::convex_hull_2(indices.begin(), indices.end(), std::back_inserter(out),
+                      CHT2(CGAL::make_property_map(points)));
 
-  size_t npoints = result.size();
+  size_t npoints = out.size();
 
+  //Rcpp::IntegerMatrix ids(npoints, 2);
   Rcpp::NumericMatrix chull(npoints, 2);
   for(size_t i = 0; i < npoints; i++) {
-    chull(i, 0) = result[i].x();
-    chull(i, 1) = result[i].y();
+    size_t id = out[i];
+    chull(i, 0) = points[id].x();
+    chull(i, 1) = points[id].y();
   }
+
   return chull;
 }
-
 
 // [[Rcpp::export]]
 Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
@@ -179,7 +191,6 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
   return out;
 }
 
-
 // [[Rcpp::export]]
 Rcpp::List del2d(Rcpp::NumericMatrix pts) {
   size_t npoints = pts.nrow();
@@ -224,10 +235,8 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
     }
   }
 
-  Rcpp::List out = Rcpp::List::create(
-      Rcpp::Named("faces") = faces,
-      Rcpp::Named("edges") = edges
-  );
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("faces") = faces,
+                                      Rcpp::Named("edges") = edges);
 
   return out;
 }
