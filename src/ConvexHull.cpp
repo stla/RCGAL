@@ -291,26 +291,46 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
   // define surface mesh to hold convex hull
   DT2 mesh(points.begin(), points.end());
 
-  const unsigned nfaces = mesh.number_of_faces();
+  const size_t nfaces = mesh.number_of_faces();
+  const size_t h =
+      2 * npoints - 2 - nfaces;  // number of vertices of convex hull
+  const size_t nedges = 3 * npoints - 3 - h;
 
-  for(DT2::Finite_faces_iterator it = mesh.finite_faces_begin();
-      it != mesh.finite_faces_end(); it++) {
-    Rcpp::Rcout << it->vertex(0)->point() << " -- ";
-    Rcpp::Rcout << it->vertex(1)->point() << " -- ";
-    Rcpp::Rcout << it->vertex(2)->point() << "\n";
-    Rcpp::Rcout << it->vertex(0)->info() << "\n";
+  Rcpp::IntegerMatrix faces(nfaces, 3);
+  {
+    size_t i = 0;
+    for(DT2::Finite_faces_iterator fit = mesh.finite_faces_begin();
+        fit != mesh.finite_faces_end(); fit++) {
+      faces(i, 0) = fit->vertex(0)->info();
+      faces(i, 1) = fit->vertex(1)->info();
+      faces(i, 2) = fit->vertex(2)->info();
+      i++;
+      // Rcpp::Rcout << it->vertex(0)->point() << " -- ";
+      // Rcpp::Rcout << it->vertex(1)->point() << " -- ";
+      // Rcpp::Rcout << it->vertex(2)->point() << "\n";
+      // Rcpp::Rcout << it->vertex(0)->info() << "\n";
+    }
   }
 
-  Rcpp::Rcout << "**********************************" << "\n";
+  Rcpp::Rcout << "**********************************"
+              << "\n";
 
-  DT2::Finite_edges itedges =  mesh.finite_edges();
-  for(DT2::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end(); eit++){
-    std::pair<DT2::Face_handle, int> edge = *eit;
-    Rcpp::Rcout << edge.first->vertex((edge.second+1) % 3)->info() << " -- ";
-    Rcpp::Rcout << edge.first->vertex((edge.second+2) % 3)->info() << "\n";
-    Rcpp::Rcout << edge.second << " \n ";
+  DT2::Finite_edges itedges = mesh.finite_edges();
+  Rcpp::IntegerMatrix edges(nedges, 2);
+  {
+    size_t i = 0;
+    for(DT2::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
+        eit++) {
+      std::pair<DT2::Face_handle, int> edge = *eit;
+      edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info();
+      edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();
+      i++;
+      // Rcpp::Rcout << edge.first->vertex((edge.second + 1) % 3)->info()
+      //             << " -- ";
+      // Rcpp::Rcout << edge.first->vertex((edge.second + 2) % 3)->info() << "\n";
+      // Rcpp::Rcout << edge.second << " \n ";
+    }
   }
-
   // for(DT2::Finite_edges_iterator eit = mesh.finite_edges_begin();
   //     eit != mesh.finite_edges_end(); eit++) {
   //   // Point2 a = eit->first->vertex(0)->point();
@@ -322,10 +342,10 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
   //   Rcpp::Rcout << eit->second << " \n ";
   // }
 
-  Rcpp::IntegerMatrix faces(2, 3);
-
-  Rcpp::List out = Rcpp::List::create(  // Rcpp::Named("nedges") = edges.size(),
-      Rcpp::Named("faces") = faces);
+  Rcpp::List out = Rcpp::List::create(
+      Rcpp::Named("faces") = faces,
+      Rcpp::Named("edges") = edges
+  );
 
   return out;
 }
