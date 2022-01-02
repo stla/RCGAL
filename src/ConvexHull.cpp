@@ -20,6 +20,7 @@
 //#include <CGAL/Unique_hash_map.h>
 
 #include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Triangulation_vertex_base_with_info_2.h>
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -50,9 +51,11 @@ typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
 typedef Mesh::Face_index face_descriptor;
 
-typedef CGAL::Delaunay_triangulation_2<K> DT2;
+typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K>    Vb;
+typedef CGAL::Triangulation_data_structure_2<Vb>                    Tds;
+typedef CGAL::Delaunay_triangulation_2<K, Tds> DT2;
 typedef std::pair<Point2, unsigned> IPoint2;
-typedef CGAL::First_of_pair_property_map<IPoint2> Pmap2;
+//typedef CGAL::First_of_pair_property_map<IPoint2> Pmap2;
 // typedef CGAL::Extreme_points_traits_adapter_2<Pmap,
 //                                               CGAL::Convex_hull_traits_3<K> >
 //   CHT;
@@ -286,9 +289,9 @@ Rcpp::List cxhull3dObj(Rcpp::NumericMatrix pts) {
 Rcpp::List del2d(Rcpp::NumericMatrix pts) {
 
   size_t npoints = pts.nrow();
-  std::vector<Point2> points(npoints);
+  std::vector<IPoint2> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
-    points[i] = Point2(pts(i, 0), pts(i, 1));
+    points[i] = std::make_pair(Point2(pts(i, 0), pts(i, 1)), i + 1);
   }
 
   // define surface mesh to hold convex hull
@@ -299,6 +302,7 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
     Rcpp::Rcout << it->vertex(0)->point() << " -- ";
     Rcpp::Rcout << it->vertex(1)->point() << " -- ";
     Rcpp::Rcout << it->vertex(2)->point() << "\n";
+    Rcpp::Rcout << it->vertex(0)->info() << "\n";
   }
 
 
