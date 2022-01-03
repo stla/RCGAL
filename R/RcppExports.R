@@ -17,7 +17,7 @@ del3d_cpp <- function(pts) {
     .Call(`_RCGAL_del3d_cpp`, pts)
 }
 
-AFSreconstruction <- function(pts) {
-    .Call(`_RCGAL_AFSreconstruction`, pts)
+AFSreconstruction_cpp <- function(pts) {
+    .Call(`_RCGAL_AFSreconstruction_cpp`, pts)
 }
 

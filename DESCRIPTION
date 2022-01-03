@@ -8,7 +8,8 @@ Description: One paragraph description of what the package does as one or
         more full sentences.
 Encoding: UTF-8
 License: GPL-3
-Imports: Rcpp (>= 1.0.7)
+Imports: Rcpp (>= 1.0.7), rgl, Rvcg
 LinkingTo: Rcpp, RcppCGAL, RcppEigen, BH
+Suggests: onion
 SystemRequirements: C++ 14, gmp, mpfr
 RoxygenNote: 7.1.2

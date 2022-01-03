@@ -38,10 +38,10 @@
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include <array>
-#include <vector>
 #include <algorithm>
+#include <array>
 #include <map>
+#include <vector>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 
@@ -79,7 +79,6 @@ typedef CGAL::Advancing_front_surface_reconstruction<> AFS_reconstruction;
 typedef AFS_reconstruction::Triangulation_3 AFS_triangulation3;
 typedef AFS_reconstruction::Triangulation_data_structure_2 AFS_Tds2;
 typedef K::Vector_3 Vector3;
-
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -137,7 +136,6 @@ Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
       Rcpp::Named("edges") = edges, Rcpp::Named("surface") = surface,
       Rcpp::Named("perimeter") = perimeter);
 }
-
 
 // [[Rcpp::export]]
 Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts) {
@@ -320,17 +318,13 @@ Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
                             Rcpp::Named("edges") = edges);
 }
 
-Rcpp::String stringTriple(const unsigned i, const unsigned j, const unsigned k){
+Rcpp::String stringTriple(const unsigned i,
+                          const unsigned j,
+                          const unsigned k) {
   const Rcpp::CharacterVector stringids = Rcpp::CharacterVector::create(
-    std::to_string(i),
-    "-",
-    std::to_string(j),
-    "-",
-    std::to_string(k)
-  );
+      std::to_string(i), "-", std::to_string(j), "-", std::to_string(k));
   return Rcpp::collapse(stringids);
 }
-
 
 // [[Rcpp::export]]
 Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
@@ -352,7 +346,7 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
   {
     size_t i = 0;
     for(DT3::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
-    eit++) {
+        eit++) {
       const CGAL::Triple<DT3::Cell_handle, int, int> edge = *eit;
       edges(i, 0) = edge.first->vertex(edge.second % 4)->info();
       edges(i, 1) = edge.first->vertex(edge.third % 4)->info();
@@ -402,11 +396,10 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
       std::array<unsigned, 4> ids = {id0, id1, id2, id3};
       std::sort(ids.begin(), ids.end());
       const Rcpp::IntegerVector faces = Rcpp::IntegerVector::create(
-        facetsMap[stringTriple(ids[0], ids[1], ids[2])],
-        facetsMap[stringTriple(ids[0], ids[1], ids[3])],
-        facetsMap[stringTriple(ids[0], ids[2], ids[3])],
-        facetsMap[stringTriple(ids[1], ids[2], ids[3])]
-      );
+          facetsMap[stringTriple(ids[0], ids[1], ids[2])],
+          facetsMap[stringTriple(ids[0], ids[1], ids[3])],
+          facetsMap[stringTriple(ids[0], ids[2], ids[3])],
+          facetsMap[stringTriple(ids[1], ids[2], ids[3])]);
       Tetrahedron3 th = CGAL::Tetrahedron_3<K>(
           cit->vertex(0)->point(), cit->vertex(1)->point(),
           cit->vertex(2)->point(), cit->vertex(3)->point());
@@ -419,15 +412,13 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
     }
   }
 
-  return Rcpp::List::create(Rcpp::Named("cells") = cells,
-                            Rcpp::Named("facets") = facets,
-                            Rcpp::Named("edges") = edges,
-                            Rcpp::Named("volume") = totalVolume);
+  return Rcpp::List::create(
+      Rcpp::Named("cells") = cells, Rcpp::Named("facets") = facets,
+      Rcpp::Named("edges") = edges, Rcpp::Named("volume") = totalVolume);
 }
 
-
 // [[Rcpp::export]]
-Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
+Rcpp::List AFSreconstruction_cpp(Rcpp::NumericMatrix pts) {
   const size_t npoints = pts.nrow();
   std::vector<Point3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -439,21 +430,21 @@ Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
   reconstruction.run();
   const AFS_Tds2& tds = reconstruction.triangulation_data_structure_2();
 
-  //Rcpp::NumericVector vnormals(0);
-  //Rcpp::NumericVector vvertices(0);
+  // Rcpp::NumericVector vnormals(0);
+  // Rcpp::NumericVector vvertices(0);
   Eigen::MatrixXd normals(3, 0);
   Eigen::MatrixXd vertices(4, 0);
   unsigned counter = 0;
   for(AFS_Tds2::Face_iterator fit = tds.faces_begin(); fit != tds.faces_end();
-      ++fit){
-    if(reconstruction.has_on_surface(fit)){
+      ++fit) {
+    if(reconstruction.has_on_surface(fit)) {
       counter++;
       AFS_triangulation3::Facet f = fit->facet();
       AFS_triangulation3::Cell_handle ch = f.first;
       int ci = f.second;
       Point3 points[3];
-      for(int i = 0, j = 0; i < 4; i++){
-        if(ci != i){
+      for(int i = 0, j = 0; i < 4; i++) {
+        if(ci != i) {
           points[j] = ch->vertex(i)->point();
           j++;
         }
@@ -474,11 +465,11 @@ Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
       // vnormals.push_back(normal.x());
       // vnormals.push_back(normal.y());
       // vnormals.push_back(normal.z());
-      for(size_t k = 0; k < 3; k++){
+      for(size_t k = 0; k < 3; k++) {
         const Point3 p = points[k];
         Eigen::VectorXd w(4);
         w << p.x(), p.y(), p.z(), 1.0;
-        vertices.conservativeResize(Eigen::NoChange, vertices.cols()+1);
+        vertices.conservativeResize(Eigen::NoChange, vertices.cols() + 1);
         vertices.rightCols(1) = w;
         // vvertices.push_back(p.x());
         // vvertices.push_back(p.y());
@@ -491,9 +482,9 @@ Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
   // vvertices.attr("dim") = Rcpp::Dimension(4, 3*counter);
   // Rcpp::NumericMatrix normals = Rcpp::as<Rcpp::NumericMatrix>(vnormals);
   // Rcpp::NumericMatrix vertices = Rcpp::as<Rcpp::NumericMatrix>(vvertices);
-  Rcpp::IntegerVector vtriangles(3*counter);
-  for(size_t i = 0; i < 3*counter; i++){
-    vtriangles(i) = i+1;
+  Rcpp::IntegerVector vtriangles(3 * counter);
+  for(size_t i = 0; i < 3 * counter; i++) {
+    vtriangles(i) = i + 1;
   }
   vtriangles.attr("dim") = Rcpp::Dimension(3, counter);
   Rcpp::IntegerMatrix triangles = Rcpp::as<Rcpp::IntegerMatrix>(vtriangles);
