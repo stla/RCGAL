@@ -16,6 +16,7 @@
 
 #include <CGAL/Kernel/global_functions.h>
 
+#include <CGAL/Vector_2.h>
 #include <CGAL/Vector_3.h>
 
 //#include <CGAL/Object.h>
@@ -74,22 +75,46 @@ Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
   const size_t npoints = out.size();
 
   Rcpp::IntegerVector ids(npoints);
+  Rcpp::IntegerMatrix edges(npoints, 2);
   Rcpp::NumericMatrix chull(npoints, 2);
+  // Rcpp::NumericMatrix midpoints(npoints, 2);
+  Rcpp::NumericMatrix normals(npoints, 2);
+  // Rcpp::NumericVector lengths(npoints);
   double perimeter = 0;
-  Point2 pt0 = points[out[npoints - 1]];
+  double surface = 0;
+  size_t id0 = out[npoints - 1];
+  Point2 pt0 = points[id0];
   for(size_t i = 0; i < npoints; i++) {
-    const size_t id = out[i];
-    ids[i] = id;
-    Point2 pt1 = points[id];
-    perimeter += sqrt(CGAL::squared_distance(pt0, pt1));
+    const size_t id1 = out[i];
+    ids[i] = id1 + 1;
+    edges(i, 0) = id0 + 1;
+    edges(i, 1) = id1 + 1;
+    Point2 pt1 = points[id1];
+    const double l = sqrt(CGAL::squared_distance(pt0, pt1));
+    // lengths(i) = l;
+    perimeter += l;
+    const Point2 middle = CGAL::midpoint(pt0, pt1);
+    std::array<double, 2> center = {middle.x(), middle.y()};
+    // midpoints(i, 0) = middle.x();
+    // midpoints(i, 1) = middle.y();
+    const CGAL::Vector_2<K> vedge = pt0 - pt1;
+    const Rcpp::NumericVector normal =
+        Rcpp::NumericVector::create(-vedge.y(), vedge.x());
+    normals(i, Rcpp::_) = normal / l;
     chull(i, 0) = pt1.x();
     chull(i, 1) = pt1.y();
     pt0 = pt1;
+    id0 = id1;
+    surface +=
+        std::inner_product(center.begin(), center.end(), normal.begin(), 0.0);
   }
+  surface /= 2.0;
+  edges.attr("normals") = normals;
 
-  return Rcpp::List::create(Rcpp::Named("verticesIds") = ids,
-                            Rcpp::Named("vertices") = chull,
-                            Rcpp::Named("perimeter") = perimeter);
+  return Rcpp::List::create(
+      Rcpp::Named("verticesIds") = ids, Rcpp::Named("vertices") = chull,
+      Rcpp::Named("edges") = edges,
+      Rcpp::Named("surface") = surface, Rcpp::Named("perimeter") = perimeter);
 }
 
 // [[Rcpp::export]]
