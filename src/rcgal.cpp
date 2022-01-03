@@ -25,6 +25,8 @@
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>
 
+#include <CGAL/squared_distance_2.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <array>
@@ -58,8 +60,7 @@ typedef CGAL::Delaunay_triangulation_2<K, Tds> DT2;
 typedef std::pair<Point2, unsigned> IPoint2;
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix cxhull2d(Rcpp::NumericMatrix pts) {
-
+Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
   Points2 points;
   for(int i = 0; i < pts.nrow(); i++) {
     points.push_back(Point2(pts(i, 0), pts(i, 1)));
@@ -70,17 +71,25 @@ Rcpp::NumericMatrix cxhull2d(Rcpp::NumericMatrix pts) {
   CGAL::convex_hull_2(indices.begin(), indices.end(), std::back_inserter(out),
                       CHT2(CGAL::make_property_map(points)));
 
-  size_t npoints = out.size();
+  const size_t npoints = out.size();
 
-  //Rcpp::IntegerMatrix ids(npoints, 2);
+  Rcpp::IntegerMatrix ids(npoints, 2);
   Rcpp::NumericMatrix chull(npoints, 2);
+  double perimeter = 0;
+  Point2 pt0 = points[out[npoints - 1]];
   for(size_t i = 0; i < npoints; i++) {
-    size_t id = out[i];
-    chull(i, 0) = points[id].x();
-    chull(i, 1) = points[id].y();
+    const size_t id = out[i];
+    ids[i] = id;
+    Point2 pt1 = points[id];
+    perimeter += sqrt(CGAL::squared_distance(pt0, pt1));
+    chull(i, 0) = pt1.x();
+    chull(i, 1) = pt1.y();
+    pt0 = pt1;
   }
 
-  return chull;
+  return Rcpp::List::create(Rcpp::Named("verticesIds") = ids,
+                            Rcpp::Named("vertices") = chull,
+                            Rcpp::Named("perimeter") = perimeter);
 }
 
 // [[Rcpp::export]]
