@@ -36,6 +36,8 @@
 #include <RcppEigen.h>
 #include <array>
 #include <vector>
+#include <algorithm>
+#include <map>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 
@@ -314,6 +316,18 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
                             Rcpp::Named("edges") = edges);
 }
 
+Rcpp::String stringTriple(const unsigned i, const unsigned j, const unsigned k){
+  const Rcpp::CharacterVector stringids = Rcpp::CharacterVector::create(
+    std::to_string(i),
+    "-",
+    std::to_string(j),
+    "-",
+    std::to_string(k)
+  );
+  return Rcpp::collapse(stringids);
+}
+
+
 // [[Rcpp::export]]
 Rcpp::List del3d(Rcpp::NumericMatrix pts) {
   const size_t npoints = pts.nrow();
@@ -328,6 +342,7 @@ Rcpp::List del3d(Rcpp::NumericMatrix pts) {
   const size_t nfacets = mesh.number_of_finite_facets();
   const size_t ncells = mesh.number_of_finite_cells();
 
+  std::map<Rcpp::String, size_t> facetsMap = {};
   Rcpp::IntegerMatrix facets(nfacets, 3);
   {
     size_t i = 0;
@@ -337,32 +352,56 @@ Rcpp::List del3d(Rcpp::NumericMatrix pts) {
       DT3::Vertex_handle v0 = facet.first->vertex((facet.second + 1) % 4);
       DT3::Vertex_handle v1 = facet.first->vertex((facet.second + 2) % 4);
       DT3::Vertex_handle v2 = facet.first->vertex((facet.second + 3) % 4);
-      facets(i, 0) = v0->info();
-      facets(i, 1) = v1->info();
-      facets(i, 2) = v2->info();
+      const unsigned id0 = v0->info();
+      const unsigned id1 = v1->info();
+      const unsigned id2 = v2->info();
+      facets(i, 0) = id0;
+      facets(i, 1) = id1;
+      facets(i, 2) = id2;
+      std::array<unsigned, 3> ids = {id0, id1, id2};
+      std::sort(ids.begin(), ids.end());
+      const Rcpp::String facetAsString = stringTriple(ids[0], ids[1], ids[2]);
       i++;
+      facetsMap[facetAsString] = i;
     }
   }
 
-  Rcpp::IntegerMatrix cells(ncells, 4);
-  Rcpp::NumericVector volumes(ncells);
+  Rcpp::List cells(ncells);
+  double totalVolume = 0.0;
   {
     size_t i = 0;
     for(DT3::Finite_cells_iterator cit = mesh.finite_cells_begin();
         cit != mesh.finite_cells_end(); cit++) {
-      cells(i, 0) = cit->vertex(0)->info();
-      cells(i, 1) = cit->vertex(1)->info();
-      cells(i, 2) = cit->vertex(2)->info();
-      cells(i, 3) = cit->vertex(3)->info();
+      const unsigned id0 = cit->vertex(0)->info();
+      const unsigned id1 = cit->vertex(1)->info();
+      const unsigned id2 = cit->vertex(2)->info();
+      const unsigned id3 = cit->vertex(3)->info();
+      Rcpp::IntegerVector cell(4);
+      cell(0) = id0;
+      cell(1) = id1;
+      cell(2) = id2;
+      cell(3) = id3;
+      std::array<unsigned, 4> ids = {id0, id1, id2, id3};
+      std::sort(ids.begin(), ids.end());
+      const Rcpp::IntegerVector faces = Rcpp::IntegerVector::create(
+        facetsMap[stringTriple(ids[0], ids[1], ids[2])],
+        facetsMap[stringTriple(ids[0], ids[1], ids[3])],
+        facetsMap[stringTriple(ids[0], ids[2], ids[3])],
+        facetsMap[stringTriple(ids[1], ids[2], ids[3])]
+      );
       Tetrahedron3 th = CGAL::Tetrahedron_3<K>(
           cit->vertex(0)->point(), cit->vertex(1)->point(),
           cit->vertex(2)->point(), cit->vertex(3)->point());
-      volumes(i) = th.volume();
+      const double volume = th.volume();
+      totalVolume += volume;
+      cells[i] = Rcpp::List::create(Rcpp::Named("cell") = cell,
+                                    Rcpp::Named("faces") = faces,
+                                    Rcpp::Named("volume") = volume);
       i++;
     }
-    cells.attr("volumes") = volumes;
   }
 
   return Rcpp::List::create(Rcpp::Named("cells") = cells,
-                            Rcpp::Named("facets") = facets);
+                            Rcpp::Named("facets") = facets,
+                            Rcpp::Named("volume") = totalVolume);
 }
