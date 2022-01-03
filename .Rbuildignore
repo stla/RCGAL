@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^inst/trash$
+^inst/essais$
+^LICENSE$

@@ -19,6 +19,7 @@
 
 # RStudio files
 .Rproj.user/
+*.Rproj
 
 # produced vignettes
 vignettes/*.html
@@ -44,3 +45,6 @@ src/*.so
 src/*.dll
 src-i386/
 src-x64/
+
+# other
+inst/trash/

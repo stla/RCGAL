@@ -72,7 +72,7 @@ typedef CGAL::Delaunay_triangulation_3<K, Tds3> DT3;
 typedef K::Tetrahedron_3 Tetrahedron3;
 
 // [[Rcpp::export]]
-Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
+Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
   Points2 points;
   for(int i = 0; i < pts.nrow(); i++) {
     points.push_back(Point2(pts(i, 0), pts(i, 1)));
@@ -91,8 +91,8 @@ Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
   // Rcpp::NumericMatrix midpoints(npoints, 2);
   Rcpp::NumericMatrix normals(npoints, 2);
   // Rcpp::NumericVector lengths(npoints);
-  double perimeter = 0;
-  double surface = 0;
+  double perimeter = 0.0;
+  double surface = 0.0;
   size_t id0 = out[npoints - 1];
   Point2 pt0 = points[id0];
   for(size_t i = 0; i < npoints; i++) {
@@ -128,8 +128,9 @@ Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
       Rcpp::Named("perimeter") = perimeter);
 }
 
+
 // [[Rcpp::export]]
-Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
+Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts) {
   const size_t npoints = pts.nrow();
   std::vector<IPoint3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -183,11 +184,9 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
         vids0[counter0] = ivertex.second;
         vpoints0[counter0] = ivertex.first;
         counter0++;
-        Rcpp::Rcout << "face0 : " << ivertex.second << "\n";
       }
       const CGAL::Vector_3<K> normal0 =
           CGAL::unit_normal(vpoints0[0], vpoints0[1], vpoints0[2]);
-      Rcpp::Rcout << "normal0 : " << normal0 << "\n";
 
       const Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
       const Mesh::Face_index face1 = mesh.face(h1);
@@ -200,11 +199,9 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
         vids1[counter1] = ivertex.second;
         vpoints1[counter1] = ivertex.first;
         counter1++;
-        Rcpp::Rcout << "face1 : " << ivertex.second << "\n";
       }
       const CGAL::Vector_3<K> normal1 =
           CGAL::unit_normal(vpoints1[0], vpoints1[1], vpoints1[2]);
-      Rcpp::Rcout << "normal1 : " << normal1 << "\n";
 
       edges(i, 2) = normal0 == normal1 ? 0 : 1;
 
@@ -269,7 +266,7 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List del2d(Rcpp::NumericMatrix pts) {
+Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
   const size_t npoints = pts.nrow();
   std::vector<IPoint2> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -295,9 +292,6 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
       i++;
     }
   }
-
-  Rcpp::Rcout << "**********************************"
-              << "\n";
 
   const DT2::Finite_edges itedges = mesh.finite_edges();
   Rcpp::IntegerMatrix edges(nedges, 2);
@@ -329,7 +323,7 @@ Rcpp::String stringTriple(const unsigned i, const unsigned j, const unsigned k){
 
 
 // [[Rcpp::export]]
-Rcpp::List del3d(Rcpp::NumericMatrix pts) {
+Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
   const size_t npoints = pts.nrow();
   std::vector<IPoint3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {

@@ -11,55 +11,56 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// test
-Rcpp::NumericMatrix test();
-RcppExport SEXP _RCGAL_test() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(test());
-    return rcpp_result_gen;
-END_RCPP
-}
-// cxhull2d
-Rcpp::NumericMatrix cxhull2d(Rcpp::NumericMatrix pts);
-RcppExport SEXP _RCGAL_cxhull2d(SEXP ptsSEXP) {
+// cxhull2d_cpp
+Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts);
+RcppExport SEXP _RCGAL_cxhull2d_cpp(SEXP ptsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
-    rcpp_result_gen = Rcpp::wrap(cxhull2d(pts));
+    rcpp_result_gen = Rcpp::wrap(cxhull2d_cpp(pts));
     return rcpp_result_gen;
 END_RCPP
 }
-// cxhull3d
-Rcpp::NumericMatrix cxhull3d(Rcpp::NumericMatrix pts);
-RcppExport SEXP _RCGAL_cxhull3d(SEXP ptsSEXP) {
+// cxhull3d_cpp
+Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts);
+RcppExport SEXP _RCGAL_cxhull3d_cpp(SEXP ptsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
-    rcpp_result_gen = Rcpp::wrap(cxhull3d(pts));
+    rcpp_result_gen = Rcpp::wrap(cxhull3d_cpp(pts));
     return rcpp_result_gen;
 END_RCPP
 }
-// cxhull3d2
-Rcpp::List cxhull3d2(Rcpp::NumericMatrix pts);
-RcppExport SEXP _RCGAL_cxhull3d2(SEXP ptsSEXP) {
+// del2d_cpp
+Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts);
+RcppExport SEXP _RCGAL_del2d_cpp(SEXP ptsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
-    rcpp_result_gen = Rcpp::wrap(cxhull3d2(pts));
+    rcpp_result_gen = Rcpp::wrap(del2d_cpp(pts));
+    return rcpp_result_gen;
+END_RCPP
+}
+// del3d_cpp
+Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts);
+RcppExport SEXP _RCGAL_del3d_cpp(SEXP ptsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
+    rcpp_result_gen = Rcpp::wrap(del3d_cpp(pts));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RCGAL_test", (DL_FUNC) &_RCGAL_test, 0},
-    {"_RCGAL_cxhull2d", (DL_FUNC) &_RCGAL_cxhull2d, 1},
-    {"_RCGAL_cxhull3d", (DL_FUNC) &_RCGAL_cxhull3d, 1},
-    {"_RCGAL_cxhull3d2", (DL_FUNC) &_RCGAL_cxhull3d2, 1},
+    {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
+    {"_RCGAL_cxhull3d_cpp", (DL_FUNC) &_RCGAL_cxhull3d_cpp, 1},
+    {"_RCGAL_del2d_cpp", (DL_FUNC) &_RCGAL_del2d_cpp, 1},
+    {"_RCGAL_del3d_cpp", (DL_FUNC) &_RCGAL_del3d_cpp, 1},
     {NULL, NULL, 0}
 };
 
