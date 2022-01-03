@@ -1,11 +1,19 @@
-data(bunny, package = "onion")
-afs <- RCGAL:::AFSreconstruction(bunny)
-
-pts <- uniformly::runif_on_sphere(1500, 3)
-afs <- RCGAL:::AFSreconstruction(pts)
-
+library(RCGAL)
 library(rgl)
-mesh <- tmesh3d(afs$vertices, afs$triangles, normals=afs$normals)
-library(Rvcg)
-mm <- vcgClean(mesh, sel = c(0,7))
-shade3d(mm, color = "red")
+
+data(bunny, package = "onion")
+mesh <- AFSreconstruction(bunny)
+
+pts <- uniformly::runif_on_sphere(500, 3)
+mesh <- AFSreconstruction(pts)
+shade3d(mesh, color = "red")
+
+tp <- tessellation::teapot()
+mesh <- AFSreconstruction(tp)
+shade3d(mesh, color = "red")
+
+data(dummyhead, package = "Rvcg")
+dummyhead <- t(dummyhead.mesh$vb[-4L, ])
+mesh <- AFSreconstruction(dummyhead)
+shade3d(mesh, color = "red")
+

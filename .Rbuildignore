@@ -3,3 +3,4 @@
 ^inst/trash$
 ^inst/essais$
 ^LICENSE$
+^\.github$

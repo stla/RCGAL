@@ -12,4 +12,6 @@ Imports: Rcpp (>= 1.0.7), rgl, Rvcg
 LinkingTo: Rcpp, RcppCGAL, RcppEigen, BH
 Suggests: onion
 SystemRequirements: C++ 14, gmp, mpfr
+URL: https://github.com/stla/RCGAL
+BugReports: https://github.com/stla/RCGAL/issues
 RoxygenNote: 7.1.2
