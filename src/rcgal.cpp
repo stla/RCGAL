@@ -174,10 +174,17 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
 
       i++;
     }
+    Rcpp::CharacterVector columnNames =
+        Rcpp::CharacterVector::create("i1", "i2", "border");
+    Rcpp::colnames(edges) = columnNames;
+    edges.attr("info") = "The `border` column indicates border edges.";
   }
 
+  Rcpp::NumericMatrix circumcenters(nfaces, 3);
+  Rcpp::NumericMatrix normals(nfaces, 3);
   Rcpp::NumericVector areas(nfaces);
   double totalArea = 0;
+  double volume = 0;
   Rcpp::IntegerMatrix faces(nfaces, 3);
   {
     size_t i = 0;
@@ -191,18 +198,38 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
         fa_vertices[j] = ivertex.first;
         j++;
       }
-      double area = sqrt(CGAL::squared_area(fa_vertices[0], fa_vertices[1], fa_vertices[2]));
+      const double area = sqrt(
+          CGAL::squared_area(fa_vertices[0], fa_vertices[1], fa_vertices[2]));
       totalArea += area;
       areas(i) = area;
+      const CGAL::Vector_3<K> normal =
+          CGAL::unit_normal(fa_vertices[0], fa_vertices[1], fa_vertices[2]);
+      normals(i, 0) = normal.x();
+      normals(i, 1) = normal.y();
+      normals(i, 2) = normal.z();
+      const Point3 circumcenter =
+          CGAL::circumcenter(fa_vertices[0], fa_vertices[1], fa_vertices[2]);
+      circumcenters(i, 0) = circumcenter.x();
+      circumcenters(i, 1) = circumcenter.y();
+      circumcenters(i, 2) = circumcenter.z();
+
       i++;
     }
     faces.attr("areas") = areas;
+    faces.attr("normals") = normals;
+    faces.attr("circumcenters") = circumcenters;
+    for(size_t k = 0; k < nfaces; ++k) {
+      const Rcpp::NumericVector center_k = circumcenters(k, Rcpp::_);
+      volume += areas(k) * std::inner_product(center_k.begin(), center_k.end(),
+                                              normals(k, Rcpp::_).begin(), 0.0);
+    }
+    volume /= 3;
   }
 
-  return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            Rcpp::Named("edges") = edges,
-                            Rcpp::Named("faces") = faces,
-                            Rcpp::Named("surface") = totalArea);
+  return Rcpp::List::create(
+      Rcpp::Named("vertices") = vertices, Rcpp::Named("edges") = edges,
+      Rcpp::Named("faces") = faces, Rcpp::Named("surface") = totalArea,
+      Rcpp::Named("volume") = volume);
 }
 
 // [[Rcpp::export]]
