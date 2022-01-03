@@ -334,9 +334,9 @@ Rcpp::List del3d(Rcpp::NumericMatrix pts) {
     for(DT3::Finite_facets_iterator fit = mesh.finite_facets_begin();
         fit != mesh.finite_facets_end(); fit++) {
       std::pair<DT3::Cell_handle, int> facet = *fit;
-      DT3::Vertex_handle v0 = facet.first->vertex((facet.second + 1) % 3);
-      DT3::Vertex_handle v1 = facet.first->vertex((facet.second + 2) % 3);
-      DT3::Vertex_handle v2 = facet.first->vertex((facet.second + 3) % 3);
+      DT3::Vertex_handle v0 = facet.first->vertex((facet.second + 1) % 4);
+      DT3::Vertex_handle v1 = facet.first->vertex((facet.second + 2) % 4);
+      DT3::Vertex_handle v2 = facet.first->vertex((facet.second + 3) % 4);
       facets(i, 0) = v0->info();
       facets(i, 1) = v1->info();
       facets(i, 2) = v2->info();
