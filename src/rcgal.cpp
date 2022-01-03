@@ -439,9 +439,10 @@ Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
   reconstruction.run();
   const AFS_Tds2& tds = reconstruction.triangulation_data_structure_2();
 
-  Rcpp::NumericVector vnormals(0);
-  Rcpp::NumericVector vvertices(0);
-  //Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> normals(nrows, ncols);
+  //Rcpp::NumericVector vnormals(0);
+  //Rcpp::NumericVector vvertices(0);
+  Eigen::MatrixXd normals(3, 0);
+  Eigen::MatrixXd vertices(4, 0);
   unsigned counter = 0;
   for(AFS_Tds2::Face_iterator fit = tds.faces_begin(); fit != tds.faces_end();
       ++fit){
@@ -458,34 +459,44 @@ Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
         }
       }
       Vector3 normal = CGAL::unit_normal(points[0], points[1], points[2]);
-      vnormals.push_back(normal.x());
-      vnormals.push_back(normal.y());
-      vnormals.push_back(normal.z());
-      vnormals.push_back(normal.x());
-      vnormals.push_back(normal.y());
-      vnormals.push_back(normal.z());
-      vnormals.push_back(normal.x());
-      vnormals.push_back(normal.y());
-      vnormals.push_back(normal.z());
+      Eigen::VectorXd v(3);
+      v << normal.x(), normal.y(), normal.z();
+      Eigen::MatrixXd M(3, 3);
+      M << v, v, v;
+      normals.conservativeResize(Eigen::NoChange, normals.cols() + 3);
+      normals.rightCols(3) = M;
+      // vnormals.push_back(normal.x());
+      // vnormals.push_back(normal.y());
+      // vnormals.push_back(normal.z());
+      // vnormals.push_back(normal.x());
+      // vnormals.push_back(normal.y());
+      // vnormals.push_back(normal.z());
+      // vnormals.push_back(normal.x());
+      // vnormals.push_back(normal.y());
+      // vnormals.push_back(normal.z());
       for(size_t k = 0; k < 3; k++){
         const Point3 p = points[k];
-        vvertices.push_back(p.x());
-        vvertices.push_back(p.y());
-        vvertices.push_back(p.z());
-        vvertices.push_back(1.0);
+        Eigen::VectorXd w(4);
+        w << p.x(), p.y(), p.z(), 1.0;
+        vertices.conservativeResize(Eigen::NoChange, vertices.cols()+1);
+        vertices.rightCols(1) = w;
+        // vvertices.push_back(p.x());
+        // vvertices.push_back(p.y());
+        // vvertices.push_back(p.z());
+        // vvertices.push_back(1.0);
       }
     }
   }
-  vnormals.attr("dim") = Rcpp::Dimension(3, 3*counter);
-  vvertices.attr("dim") = Rcpp::Dimension(4, 3*counter);
-  Rcpp::NumericMatrix normals = Rcpp::as<Rcpp::NumericMatrix>(vnormals);
-  Rcpp::NumericMatrix vertices = Rcpp::as<Rcpp::NumericMatrix>(vvertices);
+  // vnormals.attr("dim") = Rcpp::Dimension(3, 3*counter);
+  // vvertices.attr("dim") = Rcpp::Dimension(4, 3*counter);
+  // Rcpp::NumericMatrix normals = Rcpp::as<Rcpp::NumericMatrix>(vnormals);
+  // Rcpp::NumericMatrix vertices = Rcpp::as<Rcpp::NumericMatrix>(vvertices);
   Rcpp::IntegerVector vtriangles(3*counter);
   for(size_t i = 0; i < 3*counter; i++){
     vtriangles(i) = i+1;
   }
   vtriangles.attr("dim") = Rcpp::Dimension(3, counter);
-  Rcpp::NumericMatrix triangles = Rcpp::as<Rcpp::NumericMatrix>(vtriangles);
+  Rcpp::IntegerMatrix triangles = Rcpp::as<Rcpp::IntegerMatrix>(vtriangles);
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
                             Rcpp::Named("normals") = normals,

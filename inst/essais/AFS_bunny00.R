@@ -6,3 +6,6 @@ afs <- RCGAL:::AFSreconstruction(pts)
 
 library(rgl)
 mesh <- tmesh3d(afs$vertices, afs$triangles, normals=-afs$normals)
+library(Rvcg)
+mm <- vcgClean(mesh, sel = c(0,7))
+shade3d(mm, color = "red")

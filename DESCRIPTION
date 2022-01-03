@@ -10,5 +10,5 @@ Encoding: UTF-8
 License: GPL-3
 Imports: Rcpp (>= 1.0.7)
 LinkingTo: Rcpp, RcppCGAL, RcppEigen, BH
-SystemRequirements: C++ 14, gmp
+SystemRequirements: C++ 14, gmp, mpfr
 RoxygenNote: 7.1.2
