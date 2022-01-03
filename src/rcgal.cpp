@@ -28,6 +28,10 @@
 
 #include <CGAL/squared_distance_2.h>
 
+#include <CGAL/Delaunay_triangulation_3.h>
+#include <CGAL/Tetrahedron_3.h>
+#include <CGAL/Triangulation_vertex_base_with_info_3.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <array>
@@ -55,10 +59,15 @@ typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
 typedef Mesh::Face_index face_descriptor;
 
-typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb;
-typedef CGAL::Triangulation_data_structure_2<Vb> Tds;
-typedef CGAL::Delaunay_triangulation_2<K, Tds> DT2;
+typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb2;
+typedef CGAL::Triangulation_data_structure_2<Vb2> Tds2;
+typedef CGAL::Delaunay_triangulation_2<K, Tds2> DT2;
 typedef std::pair<Point2, unsigned> IPoint2;
+
+typedef CGAL::Triangulation_vertex_base_with_info_3<unsigned, K> Vb3;
+typedef CGAL::Triangulation_data_structure_3<Vb3> Tds3;
+typedef CGAL::Delaunay_triangulation_3<K, Tds3> DT3;
+typedef K::Tetrahedron_3 Tetrahedron3;
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
@@ -303,4 +312,57 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
 
   return Rcpp::List::create(Rcpp::Named("faces") = faces,
                             Rcpp::Named("edges") = edges);
+}
+
+// [[Rcpp::export]]
+Rcpp::List del3d(Rcpp::NumericMatrix pts) {
+  const size_t npoints = pts.nrow();
+  std::vector<IPoint3> points(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    points[i] = std::make_pair(Point3(pts(i, 0), pts(i, 1), pts(i, 2)), i + 1);
+  }
+
+  // compute Delaunay mesh
+  const DT3 mesh(points.begin(), points.end());
+
+  const size_t nfacets = mesh.number_of_finite_facets();
+  const size_t ncells = mesh.number_of_finite_cells();
+
+  Rcpp::IntegerMatrix facets(nfacets, 3);
+  {
+    size_t i = 0;
+    for(DT3::Finite_facets_iterator fit = mesh.finite_facets_begin();
+        fit != mesh.finite_facets_end(); fit++) {
+      std::pair<DT3::Cell_handle, int> facet = *fit;
+      DT3::Vertex_handle v0 = facet.first->vertex((facet.second + 1) % 3);
+      DT3::Vertex_handle v1 = facet.first->vertex((facet.second + 2) % 3);
+      DT3::Vertex_handle v2 = facet.first->vertex((facet.second + 3) % 3);
+      facets(i, 0) = v0->info();
+      facets(i, 1) = v1->info();
+      facets(i, 2) = v2->info();
+      i++;
+    }
+  }
+
+  Rcpp::IntegerMatrix cells(ncells, 4);
+  Rcpp::NumericVector volumes(ncells);
+  {
+    size_t i = 0;
+    for(DT3::Finite_cells_iterator cit = mesh.finite_cells_begin();
+        cit != mesh.finite_cells_end(); cit++) {
+      cells(i, 0) = cit->vertex(0)->info();
+      cells(i, 1) = cit->vertex(1)->info();
+      cells(i, 2) = cit->vertex(2)->info();
+      cells(i, 3) = cit->vertex(3)->info();
+      Tetrahedron3 th = CGAL::Tetrahedron_3<K>(
+          cit->vertex(0)->point(), cit->vertex(1)->point(),
+          cit->vertex(2)->point(), cit->vertex(3)->point());
+      volumes(i) = th.volume();
+      i++;
+    }
+    cells.attr("volumes") = volumes;
+  }
+
+  return Rcpp::List::create(Rcpp::Named("cells") = cells,
+                            Rcpp::Named("facets") = facets);
 }
