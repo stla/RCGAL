@@ -94,7 +94,7 @@ Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
     // lengths(i) = l;
     perimeter += l;
     const Point2 middle = CGAL::midpoint(pt0, pt1);
-    std::array<double, 2> center = {middle.x(), middle.y()};
+    const std::array<double, 2> center = {middle.x(), middle.y()};
     // midpoints(i, 0) = middle.x();
     // midpoints(i, 1) = middle.y();
     const CGAL::Vector_2<K> vedge = pt0 - pt1;
@@ -113,8 +113,8 @@ Rcpp::List cxhull2d(Rcpp::NumericMatrix pts) {
 
   return Rcpp::List::create(
       Rcpp::Named("verticesIds") = ids, Rcpp::Named("vertices") = chull,
-      Rcpp::Named("edges") = edges,
-      Rcpp::Named("surface") = surface, Rcpp::Named("perimeter") = perimeter);
+      Rcpp::Named("edges") = edges, Rcpp::Named("surface") = surface,
+      Rcpp::Named("perimeter") = perimeter);
 }
 
 // [[Rcpp::export]]
@@ -259,14 +259,14 @@ Rcpp::List cxhull3d(Rcpp::NumericMatrix pts) {
 
 // [[Rcpp::export]]
 Rcpp::List del2d(Rcpp::NumericMatrix pts) {
-  size_t npoints = pts.nrow();
+  const size_t npoints = pts.nrow();
   std::vector<IPoint2> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
     points[i] = std::make_pair(Point2(pts(i, 0), pts(i, 1)), i + 1);
   }
 
   // compute Delaunay mesh
-  DT2 mesh(points.begin(), points.end());
+  const DT2 mesh(points.begin(), points.end());
 
   const size_t nfaces = mesh.number_of_faces();
   const size_t h =
@@ -288,21 +288,19 @@ Rcpp::List del2d(Rcpp::NumericMatrix pts) {
   Rcpp::Rcout << "**********************************"
               << "\n";
 
-  DT2::Finite_edges itedges = mesh.finite_edges();
+  const DT2::Finite_edges itedges = mesh.finite_edges();
   Rcpp::IntegerMatrix edges(nedges, 2);
   {
     size_t i = 0;
     for(DT2::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
         eit++) {
-      std::pair<DT2::Face_handle, int> edge = *eit;
+      const std::pair<DT2::Face_handle, int> edge = *eit;
       edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info();
       edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();
       i++;
     }
   }
 
-  Rcpp::List out = Rcpp::List::create(Rcpp::Named("faces") = faces,
-                                      Rcpp::Named("edges") = edges);
-
-  return out;
+  return Rcpp::List::create(Rcpp::Named("faces") = faces,
+                            Rcpp::Named("edges") = edges);
 }
