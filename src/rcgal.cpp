@@ -32,6 +32,8 @@
 #include <CGAL/Tetrahedron_3.h>
 #include <CGAL/Triangulation_vertex_base_with_info_3.h>
 
+#include <CGAL/utility.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <array>
@@ -335,6 +337,20 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
 
   const size_t nfacets = mesh.number_of_finite_facets();
   const size_t ncells = mesh.number_of_finite_cells();
+  const size_t nedges = mesh.number_of_finite_edges();
+
+  const DT3::Finite_edges itedges = mesh.finite_edges();
+  Rcpp::IntegerMatrix edges(nedges, 2);
+  {
+    size_t i = 0;
+    for(DT3::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
+    eit++) {
+      const CGAL::Triple<DT3::Cell_handle, int, int> edge = *eit;
+      edges(i, 0) = edge.first->vertex(edge.second % 4)->info();
+      edges(i, 1) = edge.first->vertex(edge.third % 4)->info();
+      i++;
+    }
+  }
 
   std::map<Rcpp::String, size_t> facetsMap = {};
   Rcpp::IntegerMatrix facets(nfacets, 3);
@@ -397,5 +413,6 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
 
   return Rcpp::List::create(Rcpp::Named("cells") = cells,
                             Rcpp::Named("facets") = facets,
+                            Rcpp::Named("edges") = edges,
                             Rcpp::Named("volume") = totalVolume);
 }
