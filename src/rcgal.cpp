@@ -34,6 +34,8 @@
 
 #include <CGAL/utility.h>
 
+#include <CGAL/Advancing_front_surface_reconstruction.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <array>
@@ -72,6 +74,12 @@ typedef CGAL::Triangulation_vertex_base_with_info_3<unsigned, K> Vb3;
 typedef CGAL::Triangulation_data_structure_3<Vb3> Tds3;
 typedef CGAL::Delaunay_triangulation_3<K, Tds3> DT3;
 typedef K::Tetrahedron_3 Tetrahedron3;
+
+typedef CGAL::Advancing_front_surface_reconstruction<> AFS_reconstruction;
+typedef AFS_reconstruction::Triangulation_3 AFS_triangulation3;
+typedef AFS_reconstruction::Triangulation_data_structure_2 AFS_Tds2;
+typedef K::Vector_3 Vector3;
+
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -415,4 +423,71 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
                             Rcpp::Named("facets") = facets,
                             Rcpp::Named("edges") = edges,
                             Rcpp::Named("volume") = totalVolume);
+}
+
+
+// [[Rcpp::export]]
+Rcpp::List AFSreconstruction(Rcpp::NumericMatrix pts) {
+  const size_t npoints = pts.nrow();
+  std::vector<Point3> points(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    points[i] = Point3(pts(i, 0), pts(i, 1), pts(i, 2));
+  }
+
+  AFS_triangulation3 dt(points.begin(), points.end());
+  AFS_reconstruction reconstruction(dt);
+  reconstruction.run();
+  const AFS_Tds2& tds = reconstruction.triangulation_data_structure_2();
+
+  Rcpp::NumericVector vnormals(0);
+  Rcpp::NumericVector vvertices(0);
+  //Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> normals(nrows, ncols);
+  unsigned counter = 0;
+  for(AFS_Tds2::Face_iterator fit = tds.faces_begin(); fit != tds.faces_end();
+      ++fit){
+    if(reconstruction.has_on_surface(fit)){
+      counter++;
+      AFS_triangulation3::Facet f = fit->facet();
+      AFS_triangulation3::Cell_handle ch = f.first;
+      int ci = f.second;
+      Point3 points[3];
+      for(int i = 0, j = 0; i < 4; i++){
+        if(ci != i){
+          points[j] = ch->vertex(i)->point();
+          j++;
+        }
+      }
+      Vector3 normal = CGAL::unit_normal(points[0], points[1], points[2]);
+      vnormals.push_back(normal.x());
+      vnormals.push_back(normal.y());
+      vnormals.push_back(normal.z());
+      vnormals.push_back(normal.x());
+      vnormals.push_back(normal.y());
+      vnormals.push_back(normal.z());
+      vnormals.push_back(normal.x());
+      vnormals.push_back(normal.y());
+      vnormals.push_back(normal.z());
+      for(size_t k = 0; k < 3; k++){
+        const Point3 p = points[k];
+        vvertices.push_back(p.x());
+        vvertices.push_back(p.y());
+        vvertices.push_back(p.z());
+        vvertices.push_back(1.0);
+      }
+    }
+  }
+  vnormals.attr("dim") = Rcpp::Dimension(3, 3*counter);
+  vvertices.attr("dim") = Rcpp::Dimension(4, 3*counter);
+  Rcpp::NumericMatrix normals = Rcpp::as<Rcpp::NumericMatrix>(vnormals);
+  Rcpp::NumericMatrix vertices = Rcpp::as<Rcpp::NumericMatrix>(vvertices);
+  Rcpp::IntegerVector vtriangles(3*counter);
+  for(size_t i = 0; i < 3*counter; i++){
+    vtriangles(i) = i+1;
+  }
+  vtriangles.attr("dim") = Rcpp::Dimension(3, counter);
+  Rcpp::NumericMatrix triangles = Rcpp::as<Rcpp::NumericMatrix>(vtriangles);
+
+  return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
+                            Rcpp::Named("normals") = normals,
+                            Rcpp::Named("triangles") = triangles);
 }
