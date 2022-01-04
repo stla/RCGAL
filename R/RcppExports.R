@@ -21,7 +21,11 @@ AFSreconstruction_cpp <- function(pts) {
     .Call(`_RCGAL_AFSreconstruction_cpp`, pts)
 }
 
-AFSreconstruction_perimeter_cpp <- function(pts) {
-    .Call(`_RCGAL_AFSreconstruction_perimeter_cpp`, pts)
+AFSreconstruction_perimeter_cpp <- function(pts, per) {
+    .Call(`_RCGAL_AFSreconstruction_perimeter_cpp`, pts, per)
+}
+
+Poisson_reconstruction_cpp <- function(pts, normals) {
+    .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals)
 }
 

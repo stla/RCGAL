@@ -67,13 +67,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // AFSreconstruction_perimeter_cpp
-Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts);
-RcppExport SEXP _RCGAL_AFSreconstruction_perimeter_cpp(SEXP ptsSEXP) {
+Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts, double per);
+RcppExport SEXP _RCGAL_AFSreconstruction_perimeter_cpp(SEXP ptsSEXP, SEXP perSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
-    rcpp_result_gen = Rcpp::wrap(AFSreconstruction_perimeter_cpp(pts));
+    Rcpp::traits::input_parameter< double >::type per(perSEXP);
+    rcpp_result_gen = Rcpp::wrap(AFSreconstruction_perimeter_cpp(pts, per));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Poisson_reconstruction_cpp
+Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts, Rcpp::NumericMatrix normals);
+RcppExport SEXP _RCGAL_Poisson_reconstruction_cpp(SEXP ptsSEXP, SEXP normalsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type normals(normalsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Poisson_reconstruction_cpp(pts, normals));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -84,7 +97,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_del2d_cpp", (DL_FUNC) &_RCGAL_del2d_cpp, 1},
     {"_RCGAL_del3d_cpp", (DL_FUNC) &_RCGAL_del3d_cpp, 1},
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
-    {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 1},
+    {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
+    {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 2},
     {NULL, NULL, 0}
 };
 
