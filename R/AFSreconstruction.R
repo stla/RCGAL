@@ -33,6 +33,6 @@ AFSreconstruction <- function(
   storage.mode(points) <- "double"
   afs <- AFSreconstruction_cpp(points)
   rglmesh <-
-    tmesh3d(afs[["vertices"]], afs[["triangles"]], normals = afs[["normals"]])
+    tmesh3d(afs[["vertices"]], afs[["triangles"]], normals = NULL)#afs[["normals"]])
   vcgClean(rglmesh, sel = c(0, 7), silent = TRUE)
 }

@@ -1,0 +1,10 @@
+#' @title A point cloud of a solid Möbius strip
+#'
+#' @description A matrix containing some points forming a solid Möbius strip.
+#'
+#' @format A matrix with 10000 rows and 3 columns. The 10000 points have been
+#'   sampled at random from a mesh containing more than 400000 rows, obtained
+#'   with help of the \strong{misc3d} package.
+#'
+#' @references \url{http://data.imaginary-exhibition.com/IMAGINARY-Moebiusband-Stephan-Klaus.pdf}
+"SolidMobiusStrip"

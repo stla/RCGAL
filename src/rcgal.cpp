@@ -3,6 +3,13 @@
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins(cpp14)]]
 //#define CGAL_EIGEN3_ENABLED
+
+// #include <CGAL/assertions.h>
+// #undef CGAL_error
+// #define CGAL_error
+// #undef CGAL_error_msg
+// #define CGAL_error_msg(msg)
+
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Polyhedron_3.h>
 #include <CGAL/Convex_hull_traits_adapter_2.h>
@@ -490,6 +497,6 @@ Rcpp::List AFSreconstruction_cpp(Rcpp::NumericMatrix pts) {
   Rcpp::IntegerMatrix triangles = Rcpp::as<Rcpp::IntegerMatrix>(vtriangles);
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            Rcpp::Named("normals") = normals,
+                            //Rcpp::Named("normals") = normals,
                             Rcpp::Named("triangles") = triangles);
 }

@@ -4,3 +4,4 @@
 ^inst/essais$
 ^LICENSE$
 ^\.github$
+^data-raw$

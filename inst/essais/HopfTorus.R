@@ -1,0 +1,78 @@
+library(RCGAL)
+library(rgl)
+
+HT <- function(u, v, nlobes, A){
+  p2 <- sin(pi/2 - (pi/2-A)*cos(u*nlobes)) * cos(u+A*sin(2*u*nlobes))
+  p3 <- sin(pi/2 - (pi/2-A)*cos(u*nlobes)) * sin(u+A*sin(2*u*nlobes))
+  p1 <- cos(pi/2 - (pi/2-A)*cos(u*nlobes))
+  yden <- sqrt(2*(1+p1))
+  y1 <- (1+p1)/yden
+  y2 <- p2/yden
+  y3 <- p3/yden
+  x4 <- cos(v) * y1
+  x3 <- sin(v) * y1
+  x2 <- cos(v)*y2 - sin(v)*y3
+  x1 <- cos(v)*y3 + sin(v)*y2
+  c(x1, x2, x3) / (1-x4)
+}
+
+xprod <- function(v, w){
+  c(v[2]*w[3] - v[3]*w[2], v[3]*w[1] - v[1]*w[3], v[1]*w[2] - v[2]*w[1])
+}
+
+hmesh <- function(nu, nv, normals = TRUE, nlobes = 3, A = 0.44, ...){
+  vs <- matrix(NA_real_, nrow=3, ncol=nu*nv)
+  u_ <- seq(0, 2*pi, length.out = nu+1)[-1]
+  v_ <- seq(0, 2*pi, length.out = nv+1)[-1]
+  for(i in 1:nu){
+    for(j in 1:nv){
+      vs[,(i-1)*nv+j] <- HT(u_[i], v_[j], nlobes, A)
+    }
+  }
+  if(normals){
+    Normals <- matrix(NA_real_, nrow=4, ncol=nu*nv)
+    for(i in 1L:nu){
+      im1 <- ifelse(i==1L, nu, i-1L)
+      ip1 <- ifelse(i==nu, 1L, i+1L)
+      for(j in 1L:nv){
+        jm1 <- ifelse(j==1L, nv, j-1L)
+        jp1 <- ifelse(j==nv, 1L, j+1L)
+        n1 <- xprod(vs[,(i-1)*nv+jp1]-vs[,(i-1)*nv+j],
+                    vs[,(ip1-1)*nv+j]-vs[,(i-1)*nv+j])
+        n2 <- -xprod(vs[,(i-1)*nv+jm1]-vs[,(i-1)*nv+j],
+                     vs[,(ip1-1)*nv+jm1]-vs[,(i-1)*nv+j])
+        n3 <- xprod(vs[,(im1-1)*nv+j]-vs[,(i-1)*nv+j],
+                    vs[,(im1-1)*nv+jp1]-vs[,(i-1)*nv+j])
+        n4 <- xprod(vs[,(ip1-1)*nv+j]-vs[,(i-1)*nv+j],
+                    vs[,(ip1-1)*nv+jm1]-vs[,(i-1)*nv+j])
+        n5 <- -xprod(vs[,(im1-1)*nv+j]-vs[,(i-1)*nv+j],
+                     vs[,(i-1)*nv+jm1]-vs[,(i-1)*nv+j])
+        n6 <- xprod(vs[,(im1-1)*nv+jp1]-vs[,(i-1)*nv+j],
+                    vs[,(i-1)*nv+jp1]-vs[,(i-1)*nv+j])
+        Normals[,(i-1)*nv+j] <- c(c(n1+n2+n3+n4+n5+n6)/6,1)
+      }
+    }
+  }
+  tris1 <- matrix(NA_integer_, nrow=3, ncol=nu*nv)
+  tris2 <- matrix(NA_integer_, nrow=3, ncol=nu*nv)
+  for(i in 1L:nu){
+    ip1 <- ifelse(i==nu, 1L, i+1L)
+    for(j in 1L:nv){
+      jp1 <- ifelse(j==nv, 1L, j+1L)
+      tris1[,(i-1)*nv+j] <- c((i-1L)*nv+j,(i-1L)*nv+jp1, (ip1-1L)*nv+j)
+      tris2[,(i-1)*nv+j] <- c((i-1L)*nv+jp1,(ip1-1L)*nv+jp1,(ip1-1L)*nv+j)
+    }
+  }
+  tmesh3d(
+    vertices = rbind(vs, 1),
+    indices = cbind(tris1, tris2),
+    normals = if(normals) Normals else NULL
+  )
+}
+
+hopf <- hmesh(200, 200)
+points <- t(hopf$vb[-4L, ])
+points <- points[sample.int(40000, 10000), ]
+
+mesh <- AFSreconstruction(points)
+shade3d(mesh, color = "red")
