@@ -46,6 +46,9 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/tuple.h>
 
+#include <CGAL/Polyhedron_3.h>
+#include <CGAL/Polyhedron_items_with_id_3.h>
+#include <CGAL/poisson_surface_reconstruction.h>
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -92,6 +95,9 @@ typedef AFS_reconstruction::Triangulation_data_structure_2 AFS_Tds2;
 typedef K::Vector_3 Vector3;
 
 typedef CGAL::Simple_cartesian<double> KSC;
+
+typedef std::pair<Point3, Vector3> P3wn;
+typedef CGAL::Polyhedron_3<K, CGAL::Polyhedron_items_with_id_3> Polyhedron;
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -484,66 +490,65 @@ Rcpp::List AFSreconstruction_cpp(Rcpp::NumericMatrix pts) {
   Rcpp::IntegerMatrix triangles = Rcpp::as<Rcpp::IntegerMatrix>(vtriangles);
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            //Rcpp::Named("normals") = normals,
+                            // Rcpp::Named("normals") = normals,
                             Rcpp::Named("triangles") = triangles);
 }
 
-
 struct Perimeter {
   double bound;
-  Perimeter(double bound)
-    : bound(bound)
-  {}
+  Perimeter(double bound) : bound(bound) {}
   template <typename AdvancingFront, typename Cell_handle>
-  double operator() (const AdvancingFront& adv, Cell_handle& c,
-                  const int& index) const
-  {
+  double operator()(const AdvancingFront& adv,
+                    Cell_handle& c,
+                    const int& index) const {
     // bound == 0 is better than bound < infinity
     // as it avoids the distance computations
-    if(bound == 0){
-      return adv.smallest_radius_delaunay_sphere (c, index);
+    if(bound == 0) {
+      return adv.smallest_radius_delaunay_sphere(c, index);
     }
     // If perimeter > bound, return infinity so that facet is not used
     double d = 0;
-    d = sqrt(squared_distance(c->vertex((index+1)%4)->point(),
-                              c->vertex((index+2)%4)->point()));
-    if(d>bound) return adv.infinity();
-    d += sqrt(squared_distance(c->vertex((index+2)%4)->point(),
-                               c->vertex((index+3)%4)->point()));
-    if(d>bound) return adv.infinity();
-    d += sqrt(squared_distance(c->vertex((index+1)%4)->point(),
-                               c->vertex((index+3)%4)->point()));
-    if(d>bound) return adv.infinity();
+    d = sqrt(squared_distance(c->vertex((index + 1) % 4)->point(),
+                              c->vertex((index + 2) % 4)->point()));
+    if(d > bound)
+      return adv.infinity();
+    d += sqrt(squared_distance(c->vertex((index + 2) % 4)->point(),
+                               c->vertex((index + 3) % 4)->point()));
+    if(d > bound)
+      return adv.infinity();
+    d += sqrt(squared_distance(c->vertex((index + 1) % 4)->point(),
+                               c->vertex((index + 3) % 4)->point()));
+    if(d > bound)
+      return adv.infinity();
     // Otherwise, return usual priority value: smallest radius of
     // delaunay sphere
-    return adv.smallest_radius_delaunay_sphere (c, index);
+    return adv.smallest_radius_delaunay_sphere(c, index);
   }
 };
 
 // [[Rcpp::export]]
-Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts) {
+Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts,
+                                           double per) {
   const size_t npoints = pts.nrow();
   std::vector<KSC::Point_3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
     points[i] = KSC::Point_3(pts(i, 0), pts(i, 1), pts(i, 2));
   }
 
-  double per = 0;
+  // double per = 0;
   double radius_ratio_bound = 5.0;
 
-  std::vector<std::array<size_t,3>> facets;
+  std::vector<std::array<size_t, 3>> facets;
 
   Perimeter perimeter(per);
-  CGAL::advancing_front_surface_reconstruction(points.begin(),
-                                               points.end(),
+  CGAL::advancing_front_surface_reconstruction(points.begin(), points.end(),
                                                std::back_inserter(facets),
-                                               perimeter,
-                                               radius_ratio_bound);
+                                               perimeter, radius_ratio_bound);
 
   size_t nfacets = facets.size();
   Rcpp::IntegerMatrix triangles(3, nfacets);
-  for(size_t j = 0; j < nfacets; j++){
-    std::array<size_t,3> facet = facets[j];
+  for(size_t j = 0; j < nfacets; j++) {
+    std::array<size_t, 3> facet = facets[j];
     triangles(0, j) = facet[0] + 1;
     triangles(1, j) = facet[1] + 1;
     triangles(2, j) = facet[2] + 1;
@@ -551,5 +556,62 @@ Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts) {
 
   return Rcpp::List::create(Rcpp::Named("vertices") = pts,
                             Rcpp::Named("triangles") = triangles);
+}
 
+// [[Rcpp::export]]
+Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts,
+                                      Rcpp::NumericMatrix normals) {
+  const size_t npoints = pts.nrow();
+  std::vector<P3wn> points(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    points[i] =
+        std::make_pair(Point3(pts(i, 0), pts(i, 1), pts(i, 2)),
+                       Vector3(normals(i, 0), normals(i, 1), normals(i, 2)));
+  }
+
+  Polyhedron mesh;
+  double average_spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
+      points, 6,
+      CGAL::parameters::point_map(CGAL::First_of_pair_property_map<P3wn>()));
+
+  CGAL::poisson_surface_reconstruction_delaunay(
+      points.begin(), points.end(), CGAL::First_of_pair_property_map<P3wn>(),
+      CGAL::Second_of_pair_property_map<P3wn>(), mesh, average_spacing);
+
+  int id = 1;
+  for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
+      vit != mesh.vertices_end(); ++vit) {
+    vit->id() = id;
+    id++;
+  }
+
+  const size_t nfacets = mesh.size_of_facets();
+  const size_t nvertices = mesh.size_of_vertices();
+
+  Rcpp::IntegerMatrix facets(nfacets, 3);
+  {
+    size_t i = 0;
+    for(Polyhedron::Facet_iterator fit = mesh.facets_begin();
+        fit != mesh.facets_end(); fit++) {
+      facets(i, 0) = fit->halfedge()->vertex()->id();
+      facets(i, 1) = fit->halfedge()->next()->vertex()->id();
+      facets(i, 2) = fit->halfedge()->opposite()->vertex()->id();
+      i++;
+    }
+  }
+
+  Rcpp::NumericMatrix vertices(nvertices, 3);
+  {
+    size_t i = 0;
+    for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
+        vit != mesh.vertices_end(); vit++) {
+      vertices(i, 0) = vit->point().x();
+      vertices(i, 1) = vit->point().y();
+      vertices(i, 2) = vit->point().z();
+      i++;
+    }
+  }
+
+  return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
+                            Rcpp::Named("facets") = facets);
 }
