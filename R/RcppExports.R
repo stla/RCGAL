@@ -25,7 +25,7 @@ AFSreconstruction_perimeter_cpp <- function(pts, per) {
     .Call(`_RCGAL_AFSreconstruction_perimeter_cpp`, pts, per)
 }
 
-Poisson_reconstruction_cpp <- function(pts, normals) {
-    .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals)
+Poisson_reconstruction_cpp <- function(pts, normals, spacing, sm_angle, sm_radius, sm_distance) {
+    .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals, spacing, sm_angle, sm_radius, sm_distance)
 }
 

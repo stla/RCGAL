@@ -559,8 +559,10 @@ Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts,
 }
 
 // [[Rcpp::export]]
-Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts,
-                                      Rcpp::NumericMatrix normals) {
+Rcpp::List Poisson_reconstruction_cpp(
+    Rcpp::NumericMatrix pts, Rcpp::NumericMatrix normals, double spacing,
+    double sm_angle, double sm_radius, double sm_distance
+) {
   const size_t npoints = pts.nrow();
   std::vector<P3wn> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -570,13 +572,20 @@ Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts,
   }
 
   Polyhedron mesh;
-  double average_spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
+  if(spacing == -1.0){
+    spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
       points, 6,
       CGAL::parameters::point_map(CGAL::First_of_pair_property_map<P3wn>()));
+  }
 
-  CGAL::poisson_surface_reconstruction_delaunay(
+  bool psr = CGAL::poisson_surface_reconstruction_delaunay(
       points.begin(), points.end(), CGAL::First_of_pair_property_map<P3wn>(),
-      CGAL::Second_of_pair_property_map<P3wn>(), mesh, average_spacing);
+      CGAL::Second_of_pair_property_map<P3wn>(), mesh, spacing,
+      sm_angle, sm_radius, sm_distance);
+
+  if(!psr){
+    throw Rcpp::exception("Poisson surface reconstruction has failed.");
+  }
 
   int id = 1;
   for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();

@@ -6,9 +6,18 @@
 #'   (it must have the same size as the \code{points} matrix); if you don't
 #'   have normals, set \code{normals=NULL} (the default) and some normals will
 #'   be computed with the help of \code{\link[Rvcg]{vcgUpdateNormals}}
+#' @param spacing size parameter; higher values increase the precision of the
+#'   output mesh at the cost of higher computation time; set to \code{NULL}
+#'   (the default) for a reasonable automatic value
+#' @param sm_angle bound for the minimum facet angle in degrees
+#' @param sm_radius relative bound for the radius of the surface Delaunay balls
+#' @param sm_distance relative bound for the center-center distances
 #'
 #' @return A triangular mesh, of class \code{mesh3d} (ready for plotting
 #'   with \strong{rgl}).
+#'
+#' @details See \href{https://doc.cgal.org/latest/Poisson_surface_reconstruction_3/index.html}{Poisson Surface Recnstruction}.
+#'
 #' @export
 #' @importFrom rgl tmesh3d addNormals
 #' @importFrom Rvcg vcgUpdateNormals
@@ -18,7 +27,8 @@
 #' library(rgl)
 #' wire3d(Psr_mesh, color = "black")
 PoissonReconstruction <- function(
-  points, normals = NULL
+  points, normals = NULL, spacing = NULL,
+  sm_angle = 20, sm_radius = 30, sm_distance = 0.375
 ){
   if(!is.matrix(points) || !is.numeric(points)){
     stop("The `points` argument must be a numeric matrix.", call. = TRUE)
@@ -53,11 +63,21 @@ PoissonReconstruction <- function(
   }
   storage.mode(points) <- "double"
   if(is.null(normals)){
-    normals <- vcgUpdateNormals(points, silent = TRUE)
+    normals <- t(vcgUpdateNormals(points, silent = TRUE)[["normals"]][-4L, ])
   }else{
     storage.mode(normals) <- "double"
   }
-  Psr <- Poisson_reconstruction_cpp(points, normals)
+  if(is.null(spacing)){
+    spacing <- -1
+  }else{
+    stopifnot(isPositiveNumber(spacing))
+  }
+  stopifnot(isPositiveNumber(sm_angle))
+  stopifnot(isPositiveNumber(sm_radius))
+  stopifnot(isPositiveNumber(sm_distance))
+  Psr <- Poisson_reconstruction_cpp(
+    points, normals, spacing, sm_angle, sm_radius, sm_distance
+  )
   addNormals(
     tmesh3d(t(Psr[["vertices"]]), t(Psr[["facets"]]), normals = NULL)
   )

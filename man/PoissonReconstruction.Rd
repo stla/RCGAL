@@ -4,7 +4,14 @@
 \alias{PoissonReconstruction}
 \title{Poisson surface reconstruction}
 \usage{
-PoissonReconstruction(points, normals = NULL)
+PoissonReconstruction(
+  points,
+  normals = NULL,
+  spacing = NULL,
+  sm_angle = 20,
+  sm_radius = 30,
+  sm_distance = 0.375
+)
 }
 \arguments{
 \item{points}{numeric matrix which stores the points, one point per row}
@@ -13,6 +20,16 @@ PoissonReconstruction(points, normals = NULL)
 (it must have the same size as the \code{points} matrix); if you don't
 have normals, set \code{normals=NULL} (the default) and some normals will
 be computed with the help of \code{\link[Rvcg]{vcgUpdateNormals}}}
+
+\item{spacing}{size parameter; higher values increase the precision of the
+output mesh at the cost of higher computation time; set to \code{NULL}
+(the default) for a reasonable automatic value}
+
+\item{sm_angle}{bound for the minimum facet angle in degrees}
+
+\item{sm_radius}{relative bound for the radius of the surface Delaunay balls}
+
+\item{sm_distance}{relative bound for the center-center distances}
 }
 \value{
 A triangular mesh, of class \code{mesh3d} (ready for plotting
@@ -20,6 +37,9 @@ A triangular mesh, of class \code{mesh3d} (ready for plotting
 }
 \description{
 Poisson reconstruction of a surface, from a cloud of 3D points.
+}
+\details{
+See \href{https://doc.cgal.org/latest/Poisson_surface_reconstruction_3/index.html}{Poisson Surface Recnstruction}.
 }
 \examples{
 library(RCGAL)

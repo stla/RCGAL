@@ -79,14 +79,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // Poisson_reconstruction_cpp
-Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts, Rcpp::NumericMatrix normals);
-RcppExport SEXP _RCGAL_Poisson_reconstruction_cpp(SEXP ptsSEXP, SEXP normalsSEXP) {
+Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts, Rcpp::NumericMatrix normals, double spacing, double sm_angle, double sm_radius, double sm_distance);
+RcppExport SEXP _RCGAL_Poisson_reconstruction_cpp(SEXP ptsSEXP, SEXP normalsSEXP, SEXP spacingSEXP, SEXP sm_angleSEXP, SEXP sm_radiusSEXP, SEXP sm_distanceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Poisson_reconstruction_cpp(pts, normals));
+    Rcpp::traits::input_parameter< double >::type spacing(spacingSEXP);
+    Rcpp::traits::input_parameter< double >::type sm_angle(sm_angleSEXP);
+    Rcpp::traits::input_parameter< double >::type sm_radius(sm_radiusSEXP);
+    Rcpp::traits::input_parameter< double >::type sm_distance(sm_distanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(Poisson_reconstruction_cpp(pts, normals, spacing, sm_angle, sm_radius, sm_distance));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -98,7 +102,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_del3d_cpp", (DL_FUNC) &_RCGAL_del3d_cpp, 1},
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
-    {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 2},
+    {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {NULL, NULL, 0}
 };
 
