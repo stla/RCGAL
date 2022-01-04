@@ -66,6 +66,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// AFSreconstruction_perimeter_cpp
+Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts);
+RcppExport SEXP _RCGAL_AFSreconstruction_perimeter_cpp(SEXP ptsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
+    rcpp_result_gen = Rcpp::wrap(AFSreconstruction_perimeter_cpp(pts));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
@@ -73,6 +84,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_del2d_cpp", (DL_FUNC) &_RCGAL_del2d_cpp, 1},
     {"_RCGAL_del3d_cpp", (DL_FUNC) &_RCGAL_del3d_cpp, 1},
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
+    {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 1},
     {NULL, NULL, 0}
 };
 

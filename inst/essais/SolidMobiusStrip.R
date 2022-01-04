@@ -29,7 +29,7 @@ surf <- computeContour3d(voxel, maxvol=max(voxel), level=0,
 set.seed(666L)
 SolidMobiusStrip <- surf[sample.int(nrow(surf), 10000L), ]
 mesh <- AFSreconstruction(SolidMobiusStrip)
-shade3d(mesh, color = "darkred")
+shade3d(mesh, color = "maroon")
 
 
 

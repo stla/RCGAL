@@ -27,3 +27,12 @@ pts <- as.matrix(dat[, c(2, 3, 4)])
 mesh <- AFSreconstruction(pts)
 shade3d(mesh, color = "red")
 
+tp <- as.matrix(read.table("teapot.txt"))
+afs <- RCGAL:::AFSreconstruction_perimeter_cpp(tp)
+mesh <- tmesh3d(t(tp), afs$triangles)
+mesh <- Rvcg::vcgClean(mesh, c(0, 7))
+shade3d(mesh, color = "red")
+
+teapot <- as.matrix(
+  read.table(system.file("data-raw", "teapot.txt", package = "RCGAL"))
+)

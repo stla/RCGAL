@@ -43,6 +43,10 @@
 
 #include <CGAL/Advancing_front_surface_reconstruction.h>
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/tuple.h>
+
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -86,6 +90,8 @@ typedef CGAL::Advancing_front_surface_reconstruction<> AFS_reconstruction;
 typedef AFS_reconstruction::Triangulation_3 AFS_triangulation3;
 typedef AFS_reconstruction::Triangulation_data_structure_2 AFS_Tds2;
 typedef K::Vector_3 Vector3;
+
+typedef CGAL::Simple_cartesian<double> KSC;
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -437,9 +443,7 @@ Rcpp::List AFSreconstruction_cpp(Rcpp::NumericMatrix pts) {
   reconstruction.run();
   const AFS_Tds2& tds = reconstruction.triangulation_data_structure_2();
 
-  // Rcpp::NumericVector vnormals(0);
-  // Rcpp::NumericVector vvertices(0);
-  Eigen::MatrixXd normals(3, 0);
+  // Eigen::MatrixXd normals(3, 0);
   Eigen::MatrixXd vertices(4, 0);
   unsigned counter = 0;
   for(AFS_Tds2::Face_iterator fit = tds.faces_begin(); fit != tds.faces_end();
@@ -456,39 +460,22 @@ Rcpp::List AFSreconstruction_cpp(Rcpp::NumericMatrix pts) {
           j++;
         }
       }
-      Vector3 normal = CGAL::unit_normal(points[0], points[1], points[2]);
-      Eigen::VectorXd v(3);
-      v << normal.x(), normal.y(), normal.z();
-      Eigen::MatrixXd M(3, 3);
-      M << v, v, v;
-      normals.conservativeResize(Eigen::NoChange, normals.cols() + 3);
-      normals.rightCols(3) = M;
-      // vnormals.push_back(normal.x());
-      // vnormals.push_back(normal.y());
-      // vnormals.push_back(normal.z());
-      // vnormals.push_back(normal.x());
-      // vnormals.push_back(normal.y());
-      // vnormals.push_back(normal.z());
-      // vnormals.push_back(normal.x());
-      // vnormals.push_back(normal.y());
-      // vnormals.push_back(normal.z());
+      // Vector3 normal = CGAL::unit_normal(points[0], points[1], points[2]);
+      // Eigen::VectorXd v(3);
+      // v << normal.x(), normal.y(), normal.z();
+      // Eigen::MatrixXd M(3, 3);
+      // M << v, v, v;
+      // normals.conservativeResize(Eigen::NoChange, normals.cols() + 3);
+      // normals.rightCols(3) = M;
       for(size_t k = 0; k < 3; k++) {
         const Point3 p = points[k];
         Eigen::VectorXd w(4);
         w << p.x(), p.y(), p.z(), 1.0;
         vertices.conservativeResize(Eigen::NoChange, vertices.cols() + 1);
         vertices.rightCols(1) = w;
-        // vvertices.push_back(p.x());
-        // vvertices.push_back(p.y());
-        // vvertices.push_back(p.z());
-        // vvertices.push_back(1.0);
       }
     }
   }
-  // vnormals.attr("dim") = Rcpp::Dimension(3, 3*counter);
-  // vvertices.attr("dim") = Rcpp::Dimension(4, 3*counter);
-  // Rcpp::NumericMatrix normals = Rcpp::as<Rcpp::NumericMatrix>(vnormals);
-  // Rcpp::NumericMatrix vertices = Rcpp::as<Rcpp::NumericMatrix>(vvertices);
   Rcpp::IntegerVector vtriangles(3 * counter);
   for(size_t i = 0; i < 3 * counter; i++) {
     vtriangles(i) = i + 1;
@@ -499,4 +486,70 @@ Rcpp::List AFSreconstruction_cpp(Rcpp::NumericMatrix pts) {
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
                             //Rcpp::Named("normals") = normals,
                             Rcpp::Named("triangles") = triangles);
+}
+
+
+struct Perimeter {
+  double bound;
+  Perimeter(double bound)
+    : bound(bound)
+  {}
+  template <typename AdvancingFront, typename Cell_handle>
+  double operator() (const AdvancingFront& adv, Cell_handle& c,
+                  const int& index) const
+  {
+    // bound == 0 is better than bound < infinity
+    // as it avoids the distance computations
+    if(bound == 0){
+      return adv.smallest_radius_delaunay_sphere (c, index);
+    }
+    // If perimeter > bound, return infinity so that facet is not used
+    double d = 0;
+    d = sqrt(squared_distance(c->vertex((index+1)%4)->point(),
+                              c->vertex((index+2)%4)->point()));
+    if(d>bound) return adv.infinity();
+    d += sqrt(squared_distance(c->vertex((index+2)%4)->point(),
+                               c->vertex((index+3)%4)->point()));
+    if(d>bound) return adv.infinity();
+    d += sqrt(squared_distance(c->vertex((index+1)%4)->point(),
+                               c->vertex((index+3)%4)->point()));
+    if(d>bound) return adv.infinity();
+    // Otherwise, return usual priority value: smallest radius of
+    // delaunay sphere
+    return adv.smallest_radius_delaunay_sphere (c, index);
+  }
+};
+
+// [[Rcpp::export]]
+Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts) {
+  const size_t npoints = pts.nrow();
+  std::vector<KSC::Point_3> points(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    points[i] = KSC::Point_3(pts(i, 0), pts(i, 1), pts(i, 2));
+  }
+
+  double per = 0;
+  double radius_ratio_bound = 5.0;
+
+  std::vector<std::array<size_t,3>> facets;
+
+  Perimeter perimeter(per);
+  CGAL::advancing_front_surface_reconstruction(points.begin(),
+                                               points.end(),
+                                               std::back_inserter(facets),
+                                               perimeter,
+                                               radius_ratio_bound);
+
+  size_t nfacets = facets.size();
+  Rcpp::IntegerMatrix triangles(3, nfacets);
+  for(size_t j = 0; j < nfacets; j++){
+    std::array<size_t,3> facet = facets[j];
+    triangles(0, j) = facet[0] + 1;
+    triangles(1, j) = facet[1] + 1;
+    triangles(2, j) = facet[2] + 1;
+  }
+
+  return Rcpp::List::create(Rcpp::Named("vertices") = pts,
+                            Rcpp::Named("triangles") = triangles);
+
 }
