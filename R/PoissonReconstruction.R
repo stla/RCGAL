@@ -6,7 +6,7 @@
 #'   (it must have the same size as the \code{points} matrix); if you don't
 #'   have normals, set \code{normals=NULL} (the default) and some normals will
 #'   be computed with the help of \code{\link[Rvcg]{vcgUpdateNormals}}
-#' @param spacing size parameter; higher values increase the precision of the
+#' @param spacing size parameter; smaller values increase the precision of the
 #'   output mesh at the cost of higher computation time; set to \code{NULL}
 #'   (the default) for a reasonable automatic value: an average spacing whose
 #'   value will be displayed in a message and that you can also get in the

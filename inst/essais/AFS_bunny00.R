@@ -46,3 +46,9 @@ poiss <- RCGAL:::Poisson_reconstruction_cpp(SolidMobiusStrip, teapot_normals)
 mesh <- tmesh3d(t(poiss$vertices), t(poiss$facets+1L))
 mesh <- addNormals(mesh)#Rvcg::vcgClean(mesh, c(0, 7))
 wire3d(mesh, color = "black")
+
+
+data(bunny, package = "onion")
+psr_mesh <- PoissonReconstruction(bunny, spacing = 0.0005)
+library(rgl)
+shade3d(psr_mesh, color = "green")
