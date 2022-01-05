@@ -23,7 +23,9 @@ be computed with the help of \code{\link[Rvcg]{vcgUpdateNormals}}}
 
 \item{spacing}{size parameter; higher values increase the precision of the
 output mesh at the cost of higher computation time; set to \code{NULL}
-(the default) for a reasonable automatic value}
+(the default) for a reasonable automatic value: an average spacing whose
+value will be displayed in a message and that you can also get in the
+\code{"spacing"} attribute of the output}
 
 \item{sm_angle}{bound for the minimum facet angle in degrees}
 
@@ -45,5 +47,6 @@ See \href{https://doc.cgal.org/latest/Poisson_surface_reconstruction_3/index.htm
 library(RCGAL)
 Psr_mesh <- PoissonReconstruction(SolidMobiusStrip)
 library(rgl)
+shade3d(Psr_mesh, color= "yellow")
 wire3d(Psr_mesh, color = "black")
 }

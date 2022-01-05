@@ -622,5 +622,6 @@ Rcpp::List Poisson_reconstruction_cpp(
   }
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            Rcpp::Named("facets") = facets);
+                            Rcpp::Named("facets") = facets,
+                            Rcpp::Named("spacing") = spacing);
 }

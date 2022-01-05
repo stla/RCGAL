@@ -8,7 +8,9 @@
 #'   be computed with the help of \code{\link[Rvcg]{vcgUpdateNormals}}
 #' @param spacing size parameter; higher values increase the precision of the
 #'   output mesh at the cost of higher computation time; set to \code{NULL}
-#'   (the default) for a reasonable automatic value
+#'   (the default) for a reasonable automatic value: an average spacing whose
+#'   value will be displayed in a message and that you can also get in the
+#'   \code{"spacing"} attribute of the output
 #' @param sm_angle bound for the minimum facet angle in degrees
 #' @param sm_radius relative bound for the radius of the surface Delaunay balls
 #' @param sm_distance relative bound for the center-center distances
@@ -25,6 +27,7 @@
 #' @examples library(RCGAL)
 #' Psr_mesh <- PoissonReconstruction(SolidMobiusStrip)
 #' library(rgl)
+#' shade3d(Psr_mesh, color= "yellow")
 #' wire3d(Psr_mesh, color = "black")
 PoissonReconstruction <- function(
   points, normals = NULL, spacing = NULL,
@@ -78,7 +81,15 @@ PoissonReconstruction <- function(
   Psr <- Poisson_reconstruction_cpp(
     points, normals, spacing, sm_angle, sm_radius, sm_distance
   )
-  addNormals(
+  out <-  addNormals(
     tmesh3d(t(Psr[["vertices"]]), t(Psr[["facets"]]), normals = NULL)
   )
+  if(spacing == -1){
+    message(sprintf(
+      "Poisson reconstruction using average spacing: %s.",
+      formatC(Psr[["spacing"]])
+    ))
+    attr(out, "spacing") <- Psr[["spacing"]]
+  }
+  out
 }
