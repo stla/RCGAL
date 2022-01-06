@@ -50,6 +50,9 @@
 #include <CGAL/Polyhedron_items_with_id_3.h>
 #include <CGAL/poisson_surface_reconstruction.h>
 
+#include <CGAL/jet_estimate_normals.h>
+#include <CGAL/mst_orient_normals.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -98,6 +101,8 @@ typedef CGAL::Simple_cartesian<double> KSC;
 
 typedef std::pair<Point3, Vector3> P3wn;
 typedef CGAL::Polyhedron_3<K, CGAL::Polyhedron_items_with_id_3> Polyhedron;
+
+typedef CGAL::Parallel_if_available_tag Concurrency_tag;
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -559,10 +564,12 @@ Rcpp::List AFSreconstruction_perimeter_cpp(Rcpp::NumericMatrix pts,
 }
 
 // [[Rcpp::export]]
-Rcpp::List Poisson_reconstruction_cpp(
-    Rcpp::NumericMatrix pts, Rcpp::NumericMatrix normals, double spacing,
-    double sm_angle, double sm_radius, double sm_distance
-) {
+Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts,
+                                      Rcpp::NumericMatrix normals,
+                                      double spacing,
+                                      double sm_angle,
+                                      double sm_radius,
+                                      double sm_distance) {
   const size_t npoints = pts.nrow();
   std::vector<P3wn> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -572,18 +579,18 @@ Rcpp::List Poisson_reconstruction_cpp(
   }
 
   Polyhedron mesh;
-  if(spacing == -1.0){
+  if(spacing == -1.0) {
     spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag>(
-      points, 6,
-      CGAL::parameters::point_map(CGAL::First_of_pair_property_map<P3wn>()));
+        points, 6,
+        CGAL::parameters::point_map(CGAL::First_of_pair_property_map<P3wn>()));
   }
 
   bool psr = CGAL::poisson_surface_reconstruction_delaunay(
       points.begin(), points.end(), CGAL::First_of_pair_property_map<P3wn>(),
-      CGAL::Second_of_pair_property_map<P3wn>(), mesh, spacing,
-      sm_angle, sm_radius, sm_distance);
+      CGAL::Second_of_pair_property_map<P3wn>(), mesh, spacing, sm_angle,
+      sm_radius, sm_distance);
 
-  if(!psr){
+  if(!psr) {
     throw Rcpp::exception("Poisson surface reconstruction has failed.");
   }
 
@@ -624,4 +631,35 @@ Rcpp::List Poisson_reconstruction_cpp(
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
                             Rcpp::Named("facets") = facets,
                             Rcpp::Named("spacing") = spacing);
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericMatrix compute_normals_cpp(Rcpp::NumericMatrix pts,
+                                        unsigned nb_neighbors) {
+  const size_t npoints = pts.nrow();
+  std::vector<P3wn> points(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    points[i] = std::make_pair(Point3(pts(i, 0), pts(i, 1), pts(i, 2)),
+                               Vector3(0.0, 0.0, 0.0));
+  }
+
+  CGAL::jet_estimate_normals<Concurrency_tag>(
+      points, nb_neighbors,
+      CGAL::parameters::point_map(CGAL::First_of_pair_property_map<P3wn>())
+          .normal_map(CGAL::Second_of_pair_property_map<P3wn>()));
+
+  CGAL::mst_orient_normals(
+      points, nb_neighbors,
+      CGAL::parameters::point_map(CGAL::First_of_pair_property_map<P3wn>())
+          .normal_map(CGAL::Second_of_pair_property_map<P3wn>()));
+
+  Rcpp::NumericMatrix normals(npoints, 3);
+  for(size_t i = 0; i < npoints; i++) {
+    const Vector3 normal = points[i].second;
+    normals(i, 0) = normal.x();
+    normals(i, 1) = normal.y();
+    normals(i, 2) = normal.z();
+  }
+
+  return normals;
 }

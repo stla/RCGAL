@@ -29,3 +29,7 @@ Poisson_reconstruction_cpp <- function(pts, normals, spacing, sm_angle, sm_radiu
     .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals, spacing, sm_angle, sm_radius, sm_distance)
 }
 
+compute_normals_cpp <- function(pts, nb_neighbors) {
+    .Call(`_RCGAL_compute_normals_cpp`, pts, nb_neighbors)
+}
+
