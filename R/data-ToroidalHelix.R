@@ -4,5 +4,4 @@
 #'
 #' @format A matrix with 6000 rows and 3 columns.
 #'
-#' @references \url{http://data.imaginary-exhibition.com/IMAGINARY-Moebiusband-Stephan-Klaus.pdf}
 "ToroidalHeix"

@@ -89,3 +89,38 @@ shade3d(mesh, color = "red")
 
 mesh <- AFSreconstruction(points)
 shade3d(mesh, color = "red")
+
+
+##############################################################################
+A <- 0.44
+n <- 3
+Gamma <- function(t){
+  alpha <- pi/2 - (pi/2-A)*cos(n*t)
+  beta <- t + A*sin(2*n*t)
+  c(
+    sin(alpha) * cos(beta),
+    sin(alpha) * sin(beta),
+    cos(alpha)
+  )
+}
+HopfInverse <- function(p, phi){
+  c(
+    (1+p[3])*cos(phi),
+    p[1]*sin(phi) - p[2]*cos(phi),
+    p[1]*cos(phi) + p[2]*sin(phi),
+    (1+p[3])*sin(phi)
+  ) / sqrt(2*(1+p[3]))
+}
+Stereo <- function(q){
+  2*q[1:3] / (1-q[4])
+}
+F <- function(t, phi){
+  Stereo(HopfInverse(Gamma(t), phi))
+}
+
+fx <- Vectorize(function(u,v) F(u,v)[1])
+fy <- Vectorize(function(u,v) F(u,v)[2])
+fz <- Vectorize(function(u,v) F(u,v)[3])
+library(misc3d)
+tgls <- parametric3d(fx, fy, fz, umin = 0, umax = 2*pi, vmin = 0, vmax = 2*pi,
+             n = 200, engine = "none")
