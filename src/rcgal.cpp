@@ -10,6 +10,8 @@
 // #undef CGAL_error_msg
 // #define CGAL_error_msg(msg)
 
+#include <iostream>
+
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Polyhedron_3.h>
 #include <CGAL/Convex_hull_traits_adapter_2.h>
@@ -627,6 +629,8 @@ Rcpp::List Poisson_reconstruction_cpp(Rcpp::NumericMatrix pts,
       i++;
     }
   }
+
+  //std::ofstream("out.off") << std::setprecision(17) << mesh;
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
                             Rcpp::Named("facets") = facets,

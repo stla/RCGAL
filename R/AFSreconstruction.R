@@ -5,6 +5,9 @@
 #'
 #' @return A triangular mesh, of class \code{mesh3d} (ready for plotting
 #'   with \strong{rgl}).
+#'
+#' @details See \href{https://doc.cgal.org/latest/Advancing_front_surface_reconstruction/index.html#Chapter_Advancing_Front_Surface_Reconstruction}{Advancing Front Surface Reconstruction}.
+#'
 #' @export
 #' @importFrom rgl tmesh3d
 #' @importFrom Rvcg vcgClean
