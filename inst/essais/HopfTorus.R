@@ -64,15 +64,28 @@ hmesh <- function(nu, nv, normals = TRUE, nlobes = 3, A = 0.44, ...){
     }
   }
   tmesh3d(
-    vertices = rbind(vs, 1),
+    vertices = vs,
     indices = cbind(tris1, tris2),
     normals = if(normals) Normals else NULL
   )
 }
 
-hopf <- hmesh(200, 200)
+hopf <- addNormals(hmesh(200, 100, normals = FALSE))
 points <- t(hopf$vb[-4L, ])
+normals <- t(hopf$normals[-4L, ])
+
+indices <- sample.int(40000, 10000)
+mesh <- PoissonReconstruction(points[indices, ], normals[indices, ])#spacing = 0.05, sm_distance = 0.1)
+shade3d(mesh, color = "red")
+
+set.seed(666)
 points <- points[sample.int(40000, 10000), ]
+
+mesh <- PoissonReconstruction(points)#, spacing = 0.05, sm_distance = 0.1)
+shade3d(mesh, color = "red")
+
+mesh <- PoissonReconstruction(points, getSomeNormals(points, 10))
+shade3d(mesh, color = "red")
 
 mesh <- AFSreconstruction(points)
 shade3d(mesh, color = "red")

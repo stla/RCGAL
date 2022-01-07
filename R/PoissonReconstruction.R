@@ -83,7 +83,10 @@ PoissonReconstruction <- function(
     points, normals, spacing, sm_angle, sm_radius, sm_distance
   )
   out <-  addNormals(
-    tmesh3d(t(Psr[["vertices"]]), t(Psr[["facets"]]), normals = NULL)
+    tmesh3d(
+      t(Psr[["vertices"]]), t(Psr[["facets"]]), normals = NULL,
+      homogeneous = FALSE
+    )
   )
   if(spacing == -1){
     message(sprintf(
