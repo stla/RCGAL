@@ -94,15 +94,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compute_normals_cpp
-Rcpp::NumericMatrix compute_normals_cpp(Rcpp::NumericMatrix pts, unsigned nb_neighbors);
-RcppExport SEXP _RCGAL_compute_normals_cpp(SEXP ptsSEXP, SEXP nb_neighborsSEXP) {
+// jet_normals_cpp
+Rcpp::NumericMatrix jet_normals_cpp(Rcpp::NumericMatrix pts, unsigned nb_neighbors);
+RcppExport SEXP _RCGAL_jet_normals_cpp(SEXP ptsSEXP, SEXP nb_neighborsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
     Rcpp::traits::input_parameter< unsigned >::type nb_neighbors(nb_neighborsSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_normals_cpp(pts, nb_neighbors));
+    rcpp_result_gen = Rcpp::wrap(jet_normals_cpp(pts, nb_neighbors));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pca_normals_cpp
+Rcpp::NumericMatrix pca_normals_cpp(Rcpp::NumericMatrix pts, unsigned nb_neighbors);
+RcppExport SEXP _RCGAL_pca_normals_cpp(SEXP ptsSEXP, SEXP nb_neighborsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type nb_neighbors(nb_neighborsSEXP);
+    rcpp_result_gen = Rcpp::wrap(pca_normals_cpp(pts, nb_neighbors));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -115,7 +127,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
-    {"_RCGAL_compute_normals_cpp", (DL_FUNC) &_RCGAL_compute_normals_cpp, 2},
+    {"_RCGAL_jet_normals_cpp", (DL_FUNC) &_RCGAL_jet_normals_cpp, 2},
+    {"_RCGAL_pca_normals_cpp", (DL_FUNC) &_RCGAL_pca_normals_cpp, 2},
     {NULL, NULL, 0}
 };
 

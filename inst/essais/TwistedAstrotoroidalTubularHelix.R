@@ -100,6 +100,12 @@ view3d(0,-55)
 shade3d(mesh, color = "orange")
 wire3d(mesh, color="black")
 
+mesh <- PoissonReconstruction(pts, compute_normals_cpp2(pts, 10))
+open3d(windowRect = c(50,50,562,562))
+view3d(0,-55)
+shade3d(mesh, color = "orange")
+wire3d(mesh, color="black")
+
 # draw ####
 m <- TubularHelixMesh(R=4, r=1, w=20, a=0.25, 20*60, 60, alpha=0.5, twists=2)
 open3d(windowRect = c(50,50,550,550))

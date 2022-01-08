@@ -71,7 +71,14 @@ hmesh <- function(nu, nv, normals = TRUE, nlobes = 3, A = 0.44, ...){
 }
 
 hopf <- addNormals(hmesh(200, 100, normals = FALSE))
+hopf <- Rvcg::vcgIsotropicRemeshing(hopf, TargetLen = 0.5)
 points <- t(hopf$vb[-4L, ])
+points3d(points)
+mesh <- PoissonReconstruction(points, getSomeNormals(points, 10))#, spacing = 0.05, sm_distance = 0.1)
+shade3d(mesh, color = "red")
+wire3d(mesh, color = "black")
+
+
 normals <- t(hopf$normals[-4L, ])
 
 indices <- sample.int(40000, 10000)
@@ -83,9 +90,15 @@ points <- points[sample.int(40000, 10000), ]
 
 mesh <- PoissonReconstruction(points)#, spacing = 0.05, sm_distance = 0.1)
 shade3d(mesh, color = "red")
+wire3d(mesh, color = "black")
 
 mesh <- PoissonReconstruction(points, getSomeNormals(points, 10))
 shade3d(mesh, color = "red")
+wire3d(mesh, color = "black")
+
+mesh <- PoissonReconstruction(points, compute_normals_cpp2(points, 10))
+shade3d(mesh, color = "red")
+wire3d(mesh, color = "black")
 
 mesh <- AFSreconstruction(points)
 shade3d(mesh, color = "red")

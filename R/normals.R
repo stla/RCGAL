@@ -3,11 +3,13 @@
 #'
 #' @param points matrix of points, one point per row
 #' @param nbNeighbors integer, number of neighbors used to compute the normals
+#' @param method one of \code{"pca"} or \code{"jet"}
 #'
 #' @return A matrix of the same size as the \code{points} matrix, giving one
 #'   unit normal for each point.
 #' @export
-getSomeNormals <- function(points, nbNeighbors){
+getSomeNormals <- function(points, nbNeighbors, method = "pca"){
+  method <- match.arg(method, c("pca", "jet"))
   if(!is.matrix(points) || !is.numeric(points)){
     stop("The `points` argument must be a numeric matrix.", call. = TRUE)
   }
@@ -26,5 +28,9 @@ getSomeNormals <- function(points, nbNeighbors){
   if(nbNeighbors <= 2L){
     stop("There must be at least two neighbors.", call. = TRUE)
   }
-  compute_normals_cpp(points, nbNeighbors)
+  if(method == "pca"){
+    pca_normals_cpp(points, nbNeighbors)
+  }else{
+    jet_normals_cpp(points, nbNeighbors)
+  }
 }

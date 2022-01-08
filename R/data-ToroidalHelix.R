@@ -4,4 +4,4 @@
 #'
 #' @format A matrix with 6000 rows and 3 columns.
 #'
-"ToroidalHeix"
+"ToroidalHelix"

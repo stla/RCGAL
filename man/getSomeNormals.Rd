@@ -4,12 +4,14 @@
 \alias{getSomeNormals}
 \title{Normals for a points could}
 \usage{
-getSomeNormals(points, nbNeighbors)
+getSomeNormals(points, nbNeighbors, method = "pca")
 }
 \arguments{
 \item{points}{matrix of points, one point per row}
 
 \item{nbNeighbors}{integer, number of neighbors used to compute the normals}
+
+\item{method}{one of \code{"pca"} or \code{"jet"}}
 }
 \value{
 A matrix of the same size as the \code{points} matrix, giving one
