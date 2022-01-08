@@ -391,7 +391,7 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
   }
 
   std::map<Rcpp::String, size_t> facetsMap = {};
-  Rcpp::IntegerMatrix facets(nfacets, 3);
+  Rcpp::IntegerMatrix facets(nfacets, 4);
   {
     size_t i = 0;
     for(DT3::Finite_facets_iterator fit = mesh.finite_facets_begin();
@@ -406,12 +406,20 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
       facets(i, 0) = id0;
       facets(i, 1) = id1;
       facets(i, 2) = id2;
+      facets(i, 3) = mesh.is_infinite(facet.first) ||
+        mesh.is_infinite(mesh.mirror_facet(facet).first);
       std::array<unsigned, 3> ids = {id0, id1, id2};
       std::sort(ids.begin(), ids.end());
       const Rcpp::String facetAsString = stringTriple(ids[0], ids[1], ids[2]);
       i++;
       facetsMap[facetAsString] = i;
     }
+    Rcpp::CharacterVector columnNames =
+      Rcpp::CharacterVector::create("i1", "i2", "i3", "onhull");
+    Rcpp::colnames(facets) = columnNames;
+    facets.attr("info") =
+      "The `onhull` column indicates whether the face is on the convex hull.";
+
   }
 
   Rcpp::List cells(ncells);
