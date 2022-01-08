@@ -46,5 +46,5 @@ hmesh <- function(nu, nv, nlobes = 3, A = 0.44){
   ))
 }
 
-HopfTorus_Mesh <- vcgUniformRemesh(hmesh(250, 150), multiSample = TRUE)
+HopfTorus_Mesh <- vcgUniformRemesh(hmesh(200, 150))
 HopfTorus <- t(HopfTorus_Mesh[["vb"]][-4L, ])

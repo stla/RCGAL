@@ -5,3 +5,5 @@
 ^LICENSE$
 ^\.github$
 ^data-raw$
+^inst/makegifs$
+^inst/PoissonExamples$
