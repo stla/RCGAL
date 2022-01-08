@@ -4,10 +4,15 @@
 \alias{delaunay}
 \title{Delaunay tessellation}
 \usage{
-delaunay(points)
+delaunay(points, elevation = FALSE)
 }
 \arguments{
 \item{points}{numeric matrix which stores the points, one point per row}
+
+\item{elevation}{if points are three-dimensional and \code{elevation=TRUE},
+then the function performs an elevated two-dimensional Delaunay
+triangulation, using the \code{z} coordinates of the points for the
+elevations; see the example}
 }
 \value{
 The Delaunay tessellation.
@@ -17,4 +22,20 @@ Delaunay tessellation of a set of 2D or 3D points.
 }
 \examples{
 library(RCGAL)
+# elevated Delaunay triangulation
+f <- function(x, y){
+  2 * exp(-(x^2 + y^2)) # integrate to 2pi
+}
+x <- y <- seq(-4, 4, length.out = 50)
+grd <- transform(expand.grid(x = x, y = y), z = f(x, y))
+del <- delaunay(as.matrix(grd), elevation = TRUE)
+# `del` is a list; its first component is a mesh representing the surface:
+mesh <- del[["mesh"]]
+library(rgl)
+open3d(windowRect = c(50, 50, 562, 562))
+shade3d(mesh, color = "limegreen")
+wire3d(mesh)
+# in `del` you can also found the volume under the surface, which should
+#   approximate the integral of the function:
+del[["volume"]]
 }

@@ -116,7 +116,6 @@ typedef CGAL::Delaunay_triangulation_2<Pxy, Tds_xy> Delaunay_xy;
 
 typedef Rcpp::NumericVector Dvector;
 
-
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
   Points2 points;
@@ -710,7 +709,7 @@ Rcpp::NumericMatrix pca_normals_cpp(Rcpp::NumericMatrix pts,
   return normals;
 }
 
-double volume_under_triangle(Dvector v0, Dvector v1, Dvector v2){
+double volume_under_triangle(Dvector v0, Dvector v1, Dvector v2) {
   double x0 = v0(0);
   double y0 = v0(1);
   double z0 = v0(2);
@@ -720,7 +719,8 @@ double volume_under_triangle(Dvector v0, Dvector v1, Dvector v2){
   double x2 = v2(0);
   double y2 = v2(1);
   double z2 = v2(2);
-  return (z0+z1+z2) * (x0*y1 - x1*y0 + x1*y2 - x2*y1 + x2*y0 - x0*y2) / 6.0;
+  return (z0 + z1 + z2) *
+         (x0 * y1 - x1 * y0 + x1 * y2 - x2 * y1 + x2 * y0 - x0 * y2) / 6.0;
 }
 
 // [[Rcpp::export]]
@@ -737,7 +737,7 @@ Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts) {
 
   const size_t nfaces = mesh.number_of_faces();
   const size_t h =
-    2 * npoints - 2 - nfaces;  // number of vertices of convex hull
+      2 * npoints - 2 - nfaces;  // number of vertices of convex hull
   const size_t nedges = 3 * npoints - 3 - h;
 
   Rcpp::IntegerMatrix faces(nfaces, 3);
@@ -753,9 +753,8 @@ Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts) {
       faces(i, 0) = i0 + 1;
       faces(i, 1) = i1 + 1;
       faces(i, 2) = i2 + 1;
-      double volume = volume_under_triangle(
-        pts(i0, Rcpp::_), pts(i1, Rcpp::_), pts(i2, Rcpp::_)
-      );
+      double volume = volume_under_triangle(pts(i0, Rcpp::_), pts(i1, Rcpp::_),
+                                            pts(i2, Rcpp::_));
       volumes(i) = volume;
       totalVolume += volume;
       i++;
@@ -767,8 +766,8 @@ Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts) {
   Rcpp::IntegerMatrix edges(nedges, 2);
   {
     size_t i = 0;
-    for(Delaunay_xy::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
-    eit++) {
+    for(Delaunay_xy::Finite_edges_iterator eit = itedges.begin();
+        eit != itedges.end(); eit++) {
       const std::pair<Delaunay_xy::Face_handle, int> edge = *eit;
       edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info();
       edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();

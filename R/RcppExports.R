@@ -37,3 +37,7 @@ pca_normals_cpp <- function(pts, nb_neighbors) {
     .Call(`_RCGAL_pca_normals_cpp`, pts, nb_neighbors)
 }
 
+del2d_xy_cpp <- function(pts) {
+    .Call(`_RCGAL_del2d_xy_cpp`, pts)
+}
+

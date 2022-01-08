@@ -118,6 +118,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// del2d_xy_cpp
+Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts);
+RcppExport SEXP _RCGAL_del2d_xy_cpp(SEXP ptsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type pts(ptsSEXP);
+    rcpp_result_gen = Rcpp::wrap(del2d_xy_cpp(pts));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
@@ -129,6 +140,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_jet_normals_cpp", (DL_FUNC) &_RCGAL_jet_normals_cpp, 2},
     {"_RCGAL_pca_normals_cpp", (DL_FUNC) &_RCGAL_pca_normals_cpp, 2},
+    {"_RCGAL_del2d_xy_cpp", (DL_FUNC) &_RCGAL_del2d_xy_cpp, 1},
     {NULL, NULL, 0}
 };
 
