@@ -56,6 +56,8 @@
 #include <CGAL/mst_orient_normals.h>
 #include <CGAL/pca_estimate_normals.h>
 
+#include <CGAL/Projection_traits_xy_3.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -106,6 +108,11 @@ typedef std::pair<Point3, Vector3> P3wn;
 typedef CGAL::Polyhedron_3<K, CGAL::Polyhedron_items_with_id_3> Polyhedron;
 
 typedef CGAL::Parallel_if_available_tag Concurrency_tag;
+
+typedef CGAL::Projection_traits_xy_3<K> Pxy;
+typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, Pxy> Vb_xy;
+typedef CGAL::Triangulation_data_structure_2<Vb_xy> Tds_xy;
+typedef CGAL::Delaunay_triangulation_2<Pxy, Tds_xy> Delaunay_xy;
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -698,4 +705,51 @@ Rcpp::NumericMatrix pca_normals_cpp(Rcpp::NumericMatrix pts,
   }
 
   return normals;
+}
+
+// [[Rcpp::export]]
+Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts) {
+  const size_t npoints = pts.nrow();
+
+  // compute Delaunay mesh
+  Delaunay_xy mesh;
+  Delaunay_xy::Vertex_handle vh;
+  for(unsigned i = 0; i < npoints; i++) {
+    vh = mesh.insert(Point3(pts(i, 0), pts(i, 1), pts(i, 2)));
+    vh->info() = i + 1;
+  }
+
+  const size_t nfaces = mesh.number_of_faces();
+  Rcpp::Rcout << nfaces << "\n";
+  const size_t h =
+      2 * npoints - 2 - nfaces;  // number of vertices of convex hull
+  const size_t nedges = 3 * npoints - 3 - h;
+
+  Rcpp::IntegerMatrix faces(nfaces, 3);
+  {
+    size_t i = 0;
+    for(Delaunay_xy::Finite_faces_iterator fit = mesh.finite_faces_begin();
+        fit != mesh.finite_faces_end(); fit++) {
+      faces(i, 0) = fit->vertex(0)->info();
+      faces(i, 1) = fit->vertex(1)->info();
+      faces(i, 2) = fit->vertex(2)->info();
+      i++;
+    }
+  }
+
+  const Delaunay_xy::Finite_edges itedges = mesh.finite_edges();
+  Rcpp::IntegerMatrix edges(nedges, 2);
+  {
+    size_t i = 0;
+    for(Delaunay_xy::Finite_edges_iterator eit = itedges.begin();
+        eit != itedges.end(); eit++) {
+      const std::pair<Delaunay_xy::Face_handle, int> edge = *eit;
+      edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info();
+      edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();
+      i++;
+    }
+  }
+
+  return Rcpp::List::create(Rcpp::Named("faces") = faces,
+                            Rcpp::Named("edges") = edges);
 }
