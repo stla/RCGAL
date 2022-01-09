@@ -116,6 +116,9 @@ typedef CGAL::Delaunay_triangulation_2<Pxy, Tds_xy> Delaunay_xy;
 
 typedef Rcpp::NumericVector Dvector;
 
+typedef Eigen::Matrix<unsigned, Eigen::Dynamic, 3, Eigen::RowMajor | Eigen::AutoAlign> Imatrix;
+typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign> Ivector;
+
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
   Points2 points;
@@ -338,7 +341,7 @@ Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
   }
 
   const DT2::Finite_edges itedges = mesh.finite_edges();
-  Rcpp::IntegerMatrix edges(nedges, 2);
+  Rcpp::IntegerMatrix edges(nedges, 3);
   {
     size_t i = 0;
     for(DT2::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
@@ -348,6 +351,10 @@ Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
       edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();
       i++;
     }
+    Rcpp::CharacterVector columnNames =
+      Rcpp::CharacterVector::create("i1", "i2", "border");
+    Rcpp::colnames(edges) = columnNames;
+    edges.attr("info") = "The `border` column indicates border edges.";
   }
 
   return Rcpp::List::create(Rcpp::Named("faces") = faces,
@@ -384,14 +391,17 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
     for(DT3::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
         eit++) {
       const CGAL::Triple<DT3::Cell_handle, int, int> edge = *eit;
-      edges(i, 0) = edge.first->vertex(edge.second % 4)->info();
-      edges(i, 1) = edge.first->vertex(edge.third % 4)->info();
+      unsigned i0 = edge.first->vertex(edge.second % 4)->info();
+      unsigned i1 = edge.first->vertex(edge.third % 4)->info();
+      edges(i, 0) = std::min(i0, i1);
+      edges(i, 1) = std::max(i0, i1);
       i++;
     }
   }
 
   std::map<Rcpp::String, size_t> facetsMap = {};
   Rcpp::IntegerMatrix facets(nfacets, 4);
+  Imatrix facetsOnHull(0, 3);
   {
     size_t i = 0;
     for(DT3::Finite_facets_iterator fit = mesh.finite_facets_begin();
@@ -406,10 +416,28 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
       facets(i, 0) = id0;
       facets(i, 1) = id1;
       facets(i, 2) = id2;
-      facets(i, 3) = mesh.is_infinite(facet.first) ||
+      bool onhull = mesh.is_infinite(facet.first) ||
         mesh.is_infinite(mesh.mirror_facet(facet).first);
+      facets(i, 3) = onhull;
       std::array<unsigned, 3> ids = {id0, id1, id2};
       std::sort(ids.begin(), ids.end());
+      // if(onhull){
+      //   bool notcoplanar = true;
+      //   unsigned j = 0;
+      //   while(notcoplanar && j < nedges){
+      //     std::vector<unsigned> v_intersection;
+      //     std::array<unsigned, 2> edge = {edges(j, 0), edges(j, 1)};
+      //     std::set_intersection(ids.begin(), ids.end(),
+      //                           edge.begin(), edge.end(),
+      //                           std::back_inserter(v_intersection));
+      //     if(v_intersection.size() == 2){
+      //
+      //     }
+      //   }
+        // Imatrix.conservativeResize(Imatrix.rows() + 1, Eigen::NoChange);
+        // Ivector ivec << id0, id1, id2;
+        // Imatrix.bottomRows(1) = ivec;
+      //}
       const Rcpp::String facetAsString = stringTriple(ids[0], ids[1], ids[2]);
       i++;
       facetsMap[facetAsString] = i;
@@ -419,7 +447,26 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
     Rcpp::colnames(facets) = columnNames;
     facets.attr("info") =
       "The `onhull` column indicates whether the face is on the convex hull.";
-
+  }
+  {
+    for(size_t i = 0; i < nfacets-1; i++){
+      Rcpp::IntegerVector facet_i = facets(i, Rcpp::_);
+      if(facet_i(3)){
+        for(size_t j = i+1; j < nfacets; j++){
+          Rcpp::IntegerVector facet_j = facets(j, Rcpp::_);
+          if(facet_j(3)){
+            std::vector<int> v_intersection;
+            std::set_intersection(facet_i.begin(), facet_i.end(),
+                                  facet_j.begin(), facet_j.end(),
+                                  std::back_inserter(v_intersection));
+            if(v_intersection.size() == 2){
+              Rcpp::Rcout << v_intersection(0) << " --- "
+              Rcpp::Rcout << v_intersection(1) << "\n"
+            }
+          }
+        }
+      }
+    }
   }
 
   Rcpp::List cells(ncells);
