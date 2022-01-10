@@ -7,3 +7,4 @@
 ^data-raw$
 ^inst/makegifs$
 ^inst/PoissonExamples$
+^inst/DelaunayExamples$

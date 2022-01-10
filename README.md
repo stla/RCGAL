@@ -6,7 +6,7 @@
 
 Wrapping the C++ library **CGAL** in R. Convex hull, Delaunay tessellation, surface reconstruction.
 
-## Some examples of Poisson recontruction
+## Some examples of Poisson reconstruction
 
 *Toroidal helix:*
 
@@ -32,6 +32,14 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 *Dupin cyclide:*
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/cyclide.png)
+
+
+## Elevated Delaunay triangulation
+
+*Bivariate Gaussian density:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/DelaunayExamples/bivariateGaussian.png)
+
 
 
 ## License
