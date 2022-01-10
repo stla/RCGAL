@@ -448,26 +448,26 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
     facets.attr("info") =
       "The `onhull` column indicates whether the face is on the convex hull.";
   }
-  {
-    for(size_t i = 0; i < nfacets-1; i++){
-      Rcpp::IntegerVector facet_i = facets(i, Rcpp::_);
-      if(facet_i(3)){
-        for(size_t j = i+1; j < nfacets; j++){
-          Rcpp::IntegerVector facet_j = facets(j, Rcpp::_);
-          if(facet_j(3)){
-            std::vector<int> v_intersection;
-            std::set_intersection(facet_i.begin(), facet_i.end(),
-                                  facet_j.begin(), facet_j.end(),
-                                  std::back_inserter(v_intersection));
-            if(v_intersection.size() == 2){
-              Rcpp::Rcout << v_intersection(0) << " --- "
-              Rcpp::Rcout << v_intersection(1) << "\n"
-            }
-          }
-        }
-      }
-    }
-  }
+  // {
+  //   for(size_t i = 0; i < nfacets-1; i++){
+  //     Rcpp::IntegerVector facet_i = facets(i, Rcpp::_);
+  //     if(facet_i(3)){
+  //       for(size_t j = i+1; j < nfacets; j++){
+  //         Rcpp::IntegerVector facet_j = facets(j, Rcpp::_);
+  //         if(facet_j(3)){
+  //           std::vector<int> v_intersection;
+  //           std::set_intersection(facet_i.begin(), facet_i.end(),
+  //                                 facet_j.begin(), facet_j.end(),
+  //                                 std::back_inserter(v_intersection));
+  //           if(v_intersection.size() == 2){
+  //             Rcpp::Rcout << v_intersection(0) << " --- "
+  //             Rcpp::Rcout << v_intersection(1) << "\n"
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   Rcpp::List cells(ncells);
   double totalVolume = 0.0;

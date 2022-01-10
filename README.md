@@ -16,7 +16,7 @@ Wrapping the C++ library **CGAL** in R. Convex hull, Delaunay tessellation, surf
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/SpiderCage.png)
 
-*Solid Möbius strip*:
+*Solid Möbius strip:*
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/SolidMobiusStrip.png)
 
@@ -29,4 +29,12 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/HopfTorusMesh_spacing02.png)
 
+*Dupin cyclide:*
 
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/cyclide.png)
+
+
+## License
+
+This package is provided under the GPL-3 license. If you wish to use CGAL for commercial purposes, you must obtain a license from
+the [GeometryFactory](https://geometryfactory.com).

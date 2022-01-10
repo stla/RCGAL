@@ -1,11 +1,10 @@
 Package: RCGAL
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 1.0.9000
+Title: An Incomplete Wrapper of the 'CGAL' C++ Library
+Version: 0.0.9000
 Author: Stéphane Laurent
 Maintainer: Stéphane Laurent <laurent_step@outlook.fr>
-Description: One paragraph description of what the package does as one or
-        more full sentences.
+Description: Partly wraps the 'CGAL' C++ library. Can perform convex hull construction and Delaunay tessellation in 2D or 3D, including elevated Delaunay triangulation, and provides some surface reconstruction techniques: Poisson surface reconstruction and advanced front surface reconstruction.
 Encoding: UTF-8
 License: GPL-3
 Imports: Rcpp (>= 1.0.7), rgl, Rvcg
