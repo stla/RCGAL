@@ -33,6 +33,11 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/cyclide.png)
 
+*Clifford torus:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/CliffordTorus.gif)
+
+
 
 ## Elevated Delaunay triangulation
 
