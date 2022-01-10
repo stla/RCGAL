@@ -824,8 +824,8 @@ Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts) {
     for(Delaunay_xy::Finite_edges_iterator eit = itedges.begin();
         eit != itedges.end(); eit++) {
       const std::pair<Delaunay_xy::Face_handle, int> edge = *eit;
-      edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info();
-      edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();
+      edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info() + 1;
+      edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info() + 1;
       i++;
     }
   }
