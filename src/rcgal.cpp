@@ -116,8 +116,11 @@ typedef CGAL::Delaunay_triangulation_2<Pxy, Tds_xy> Delaunay_xy;
 
 typedef Rcpp::NumericVector Dvector;
 
-typedef Eigen::Matrix<unsigned, Eigen::Dynamic, 3, Eigen::RowMajor | Eigen::AutoAlign> Imatrix;
-typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign> Ivector;
+typedef Eigen::
+    Matrix<unsigned, Eigen::Dynamic, 3, Eigen::RowMajor | Eigen::AutoAlign>
+        Imatrix;
+typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign>
+    Ivector;
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -312,6 +315,14 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts) {
       Rcpp::Named("volume") = volume);
 }
 
+Rcpp::String stringPair(const size_t i, const size_t j) {
+  const size_t i0 = std::min(i, j);
+  const size_t i1 = std::max(i, j);
+  const Rcpp::CharacterVector stringids = Rcpp::CharacterVector::create(
+      std::to_string(i0), "-", std::to_string(i1));
+  return Rcpp::collapse(stringids);
+}
+
 // [[Rcpp::export]]
 Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
   const size_t npoints = pts.nrow();
@@ -347,12 +358,32 @@ Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
     for(DT2::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
         eit++) {
       const std::pair<DT2::Face_handle, int> edge = *eit;
-      edges(i, 0) = edge.first->vertex((edge.second + 1) % 3)->info();
-      edges(i, 1) = edge.first->vertex((edge.second + 2) % 3)->info();
+      const size_t i0 = edge.first->vertex((edge.second + 1) % 3)->info();
+      const size_t i1 = edge.first->vertex((edge.second + 2) % 3)->info();
+      edges(i, 0) = i0;
+      edges(i, 1) = i1;
+      const Rcpp::String i0i1 = stringPair(i0, i1);
+      unsigned flag = 0;
+      size_t j = 0;
+      while(flag < 2 && j <= nfaces) {
+        Rcpp::String pair01 =
+            stringPair((size_t)faces(j, 0), (size_t)faces(j, 1));
+        Rcpp::String pair02 =
+            stringPair((size_t)faces(j, 0), (size_t)faces(j, 2));
+        Rcpp::String pair12 =
+            stringPair((size_t)faces(j, 1), (size_t)faces(j, 2));
+        if(i0i1 == pair01 || i0i1 == pair02 || i0i1 == pair12) {
+          flag++;
+        }
+        j++;
+      }
+      if(flag == 1) {
+        edges(i, 2) = 1;
+      }
       i++;
     }
     Rcpp::CharacterVector columnNames =
-      Rcpp::CharacterVector::create("i1", "i2", "border");
+        Rcpp::CharacterVector::create("i1", "i2", "border");
     Rcpp::colnames(edges) = columnNames;
     edges.attr("info") = "The `border` column indicates border edges.";
   }
@@ -417,7 +448,7 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
       facets(i, 1) = id1;
       facets(i, 2) = id2;
       bool onhull = mesh.is_infinite(facet.first) ||
-        mesh.is_infinite(mesh.mirror_facet(facet).first);
+                    mesh.is_infinite(mesh.mirror_facet(facet).first);
       facets(i, 3) = onhull;
       std::array<unsigned, 3> ids = {id0, id1, id2};
       std::sort(ids.begin(), ids.end());
@@ -434,19 +465,19 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
       //
       //     }
       //   }
-        // Imatrix.conservativeResize(Imatrix.rows() + 1, Eigen::NoChange);
-        // Ivector ivec << id0, id1, id2;
-        // Imatrix.bottomRows(1) = ivec;
+      // Imatrix.conservativeResize(Imatrix.rows() + 1, Eigen::NoChange);
+      // Ivector ivec << id0, id1, id2;
+      // Imatrix.bottomRows(1) = ivec;
       //}
       const Rcpp::String facetAsString = stringTriple(ids[0], ids[1], ids[2]);
       i++;
       facetsMap[facetAsString] = i;
     }
     Rcpp::CharacterVector columnNames =
-      Rcpp::CharacterVector::create("i1", "i2", "i3", "onhull");
+        Rcpp::CharacterVector::create("i1", "i2", "i3", "onhull");
     Rcpp::colnames(facets) = columnNames;
     facets.attr("info") =
-      "The `onhull` column indicates whether the face is on the convex hull.";
+        "The `onhull` column indicates whether the face is on the convex hull.";
   }
   // {
   //   for(size_t i = 0; i < nfacets-1; i++){
