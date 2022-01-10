@@ -16,6 +16,52 @@ elevations; see the example}
 }
 \value{
 The Delaunay tessellation.
+\itemize{
+  \item \strong{If the dimension is 2}, the returned value is a list with
+        two fields: \code{faces} and \code{edges}. The \code{faces} field
+        contains an integer matrix with three columns; each row represents a
+        triangle whose each vertex is given by the index (row number) of
+        this point in the \code{points} matrix. The \code{edges} field
+        also contains an integer matrix with three columns. The two first
+        integers of a row are the indices of the two points which form the
+        edge. The third column, named \code{border}, only contains some
+        zeros and some ones; a border (exterior) edge is labelled by a
+        \code{1}.
+  \item \strong{If the dimension is 3}, the returned value is a list with
+        four fields: \code{cells}, \code{facets}, \code{edges}, and
+        \code{volume}. The \code{cells} field represents the tetrahedra
+        which form the tessellation. The \code{facets} field represents
+        the faces of these tetrahedra, some triangles. The \code{edges}
+        field represents the edges of these triangles. The \code{volume}
+        field provides only one number, the volume of the tessellation,
+        in other words the volume of the convex hull of the given points.
+        The \code{cells} field is a list of lists. Each sublist is composed
+        of three fields: \code{cell} provides the indices of the four
+        vertices of the corresponding tetrahedron, \code{faces} provides the
+        indices of the four faces of the tetrahedron, that is to say the row
+        number of the \code{facets} field which represents this face, and
+        finally there is a \code{volume} field which provides the volume of
+        the tetrahedron. The \code{facets} field is an integer matrix with
+        four columns. The three first integers of a row are the indices of
+        the points which form the corresponding facet. The fourth column,
+        names \code{onhull} is composed of zeros and ones only, and a
+        \code{1} means that the corresponding facet lies on the convex hull
+        of the points. The \code{edges} field contains an integer matrix
+        with two columns. Each row represents an edge, given by the two
+        indices of the points which form this edge. Finally the \code{volume}
+        field provides only one number, the volume of the tessellation (i.e.
+        the volume of the convex hull of the points).
+  \item \strong{If} \code{elevation=TRUE}, the returned value is a list with
+        four fields: \code{mesh}, \code{edges}, \code{faceVolumes}, and
+        \code{volume}. The \code{mesh} field is an object of class
+        \code{mesh3d}, ready for plotting with the \strong{rgl} package. The
+        \code{edges} field provides the indices of the edges, given as an
+        integer matrix with two columns. The \code{faceVolumes} is a numeric
+        vector, it provides the volumes under the faces that can be found in
+        the \code{mesh} field. Finally the \code{volume} field provides the
+        sum of these volumes, that is to say the total volume under the
+        triangulated surface.
+}
 }
 \description{
 Delaunay tessellation of a set of 2D or 3D points.
