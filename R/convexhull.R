@@ -181,12 +181,13 @@ plotConvexHull3D <- function(
   if(edgesAsTubes){
     for(i in 1L:nedges){
       shade3d(
-        cylinder3d(vertices[edge, ], radius = tubeRadius, sides = 90),
+        cylinder3d(vertices[edges[i, ], ], radius = tubeRadius, sides = 90),
         color = tubeColor
       )
     }
+    vertices <- do.call(rbind, lapply(hull[["vertices"]], `[[`, "point"))
     spheres3d(
-      hull[["vertices"]], radius = 1.5*tubeRadius, color = tubeColor
+      vertices, radius = 1.5*tubeRadius, color = tubeColor
     )
   }else{
     for(i in 1L:nedges){
