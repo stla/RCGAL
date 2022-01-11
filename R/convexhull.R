@@ -45,6 +45,44 @@
 #' @export
 #'
 #' @examples library(RCGAL)
+#' # 2D example ####
+#' pts <- rbind(
+#'   c(-1, -1),
+#'   c(-1,  1),
+#'   c( 1, -1),
+#'   c( 1,  1),
+#'   c( 2,  0),
+#'   c( 0,  2),
+#'   c(-2,  0),
+#'   c( 0, -2)
+#' )
+#' hull <- convexhull(pts)
+#' # it's easy to plot a 2D convex hull:
+#' plot(hull[["vertices]], asp = 1, pch = 19)
+#' polygon(hull[["vertices]], col = "green")
+#'
+#' # a 3D example
+#' cube <- rbind(
+#'   c(-1, -1, -1),
+#'   c(-1, -1,  1),
+#'   c(-1,  1, -1),
+#'   c(-1,  1,  1),
+#'   c( 1, -1, -1),
+#'   c( 1, -1,  1),
+#'   c( 1,  1, -1),
+#'   c( 1,  1,  1),
+#'   c( 0,  0,  0)
+#' )
+#' hull <- convexhull(cube)
+#' hull[["vertices"]][[1]]
+#' # the non-border edges are the diagonals of the faces:
+#' hull[["edges]]
+#' hull[["surface]]
+#' hull[["volume"]]
+#' # plot:
+#' library(rgl)
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' plotConvexHull3D(hull)
 convexhull <- function(
   points
 ){
