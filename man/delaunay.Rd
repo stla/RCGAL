@@ -44,11 +44,13 @@ The Delaunay tessellation.
         the tetrahedron. The \code{facets} field is an integer matrix with
         four columns. The three first integers of a row are the indices of
         the points which form the corresponding facet. The fourth column,
-        names \code{onhull} is composed of zeros and ones only, and a
+        named \code{onhull} is composed of zeros and ones only, and a
         \code{1} means that the corresponding facet lies on the convex hull
         of the points. The \code{edges} field contains an integer matrix
-        with two columns. Each row represents an edge, given by the two
-        indices of the points which form this edge. Finally the \code{volume}
+        with three columns. Each row represents an edge, given by the two
+        indices of the points which form this edge, and the third integer,
+        in the column named \code{onhull} is a \code{0/1} indicator of
+        whether the edge lies on the convex hull. Finally the \code{volume}
         field provides only one number, the volume of the tessellation (i.e.
         the volume of the convex hull of the points).
   \item \strong{If} \code{elevation=TRUE}, the returned value is a list with
