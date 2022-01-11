@@ -74,3 +74,47 @@ convexhull <- function(
   attr(out, "points") <- points
   out
 }
+
+
+plotConvexHull3D <- function(
+  hull, color = "distinct", hue = "random", luminosity = "light",
+  alpha = 1, edgesAsTubes = FALSE, tubeRadius, tubeColor
+){
+  if(!inherits(hull, "cxhull")){
+    stop(
+      "The argument `hull` must be an output of the `convexhull` function.",
+      call. = TRUE
+    )
+  }
+  vertices <- attr(hull, "points")
+  if(ncol(vertices) != 3L){
+    stop(
+      sprintf("Invalid dimension (%d instead of 3).", ncol(vertices)),
+      call. = TRUE
+    )
+  }
+  triangles <- hull[["faces"]]
+  ntriangles <- nrow(triangles)
+  if(!isFALSE(color)){
+    Color <- pmatch(color, c("random", "distinct"))
+    if(is.na(Color)){
+      colors <- rep(color, ntriangles)
+    }else if(Color == "random"){
+      colors <- randomColor(ntriangles, hue = hue, luminosity = luminosity)
+    }else{
+      colors <- distinctColorPalette(ntriangles)
+    }
+    for(i in 1L:ntriangles){
+      triangles3d(vertices[triangles[i, ], ], color = colors[i])
+    }
+  }
+  edges <- hull[["edges"]]
+  isborder <- edges[, 3L] == 1L
+  edges <- edges[isborder, c(1L, 2L)]
+  nedges <- nrow(edges)
+  for(i in 1L:nedges){
+    edge <- edges[i, ]
+    lines3d(vertices[edge, ])
+  }
+  invisible(NULL)
+}
