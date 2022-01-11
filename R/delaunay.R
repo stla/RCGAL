@@ -206,3 +206,82 @@ plotDelaunay2D <- function(
     }
   }
 }
+
+
+#' @title Plot 3D Delaunay tessellation
+#' @description Plot a 3D Delaunay tessellation with \strong{rgl}.
+#'
+#' @param tessellation the output of \code{\link{delaunay}} with 3D points
+#' @param color controls the filling colors of the tetrahedra, either
+#'   \code{FALSE} for no color, \code{"random"} to use
+#'   \code{\link[randomcoloR]{randomColor}}, or \code{"distinct"} to use
+#'   \code{\link[randomcoloR]{distinctColorPalette}}
+#' @param hue,luminosity if \code{color="random"}, these arguments are passed
+#'   to \code{\link[randomcoloR]{randomColor}}
+#' @param alpha opacity, number between 0 and 1
+#'
+#' @return No value, just renders a 3D plot.
+#' @export
+#' @importFrom randomcoloR randomColor distinctColorPalette
+#' @importFrom utils combn
+#' @importFrom rgl triangles3d
+#'
+#' @examples library(RCGAL)
+#' pts <- rbind(
+#'   c(-5, -5,  16),
+#'   c(-5,  8,   3),
+#'   c(4,  -1,   3),
+#'   c(4,  -5,   7),
+#'   c(4,  -1, -10),
+#'   c(4,  -5, -10),
+#'   c(-5,  8, -10),
+#'   c(-5, -5, -10)
+#' )
+#' tess <- delaunay(pts)
+#' library(rgl)
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' plotDelaunay3D(tess)
+plotDelaunay3D <- function(
+  tessellation, color = "distinct", hue = "random", luminosity = "light",
+  alpha = 0.3
+){
+  if(!inherits(tessellation, "delaunay")){
+    stop(
+      "The argument `tessellation` must be an output of the `delaunay` function.",
+      call. = TRUE
+    )
+  }
+  vertices <- attr(tessellation, "points")
+  if(ncol(vertices) != 3L){
+    stop(
+      sprintf("Invalid dimension (%d instead of 3).", ncol(vertices)),
+      call. = TRUE
+    )
+  }
+  cells <- tessellation[["cells"]]
+  ntetrahedra <- length(cells)
+  if(!isFALSE(color)){
+    color <- match.arg(color, c("random", "distinct"))
+    if(color == "random"){
+      colors <- randomColor(ntetrahedra, hue = hue, luminosity = luminosity)
+    }else{
+      colors <- distinctColorPalette(ntetrahedra)
+    }
+    triangles <- combn(4L, 3L)
+    for(i in 1L:ntetrahedra){
+      cellIds <- cells[[i]][["cell"]]
+      simplex <- vertices[cellIds, ]
+      for(j in 1L:4L){
+        triangles3d(simplex[triangles[, j], ], color = colors[i], alpha = alpha)
+      }
+    }
+  }
+  edges <- tessellation[["edges"]]
+  for(i in 1L:nrow(edges)){
+    edge <- edges[i, ]
+    p1 <- vertices[edge[1L], ]
+    p2 <- vertices[edge[2L], ]
+    lines3d(rbind(p1, p2), color = "black")
+  }
+  invisible(NULL)
+}
