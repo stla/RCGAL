@@ -392,9 +392,13 @@ Rcpp::List del2d_cpp(Rcpp::NumericMatrix pts) {
                             Rcpp::Named("edges") = edges);
 }
 
-Rcpp::String stringTriple(const unsigned i,
-                          const unsigned j,
-                          const unsigned k) {
+std::array<Rcpp::String, 3> triangleEdges(const size_t i0,
+                                          const size_t i1,
+                                          const size_t i2) {
+  return {stringPair(i0, i1), stringPair(i0, i2), stringPair(i1, i2)};
+}
+
+Rcpp::String stringTriple(const size_t i, const size_t j, const size_t k) {
   const Rcpp::CharacterVector stringids = Rcpp::CharacterVector::create(
       std::to_string(i), "-", std::to_string(j), "-", std::to_string(k));
   return Rcpp::collapse(stringids);
@@ -415,24 +419,10 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
   const size_t ncells = mesh.number_of_finite_cells();
   const size_t nedges = mesh.number_of_finite_edges();
 
-  const DT3::Finite_edges itedges = mesh.finite_edges();
-  Rcpp::IntegerMatrix edges(nedges, 2);
-  {
-    size_t i = 0;
-    for(DT3::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
-        eit++) {
-      const CGAL::Triple<DT3::Cell_handle, int, int> edge = *eit;
-      unsigned i0 = edge.first->vertex(edge.second % 4)->info();
-      unsigned i1 = edge.first->vertex(edge.third % 4)->info();
-      edges(i, 0) = std::min(i0, i1);
-      edges(i, 1) = std::max(i0, i1);
-      i++;
-    }
-  }
-
   std::map<Rcpp::String, size_t> facetsMap = {};
   Rcpp::IntegerMatrix facets(nfacets, 4);
-  Imatrix facetsOnHull(0, 3);
+  //Imatrix facetsOnHull(0, 3);
+  std::vector<Rcpp::String> edgesOnHull(0);
   {
     size_t i = 0;
     for(DT3::Finite_facets_iterator fit = mesh.finite_facets_begin();
@@ -441,16 +431,20 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
       DT3::Vertex_handle v0 = facet.first->vertex((facet.second + 1) % 4);
       DT3::Vertex_handle v1 = facet.first->vertex((facet.second + 2) % 4);
       DT3::Vertex_handle v2 = facet.first->vertex((facet.second + 3) % 4);
-      const unsigned id0 = v0->info();
-      const unsigned id1 = v1->info();
-      const unsigned id2 = v2->info();
+      const size_t id0 = v0->info();
+      const size_t id1 = v1->info();
+      const size_t id2 = v2->info();
       facets(i, 0) = id0;
       facets(i, 1) = id1;
       facets(i, 2) = id2;
       bool onhull = mesh.is_infinite(facet.first) ||
                     mesh.is_infinite(mesh.mirror_facet(facet).first);
-      facets(i, 3) = onhull;
-      std::array<unsigned, 3> ids = {id0, id1, id2};
+      if(onhull) {
+        facets(i, 3) = onhull;
+        std::array<Rcpp::String, 3> triangle = triangleEdges(id0, id1, id2);
+        edgesOnHull.insert(edgesOnHull.end(), triangle.begin(), triangle.end());
+      }
+      std::array<size_t, 3> ids = {id0, id1, id2};
       std::sort(ids.begin(), ids.end());
       // if(onhull){
       //   bool notcoplanar = true;
@@ -479,6 +473,32 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
     facets.attr("info") =
         "The `onhull` column indicates whether the face is on the convex hull.";
   }
+
+  const DT3::Finite_edges itedges = mesh.finite_edges();
+  Rcpp::IntegerMatrix edges(nedges, 3);
+  {
+    size_t i = 0;
+    for(DT3::Finite_edges_iterator eit = itedges.begin(); eit != itedges.end();
+        eit++) {
+      const CGAL::Triple<DT3::Cell_handle, int, int> edge = *eit;
+      size_t i0 = edge.first->vertex(edge.second % 4)->info();
+      size_t i1 = edge.first->vertex(edge.third % 4)->info();
+      edges(i, 0) = i0;  // std::min(i0, i1);
+      edges(i, 1) = i1;  // std::max(i0, i1);
+      Rcpp::String i0i1 = stringPair(i0, i1);
+      if(std::find(edgesOnHull.begin(), edgesOnHull.end(), i0i1) !=
+         edgesOnHull.end()) {
+        edges(i, 2) = 1;
+      }
+      i++;
+    }
+    Rcpp::CharacterVector columnNames =
+        Rcpp::CharacterVector::create("i1", "i2", "onhull");
+    Rcpp::colnames(edges) = columnNames;
+    edges.attr("info") =
+        "The `onhull` column indicates whether the edge is on the convex hull.";
+  }
+
   // {
   //   for(size_t i = 0; i < nfacets-1; i++){
   //     Rcpp::IntegerVector facet_i = facets(i, Rcpp::_);
