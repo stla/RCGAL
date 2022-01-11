@@ -61,7 +61,7 @@
 #' plot(hull[["vertices]], asp = 1, pch = 19)
 #' polygon(hull[["vertices]], col = "green")
 #'
-#' # a 3D example
+#' # a 3D example ####
 #' cube <- rbind(
 #'   c(-1, -1, -1),
 #'   c(-1, -1,  1),
@@ -114,6 +114,34 @@ convexhull <- function(
 }
 
 
+#' @title Plot 3D convex hull
+#' @description Plot a 3D convex hull with \strong{rgl}.
+#'
+#' @param hull the output of \code{\link{convexhull}} with 3D points
+#' @param color controls the colors of the faces, either
+#'   \code{FALSE} for no color, \code{"random"} to use
+#'   \code{\link[randomcoloR]{randomColor}}, \code{"distinct"} to use
+#'   \code{\link[randomcoloR]{distinctColorPalette}}, or a single color
+#' @param hue,luminosity if \code{color="random"}, these arguments are passed
+#'   to \code{\link[randomcoloR]{randomColor}}
+#' @param alpha opacity, number between 0 and 1
+#' @param edgesAsTubes Boolean, whether to plot the edges as tubes
+#' @param tubeRadius if \code{edgesAsTubes=TRUE}, the radius of the tubes
+#' @param tubeColor if \code{edgesAsTubes=TRUE}, the color of the tubes
+#'
+#' @return No value, just renders a 3D plot.
+#' @export
+#' @importFrom randomcoloR randomColor distinctColorPalette
+#' @importFrom rgl triangles3d spheres3d cylinder3d shade3d
+#' @examples library(RCGAL)
+#' library(rgl)
+#' dodecahedron <- t(dodecahedron3d()$vb[-4, ])
+#' hull <- convexhull(dodecahedron)
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' plotConvexHull3D(
+#'   hull, color = "navy", edgesAsTubes = TRUE,
+#'   tubeRadius = 0.03, tubeColor = "gold"
+#' )
 plotConvexHull3D <- function(
   hull, color = "distinct", hue = "random", luminosity = "light",
   alpha = 1, edgesAsTubes = FALSE, tubeRadius, tubeColor

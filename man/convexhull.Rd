@@ -70,7 +70,7 @@ hull <- convexhull(pts)
 plot(hull[["vertices]], asp = 1, pch = 19)
 polygon(hull[["vertices]], col = "green")
 
-# a 3D example
+# a 3D example ####
 cube <- rbind(
   c(-1, -1, -1),
   c(-1, -1,  1),
