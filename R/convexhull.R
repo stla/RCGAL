@@ -178,9 +178,21 @@ plotConvexHull3D <- function(
   isborder <- edges[, 3L] == 1L
   edges <- edges[isborder, c(1L, 2L)]
   nedges <- nrow(edges)
-  for(i in 1L:nedges){
-    edge <- edges[i, ]
-    lines3d(vertices[edge, ])
+  if(edgesAsTubes){
+    for(i in 1L:nedges){
+      shade3d(
+        cylinder3d(vertices[edge, ], radius = tubeRadius, sides = 90),
+        color = tubeColor
+      )
+    }
+    spheres3d(
+      hull[["vertices"]], radius = 1.5*tubeRadius, color = tubeColor
+    )
+  }else{
+    for(i in 1L:nedges){
+      edge <- edges[i, ]
+      lines3d(vertices[edge, ])
+    }
   }
   invisible(NULL)
 }
