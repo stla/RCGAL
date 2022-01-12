@@ -190,7 +190,7 @@ convexhull <- function(
 #'
 #' # the dodecahedron with multiple colors ####
 #' hull <- convexhull(dodecahedron, faceFamilies = TRUE)
-#' plotConvexHull(hull, color = "random", luminosity = "bright")
+#' plotConvexHull3D(hull, color = "random", luminosity = "bright")
 #'
 #' # a strange convex hull ####
 #' pt <- function(x){
@@ -231,11 +231,12 @@ plotConvexHull3D <- function(
         triangles3d(vertices[triangles[i, ], ], color = colors[i])
       }
     }else{
-      if(!is.null(families <- attr(triangle, "families"))){
+      if(!is.null(families <- attr(triangles, "families"))){
         faceFamilies <- TRUE
         NAfamilies <- which(is.na(families))
         families[NAfamilies] <- paste0("NA", NAfamilies)
-        ncolors <- length(unique(families))
+        distinctFamilies <- unique(families)
+        ncolors <- length(distinctFamilies)
       }
       if(Color == 1L){
         colors <- randomColor(ncolors, hue = hue, luminosity = luminosity)
@@ -243,7 +244,7 @@ plotConvexHull3D <- function(
         colors <- distinctColorPalette(ncolors)
       }
       if(faceFamilies){
-        names(colors) <- families
+        names(colors) <- distinctFamilies
         for(i in 1L:ntriangles){
           triangles3d(vertices[triangles[i, ], ], color = colors[families[i]])
         }

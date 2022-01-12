@@ -54,7 +54,7 @@ plotConvexHull3D(
 
 # the dodecahedron with multiple colors ####
 hull <- convexhull(dodecahedron, faceFamilies = TRUE)
-plotConvexHull(hull, color = "random", luminosity = "bright")
+plotConvexHull3D(hull, color = "random", luminosity = "bright")
 
 # a strange convex hull ####
 pt <- function(x){

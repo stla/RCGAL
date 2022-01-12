@@ -4,7 +4,7 @@
 \alias{convexhull}
 \title{Convex hull}
 \usage{
-convexhull(points)
+convexhull(points, faceFamilies = FALSE)
 }
 \arguments{
 \item{points}{numeric matrix which stores the points, one point per row}
