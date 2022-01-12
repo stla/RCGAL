@@ -67,8 +67,8 @@ pts <- rbind(
 )
 hull <- convexhull(pts)
 # it's easy to plot a 2D convex hull:
-plot(hull[["vertices]], asp = 1, pch = 19)
-polygon(hull[["vertices]], col = "green")
+plot(hull[["vertices"]], asp = 1, pch = 19)
+polygon(hull[["vertices"]], col = "green")
 
 # a 3D example ####
 cube <- rbind(
