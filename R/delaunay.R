@@ -60,7 +60,7 @@
 #' @importFrom rgl tmesh3d addNormals
 #'
 #' @examples library(RCGAL)
-#' # elevated Delaunay triangulation
+#' # elevated Delaunay triangulation ####
 #' f <- function(x, y){
 #'   2 * exp(-(x^2 + y^2)) # integrate to 2pi
 #' }
@@ -149,9 +149,8 @@ delaunay <- function(
 #' @importFrom randomcoloR randomColor distinctColorPalette
 #' @importFrom graphics plot polygon par segments
 #'
-#' @examples # random points in a square
+#' @examples # random points in a square ####
 #' set.seed(314)
-#' library(tessellation)
 #' library(uniformly)
 #' square <- rbind(
 #'   c(-1, 1), c(1, 1), c(1, -1), c(-1, -1)

@@ -70,7 +70,7 @@ Delaunay tessellation of a set of 2D or 3D points.
 }
 \examples{
 library(RCGAL)
-# elevated Delaunay triangulation
+# elevated Delaunay triangulation ####
 f <- function(x, y){
   2 * exp(-(x^2 + y^2)) # integrate to 2pi
 }
