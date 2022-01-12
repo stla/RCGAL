@@ -132,7 +132,7 @@ convexhull <- function(
 #' @return No value, just renders a 3D plot.
 #' @export
 #' @importFrom randomcoloR randomColor distinctColorPalette
-#' @importFrom rgl triangles3d spheres3d cylinder3d shade3d
+#' @importFrom rgl triangles3d spheres3d cylinder3d shade3d lines3d
 #' @examples library(RCGAL)
 #' library(rgl)
 #' dodecahedron <- t(dodecahedron3d()$vb[-4, ])
@@ -142,6 +142,18 @@ convexhull <- function(
 #'   hull, color = "navy", edgesAsTubes = TRUE,
 #'   tubeRadius = 0.03, tubeColor = "gold"
 #' )
+#'
+#' # a strange convex hull ####
+#' pt <- function(x){
+#'   c(
+#'     sin(x) * cos(2 * x),
+#'     sin(x) * sin(2 * x),
+#'     cos(x)
+#'   )
+#' }
+#' pts <- t(vapply(seq(0, pi, length.out = 50), pt, numeric(3L)))
+#' hull <- convexhull(pts)
+#' plotConvexHull3D(hull, color = "random", hue = "purple", luminosity = "dark")
 plotConvexHull3D <- function(
   hull, color = "distinct", hue = "random", luminosity = "light",
   alpha = 1, edgesAsTubes = FALSE, tubeRadius, tubeColor
@@ -165,7 +177,7 @@ plotConvexHull3D <- function(
     Color <- pmatch(color, c("random", "distinct"))
     if(is.na(Color)){
       colors <- rep(color, ntriangles)
-    }else if(Color == "random"){
+    }else if(Color == 1L){
       colors <- randomColor(ntriangles, hue = hue, luminosity = luminosity)
     }else{
       colors <- distinctColorPalette(ntriangles)
