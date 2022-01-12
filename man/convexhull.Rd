@@ -85,8 +85,8 @@ cube <- rbind(
 hull <- convexhull(cube)
 hull[["vertices"]][[1]]
 # the non-border edges are the diagonals of the faces:
-hull[["edges]]
-hull[["surface]]
+hull[["edges"]]
+hull[["surface"]]
 hull[["volume"]]
 # plot:
 library(rgl)
