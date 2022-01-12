@@ -8,6 +8,14 @@ convexhull(points)
 }
 \arguments{
 \item{points}{numeric matrix which stores the points, one point per row}
+
+\item{faceFamilies}{Boolean, for 3D only; faces are always triangular, and
+the family of a face is the set of faces adjacent and coplanar with this
+face (in other words, the coplanar neighbors of this face); set this
+argument to \code{TRUE} if you want the face families; this gives a label
+of the family for each face, or \code{NA} is the face is "alone" (has no
+coplanar neighbor); this is useful for plotting (see the examples in
+\code{\link{plotConvexHull3D}})}
 }
 \value{
 The convex hull.
@@ -42,8 +50,9 @@ The convex hull.
                the indices of the three points which form the face. This
                matrix has three attributes: \emph{areas}, which provides the
                areas of the faces, \emph{normals}, which provides the normals
-               of the faces, and \emph{circumcenters}, which provides the
-               circumcenters of the faces.}
+               of the faces, \emph{circumcenters}, which provides the
+               circumcenters of the faces, and \emph{families} if you set
+               \code{faceFamilies=TRUE}.}
           \item{\emph{surface}}{A number, the surface of the convex hull.}
           \item{\emph{volume}}{A number, the volume of the convex hull.}
         }

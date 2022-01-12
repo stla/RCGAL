@@ -43,6 +43,7 @@ Plot a 3D convex hull with \strong{rgl}.
 \examples{
 library(RCGAL)
 library(rgl)
+# blue dodecahedron with edges as tubes ####
 dodecahedron <- t(dodecahedron3d()$vb[-4, ])
 hull <- convexhull(dodecahedron)
 open3d(windowRect = c(50, 50, 562, 562))
@@ -50,6 +51,10 @@ plotConvexHull3D(
   hull, color = "navy", edgesAsTubes = TRUE,
   tubeRadius = 0.03, tubeColor = "gold"
 )
+
+# the dodecahedron with multiple colors ####
+hull <- convexhull(dodecahedron, faceFamilies = TRUE)
+plotConvexHull(hull, color = "random", luminosity = "bright")
 
 # a strange convex hull ####
 pt <- function(x){

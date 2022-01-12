@@ -1,7 +1,46 @@
+makeFaceFamilies <- function(faces, edges){
+  Faces <- apply(faces, 1L, function(f){
+    f <- sort(f)
+    c(
+      paste0(f[c(1L, 2L)], collapse = "-"),
+      paste0(f[c(1L, 3L)], collapse = "-"),
+      paste0(f[c(2L, 3L)], collapse = "-")
+    )
+  })
+  Edges0 <- apply(edges[edges[, 3L]==0L, c(1L, 2L)], 1L, function(e){
+    paste0(sort(e), collapse = "-")
+  })
+  Edges0Faces <- apply(Faces, 2L, function(f){
+    sort(match(f, Edges0))
+  }, simplify = FALSE)
+  nfaces <- nrow(faces)
+  families <- vector("list", nfaces)
+  fseq <- 1L:nfaces
+  for(j in fseq){
+    Edges0Faces_j <- Edges0Faces[[j]]
+    for(i in fseq[-j]){
+      if(any(Edges0Faces_j %in% Edges0Faces[[i]])){
+        families[[j]] <- families[[i]] <- union(Edges0Faces[[i]], Edges0Faces_j)
+        break
+      }
+    }
+  }
+  vapply(families, function(f){
+    if(is.null(f)) NA_character_ else paste0(sort(f), collapse = "-")
+  }, character(1L))
+}
+
 #' @title Convex hull
 #' @description Convex hull of a set of 2D or 3D points.
 #'
 #' @param points numeric matrix which stores the points, one point per row
+#' @param faceFamilies Boolean, for 3D only; faces are always triangular, and
+#'   the family of a face is the set of faces adjacent and coplanar with this
+#'   face (in other words, the coplanar neighbors of this face); set this
+#'   argument to \code{TRUE} if you want the face families; this gives a label
+#'   of the family for each face, or \code{NA} is the face is "alone" (has no
+#'   coplanar neighbor); this is useful for plotting (see the examples in
+#'   \code{\link{plotConvexHull3D}})
 #'
 #' @return The convex hull.
 #' \itemize{
@@ -36,8 +75,9 @@
 #'                the indices of the three points which form the face. This
 #'                matrix has three attributes: \emph{areas}, which provides the
 #'                areas of the faces, \emph{normals}, which provides the normals
-#'                of the faces, and \emph{circumcenters}, which provides the
-#'                circumcenters of the faces.}
+#'                of the faces, \emph{circumcenters}, which provides the
+#'                circumcenters of the faces, and \emph{families} if you set
+#'                \code{faceFamilies=TRUE}.}
 #'           \item{\emph{surface}}{A number, the surface of the convex hull.}
 #'           \item{\emph{volume}}{A number, the volume of the convex hull.}
 #'         }
@@ -84,7 +124,7 @@
 #' open3d(windowRect = c(50, 50, 562, 562))
 #' plotConvexHull3D(hull)
 convexhull <- function(
-  points
+  points, faceFamilies = FALSE
 ){
   if(!is.matrix(points) || !is.numeric(points)){
     stop("The `points` argument must be a numeric matrix.", call. = TRUE)
@@ -104,13 +144,17 @@ convexhull <- function(
   }
   storage.mode(points) <- "double"
   if(dimension == 2L){
-    out <- cxhull2d_cpp(points)
+    hull <- cxhull2d_cpp(points)
   }else{
-    out <- cxhull3d_cpp(points)
+    hull <- cxhull3d_cpp(points)
+    if(faceFamilies){
+      attr(hull[["faces"]], "families") <-
+        makeFaceFamilies(hull[["faces"]], hull[["edges"]])
+    }
   }
-  class(out) <- "cxhull"
-  attr(out, "points") <- points
-  out
+  class(hull) <- "cxhull"
+  attr(hull, "points") <- points
+  hull
 }
 
 
@@ -135,6 +179,7 @@ convexhull <- function(
 #' @importFrom rgl triangles3d spheres3d cylinder3d shade3d lines3d
 #' @examples library(RCGAL)
 #' library(rgl)
+#' # blue dodecahedron with edges as tubes ####
 #' dodecahedron <- t(dodecahedron3d()$vb[-4, ])
 #' hull <- convexhull(dodecahedron)
 #' open3d(windowRect = c(50, 50, 562, 562))
@@ -142,6 +187,10 @@ convexhull <- function(
 #'   hull, color = "navy", edgesAsTubes = TRUE,
 #'   tubeRadius = 0.03, tubeColor = "gold"
 #' )
+#'
+#' # the dodecahedron with multiple colors ####
+#' hull <- convexhull(dodecahedron, faceFamilies = TRUE)
+#' plotConvexHull(hull, color = "random", luminosity = "bright")
 #'
 #' # a strange convex hull ####
 #' pt <- function(x){
@@ -172,18 +221,37 @@ plotConvexHull3D <- function(
     )
   }
   triangles <- hull[["faces"]]
-  ntriangles <- nrow(triangles)
+  ntriangles <- ncolors <- nrow(triangles)
+  faceFamilies <- FALSE
   if(!isFALSE(color)){
     Color <- pmatch(color, c("random", "distinct"))
     if(is.na(Color)){
       colors <- rep(color, ntriangles)
-    }else if(Color == 1L){
-      colors <- randomColor(ntriangles, hue = hue, luminosity = luminosity)
+      for(i in 1L:ntriangles){
+        triangles3d(vertices[triangles[i, ], ], color = colors[i])
+      }
     }else{
-      colors <- distinctColorPalette(ntriangles)
-    }
-    for(i in 1L:ntriangles){
-      triangles3d(vertices[triangles[i, ], ], color = colors[i])
+      if(!is.null(families <- attr(triangle, "families"))){
+        faceFamilies <- TRUE
+        NAfamilies <- which(is.na(families))
+        families[NAfamilies] <- paste0("NA", NAfamilies)
+        ncolors <- length(unique(families))
+      }
+      if(Color == 1L){
+        colors <- randomColor(ncolors, hue = hue, luminosity = luminosity)
+      }else{
+        colors <- distinctColorPalette(ncolors)
+      }
+      if(faceFamilies){
+        names(colors) <- families
+        for(i in 1L:ntriangles){
+          triangles3d(vertices[triangles[i, ], ], color = colors[families[i]])
+        }
+      }else{
+        for(i in 1L:ntriangles){
+          triangles3d(vertices[triangles[i, ], ], color = colors[i])
+        }
+      }
     }
   }
   edges <- hull[["edges"]]
