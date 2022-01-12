@@ -10,7 +10,7 @@
 // #undef CGAL_error_msg
 // #define CGAL_error_msg(msg)
 
-#include <iostream>
+// #include <iostream>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Polyhedron_3.h>
@@ -62,6 +62,7 @@
 #include <RcppEigen.h>
 #include <algorithm>
 #include <array>
+#include <limits>
 #include <map>
 #include <vector>
 
@@ -121,6 +122,17 @@ typedef Eigen::
         Imatrix;
 typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign>
     Ivector;
+
+double sepsilon = sqrt(std::numeric_limits<double>::epsilon());
+
+bool approxEqual(double x, double y) {
+  return fabs(x - y) < sepsilon;
+}
+
+bool approxEqualVectors(Vector3 v, Vector3 w) {
+  return approxEqual(v.x(), w.x()) && approxEqual(v.y(), w.y()) &&
+         approxEqual(v.z(), w.z());
+}
 
 // [[Rcpp::export]]
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
@@ -253,7 +265,7 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts) {
       const CGAL::Vector_3<K> normal1 =
           CGAL::unit_normal(vpoints1[0], vpoints1[1], vpoints1[2]);
 
-      edges(i, 2) = normal0 == normal1 ? 0 : 1;
+      edges(i, 2) = approxEqualVectors(normal0, normal1) ? 0 : 1;
 
       i++;
     }
@@ -421,7 +433,7 @@ Rcpp::List del3d_cpp(Rcpp::NumericMatrix pts) {
 
   std::map<Rcpp::String, size_t> facetsMap = {};
   Rcpp::IntegerMatrix facets(nfacets, 4);
-  //Imatrix facetsOnHull(0, 3);
+  // Imatrix facetsOnHull(0, 3);
   std::vector<Rcpp::String> edgesOnHull(0);
   {
     size_t i = 0;
