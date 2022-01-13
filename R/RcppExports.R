@@ -5,8 +5,8 @@ cxhull2d_cpp <- function(pts) {
     .Call(`_RCGAL_cxhull2d_cpp`, pts)
 }
 
-cxhull3d_cpp <- function(pts) {
-    .Call(`_RCGAL_cxhull3d_cpp`, pts)
+cxhull3d_cpp <- function(pts, epsilon) {
+    .Call(`_RCGAL_cxhull3d_cpp`, pts, epsilon)
 }
 
 del2d_cpp <- function(pts) {

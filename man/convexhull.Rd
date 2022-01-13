@@ -4,7 +4,7 @@
 \alias{convexhull}
 \title{Convex hull}
 \usage{
-convexhull(points, faceFamilies = FALSE)
+convexhull(points, faceFamilies = FALSE, epsilon = sqrt(.Machine$double.eps))
 }
 \arguments{
 \item{points}{numeric matrix which stores the points, one point per row}
@@ -22,7 +22,8 @@ a role in the detection of border edges: an edge is considered as a
 non-border edge when there is approximate equality between the unit
 normals of the two adjacent faces of this edge, and \code{epsilon}
 defines the degree of the approximation (perfect equality corresponds to
-\code{epsilon=0})}
+\code{epsilon=0}); the last example of \code{\link{plotConvexHull3D}}
+illustrates the usage of \code{epsilon}}
 }
 \value{
 The convex hull.

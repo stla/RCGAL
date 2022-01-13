@@ -46,7 +46,8 @@ makeFaceFamilies <- function(faces, edges){
 #'   non-border edge when there is approximate equality between the unit
 #'   normals of the two adjacent faces of this edge, and \code{epsilon}
 #'   defines the degree of the approximation (perfect equality corresponds to
-#'   \code{epsilon=0})
+#'   \code{epsilon=0}); the last example of \code{\link{plotConvexHull3D}}
+#'   illustrates the usage of \code{epsilon}
 #'
 #' @return The convex hull.
 #' \itemize{
@@ -153,7 +154,7 @@ convexhull <- function(
   if(dimension == 2L){
     hull <- cxhull2d_cpp(points)
   }else{
-    hull <- cxhull3d_cpp(points)
+    hull <- cxhull3d_cpp(points, epsilon)
     if(faceFamilies){
       attr(hull[["faces"]], "families") <-
         makeFaceFamilies(hull[["faces"]], hull[["edges"]])
@@ -197,6 +198,7 @@ convexhull <- function(
 #'
 #' # the dodecahedron with multiple colors ####
 #' hull <- convexhull(dodecahedron, faceFamilies = TRUE)
+#' open3d(windowRect = c(50, 50, 562, 562))
 #' plotConvexHull3D(hull, color = "random", luminosity = "bright")
 #'
 #' # a strange convex hull ####
@@ -209,7 +211,85 @@ convexhull <- function(
 #' }
 #' pts <- t(vapply(seq(0, pi, length.out = 50), pt, numeric(3L)))
 #' hull <- convexhull(pts)
+#' open3d(windowRect = c(50, 50, 562, 562))
 #' plotConvexHull3D(hull, color = "random", hue = "purple", luminosity = "dark")
+#'
+#' # Leonardo da Vinci's 72-sided sphere: the `epsilon` parameter ####
+#' # the points of da Vinci's 72 sided sphere:
+#' pts <- rbind(
+#'   c(1.61352, -0.43234, 1.1862),
+#'   c(1.18118, -1.18118, 1.1862),
+#'   c(0.43234, -1.61352, 1.1862),
+#'   c(-0.43234, -1.61352, 1.1862),
+#'   c(-1.18118, -1.18118, 1.1862),
+#'   c(-1.61352, -0.43234, 1.1862),
+#'   c(-1.61352, 0.43234, 1.1862),
+#'   c(-1.18118, 1.18118, 1.1862),
+#'   c(-0.43234, 1.61352, 1.1862),
+#'   c(0.43234, 1.61352, 1.1862),
+#'   c(1.18118, 1.18118, 1.1862),
+#'   c(1.61352, 0.43234, 1.1862),
+#'   c(1.61352, -0.43234, -1.1862),
+#'   c(1.61352, 0.43234, -1.1862),
+#'   c(1.18118, 1.18118, -1.1862),
+#'   c(0.43234, 1.61352, -1.1862),
+#'   c(-0.43234, 1.61352, -1.1862),
+#'   c(-1.18118, 1.18118, -1.1862),
+#'   c(-1.61352, 0.43234, -1.1862),
+#'   c(-1.61352, -0.43234, -1.1862),
+#'   c(-1.18118, -1.18118, -1.1862),
+#'   c(-0.43234, -1.61352, -1.1862),
+#'   c(0.43234, -1.61352, -1.1862),
+#'   c(1.18118, -1.18118, -1.1862),
+#'   c(2.0102, 0.53863, 0),
+#'   c(1.47157, 1.47157, 0),
+#'   c(0.53863, 2.0102, 0),
+#'   c(-0.53863, 2.0102, 0),
+#'   c(-1.47157, 1.47157, 0),
+#'   c(-2.0102, 0.53863, 0),
+#'   c(-2.0102, -0.53863, 0),
+#'   c(-1.47157, -1.47157, 0),
+#'   c(-0.53863, -2.0102, 0),
+#'   c(0.53863, -2.0102, 0),
+#'   c(1.47157, -1.47157, 0),
+#'   c(2.0102, -0.53863, 0),
+#'   c(0.89068, 0.23866, 1.77777),
+#'   c(0.89068, -0.23866, 1.77777),
+#'   c(0.65202, -0.65202, 1.77777),
+#'   c(0.23866, -0.89068, 1.77777),
+#'   c(-0.23866, -0.89068, 1.77777),
+#'   c(-0.65202, -0.65202, 1.77777),
+#'   c(-0.89068, -0.23866, 1.77777),
+#'   c(-0.89068, 0.23866, 1.77777),
+#'   c(-0.65202, 0.65202, 1.77777),
+#'   c(-0.23866, 0.89068, 1.77777),
+#'   c(0.23866, 0.89068, 1.77777),
+#'   c(0.65202, 0.65202, 1.77777),
+#'   c(0.65202, -0.65202, -1.77777),
+#'   c(0.89068, -0.23866, -1.77777),
+#'   c(0.89068, 0.23866, -1.77777),
+#'   c(0.65202, 0.65202, -1.77777),
+#'   c(0.23866, 0.89068, -1.77777),
+#'   c(-0.23866, 0.89068, -1.77777),
+#'   c(-0.65202, 0.65202, -1.77777),
+#'   c(-0.89068, 0.23866, -1.77777),
+#'   c(-0.89068, -0.23866, -1.77777),
+#'   c(-0.65202, -0.65202, -1.77777),
+#'   c(-0.23866, -0.89068, -1.77777),
+#'   c(0.23866, -0.89068, -1.77777),
+#'   c(0, 0, 2.04922),
+#'   c(0, 0, -2.04922)
+#' )
+#'
+#' # with the default `epsilon`, some triangular faces are not merged:
+#' hull <- convexhull(pts, faceFamilies = TRUE)
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' plotConvexHull3D(hull, color = "random", hue = "pink")
+#'
+#' # so one has to increase `epsilon`:
+#' hull <- convexhull(pts, faceFamilies = TRUE, epsilon = 1e-5)
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' plotConvexHull3D(hull, color = "random", hue = "orange", luminosity = "bright")
 plotConvexHull3D <- function(
   hull, color = "distinct", hue = "random", luminosity = "light",
   alpha = 1, edgesAsTubes = FALSE, tubeRadius, tubeColor

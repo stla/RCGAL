@@ -1,7 +1,7 @@
 library(RCGAL)
 library(rgl)
 
-vs <- rbind(
+pts <- rbind(
   c(1.61352, -0.43234, 1.1862),
   c(1.18118, -1.18118, 1.1862),
   c(0.43234, -1.61352, 1.1862),
@@ -66,7 +66,41 @@ vs <- rbind(
   c(0, 0, -2.04922)
 )
 
-hull <- convexhull(vs, faceFamilies = TRUE)
+hull <- convexhull(pts, faceFamilies = TRUE, epsilon = 1e-5)
+open3d(windowRect = c(50, 50, 562, 562))
+bg3d("seashell")
+view3d(zoom = 0.7)
+plotConvexHull3D(
+  hull, color = "random", hue = "red", luminosity = "bright",
+  edgesAsTubes = TRUE, tubeRadius = 0.05, tubeColor = "darkmagenta"
+)
 
-plotConvexHull3D(hull)
+# animation ####
+M <- par3d("userMatrix")
+movie3d(
+  par3dinterp(
+    time = seq(0, 1, len = 9),
+    userMatrix = list(
+      M,
+      rotate3d(M, pi, 1, 0, 0),
+      rotate3d(M, pi, 1, 1, 0),
+      rotate3d(M, pi, 1, 1, 1),
+      rotate3d(M, pi, 0, 1, 1),
+      rotate3d(M, pi, 0, 1, 0),
+      rotate3d(M, pi, 1, 0, 1),
+      rotate3d(M, pi, 0, 0, 1),
+      M
+    )
+  ),
+  fps = 120,
+  duration = 1,
+  dir = ".",
+  frames = "zzzpic",
+  convert = "echo \"%d %s %s %s\"",
+  clean = FALSE
+)
 
+pngs <- list.files(".", pattern = "^zzzpic", full.names = TRUE)
+library(gifski)
+gifski(pngs, "Leonardo.gif",
+       width = 512, height = 512, delay = 1/10)

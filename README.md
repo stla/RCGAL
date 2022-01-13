@@ -47,6 +47,14 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 
 
+## Convex hull
+
+*Leonardo da Vinci's 72-sided sphere:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/ConvexHullExamples/Leonardo.gif)
+
+
+
 ## License
 
 This package is provided under the GPL-3 license. If you wish to use CGAL for commercial purposes, you must obtain a license from
