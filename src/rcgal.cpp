@@ -123,15 +123,16 @@ typedef Eigen::
 typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign>
     Ivector;
 
-double sepsilon = sqrt(std::numeric_limits<double>::epsilon());
+// double sepsilon = sqrt(std::numeric_limits<double>::epsilon());
 
-bool approxEqual(double x, double y) {
-  return fabs(x - y) < sepsilon;
+bool approxEqual(double x, double y, double epsilon) {
+  return fabs(x - y) <= epsilon;
 }
 
-bool approxEqualVectors(Vector3 v, Vector3 w) {
-  return approxEqual(v.x(), w.x()) && approxEqual(v.y(), w.y()) &&
-         approxEqual(v.z(), w.z());
+bool approxEqualVectors(Vector3 v, Vector3 w, double epsilon) {
+  return approxEqual(v.x(), w.x(), epsilon) &&
+         approxEqual(v.y(), w.y(), epsilon) &&
+         approxEqual(v.z(), w.z(), epsilon);
 }
 
 // [[Rcpp::export]]
@@ -192,7 +193,7 @@ Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts) {
+Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts, double epsilon) {
   const size_t npoints = pts.nrow();
   std::vector<IPoint3> points(npoints);
   for(size_t i = 0; i < npoints; i++) {
@@ -265,7 +266,7 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts) {
       const CGAL::Vector_3<K> normal1 =
           CGAL::unit_normal(vpoints1[0], vpoints1[1], vpoints1[2]);
 
-      edges(i, 2) = approxEqualVectors(normal0, normal1) ? 0 : 1;
+      edges(i, 2) = approxEqualVectors(normal0, normal1, epsilon) ? 0 : 1;
 
       i++;
     }

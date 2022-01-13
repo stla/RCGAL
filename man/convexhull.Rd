@@ -16,6 +16,13 @@ argument to \code{TRUE} if you want the face families; this gives a label
 of the family for each face, or \code{NA} is the face is "alone" (has no
 coplanar neighbor); this is useful for plotting (see the examples in
 \code{\link{plotConvexHull3D}})}
+
+\item{epsilon}{for 3D only, a small nonnegative number; this number plays
+a role in the detection of border edges: an edge is considered as a
+non-border edge when there is approximate equality between the unit
+normals of the two adjacent faces of this edge, and \code{epsilon}
+defines the degree of the approximation (perfect equality corresponds to
+\code{epsilon=0})}
 }
 \value{
 The convex hull.

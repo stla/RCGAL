@@ -41,6 +41,12 @@ makeFaceFamilies <- function(faces, edges){
 #'   of the family for each face, or \code{NA} is the face is "alone" (has no
 #'   coplanar neighbor); this is useful for plotting (see the examples in
 #'   \code{\link{plotConvexHull3D}})
+#' @param epsilon for 3D only, a small nonnegative number; this number plays
+#'   a role in the detection of border edges: an edge is considered as a
+#'   non-border edge when there is approximate equality between the unit
+#'   normals of the two adjacent faces of this edge, and \code{epsilon}
+#'   defines the degree of the approximation (perfect equality corresponds to
+#'   \code{epsilon=0})
 #'
 #' @return The convex hull.
 #' \itemize{
@@ -124,8 +130,9 @@ makeFaceFamilies <- function(faces, edges){
 #' open3d(windowRect = c(50, 50, 562, 562))
 #' plotConvexHull3D(hull)
 convexhull <- function(
-  points, faceFamilies = FALSE
+  points, faceFamilies = FALSE, epsilon = sqrt(.Machine$double.eps)
 ){
+  stopifnot(isNonNegativeNumber(epsilon))
   if(!is.matrix(points) || !is.numeric(points)){
     stop("The `points` argument must be a numeric matrix.", call. = TRUE)
   }
