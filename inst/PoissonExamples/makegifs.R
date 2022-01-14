@@ -3,6 +3,24 @@ library(RCGAL)
 
 setwd("C:/SL/MyPackages/RCGAL/inst/PoissonExamples")
 
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(20, 70, zoom = 0.65)
+points3d(Orthocircle)
+rgl.snapshot("OrthocircleCloud.png")
+
+psr <- PoissonReconstruction(Orthocircle)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(20, 70, zoom = 0.65)
+shade3d(psr, color = "orangered")
+wire3d(psr, color = "black")
+rgl.snapshot("OrthocircleMesh.png")
+
+command <-
+  "magick convert OrthocircleCloud.png OrthocircleMesh.png +append Orthocircle.png"
+system(command)
+
+
+
 data(bunny, package = "onion")
 open3d(windowRect = c(50, 50, 450, 450))
 view3d(0, 0, zoom = 0.8)
@@ -19,6 +37,7 @@ rgl.snapshot("StanfordBunnyMesh.png")
 command <-
   "magick convert StanfordBunnyCloud.png StanfordBunnyMesh.png +append StanfordBunny.png"
 system(command)
+
 
 
 open3d(windowRect = c(50, 50, 450, 450))

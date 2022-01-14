@@ -37,6 +37,10 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/CliffordTorus.gif)
 
+*Orthocircle:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/Orthocircle.png)
+
 *Stanford bunny:*
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/StanfordBunny.png)
