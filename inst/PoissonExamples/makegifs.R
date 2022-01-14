@@ -3,6 +3,24 @@ library(RCGAL)
 
 setwd("C:/SL/MyPackages/RCGAL/inst/PoissonExamples")
 
+data(bunny, package = "onion")
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(0, 0, zoom = 0.8)
+points3d(bunny)
+rgl.snapshot("StanfordBunnyCloud.png")
+
+psr <- PoissonReconstruction(bunny, spacing = 0.0005)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(0, 0, zoom = 0.8)
+shade3d(psr, color = "yellowgreen")
+wire3d(psr, color = "black")
+rgl.snapshot("StanfordBunnyMesh.png")
+
+command <-
+  "magick convert StanfordBunnyCloud.png StanfordBunnyMesh.png +append StanfordBunny.png"
+system(command)
+
+
 open3d(windowRect = c(50, 50, 450, 450))
 view3d(10, -60, zoom = 0.9)
 points3d(CostaSurface)

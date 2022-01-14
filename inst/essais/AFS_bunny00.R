@@ -3,6 +3,8 @@ library(rgl)
 
 data(bunny, package = "onion")
 mesh <- AFSreconstruction(bunny)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(0, 0, zoom = 0.8)
 shade3d(mesh, color = "darkred")
 
 pts <- uniformly::runif_on_sphere(500, 3)

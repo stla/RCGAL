@@ -37,6 +37,18 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/CliffordTorus.gif)
 
+*Stanford bunny:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/StanfordBunny.png)
+
+
+
+## Advanced front surface reconstruction
+
+*Stanford bunny:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/Bunny.png)
+
 
 
 ## Elevated Delaunay triangulation
@@ -57,5 +69,6 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ## License
 
-This package is provided under the GPL-3 license. If you wish to use CGAL for commercial purposes, you must obtain a license from
-the [GeometryFactory](https://geometryfactory.com).
+This package is provided under the GPL-3 license. If you wish to use CGAL for 
+commercial purposes, you must obtain a license from the 
+[GeometryFactory](https://geometryfactory.com).

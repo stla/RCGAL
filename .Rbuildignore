@@ -9,3 +9,5 @@
 ^inst/PoissonExamples$
 ^inst/DelaunayExamples$
 ^\.Rprofile$
+^inst/ConvexHullExamples$
+^inst/AFSexamples$
