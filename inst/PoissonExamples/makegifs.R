@@ -158,3 +158,23 @@ view3d(0, 0, zoom = 0.7)
 shade3d(psr, color = "orangered")
 wire3d(psr, color = "black")
 rgl.snapshot("HopfTorusMesh_spacing02.png")
+
+
+
+#
+s_ <- seq(0.005, 0.05, length.out = 60)
+for(i in seq_along(s_)){
+  psr <- PoissonReconstruction(
+    SolidMobiusStrip, spacing = s_[i], sm_distance = 0.9
+  )
+  open3d(windowRect = c(50, 50, 562, 562))
+  view3d(0, -50, zoom = 0.7)
+  shade3d(psr, color = "darkorange")
+  wire3d(psr, color = "black")
+  rgl.snapshot(sprintf("zzpic%03d.png", i))
+  close3d()
+}
+
+command <-
+  "magick convert -dispose previous -delay 8 -duplicate 1,-2-1 zzpic*.png SolidMobiusStripAnim.gif"
+system(command)
