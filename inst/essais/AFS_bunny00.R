@@ -18,7 +18,9 @@ shade3d(mesh, color = "red")
 data(dummyhead, package = "Rvcg")
 dummyhead <- t(dummyhead.mesh$vb[-4L, ])
 mesh <- AFSreconstruction(dummyhead)
-shade3d(mesh, color = "red")
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(0, 0, zoom = 0.8)
+shade3d(mesh, color = "darksalmon")
 
 # setwd("C:/SL/MyPackages/RCGAL/inst/essais")
 #

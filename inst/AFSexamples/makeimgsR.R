@@ -3,6 +3,27 @@ library(RCGAL)
 
 setwd("C:/SL/MyPackages/RCGAL/inst/AFSexamples")
 
+
+data(dummyhead, package = "Rvcg")
+dummyhead <- t(dummyhead.mesh$vb[-4L, ])
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(0, 0, zoom = 0.8)
+points3d(dummyhead)
+rgl.snapshot("DummyHeadCloud.png")
+
+afs <- AFSreconstruction(dummyhead)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(0, 0, zoom = 0.8)
+shade3d(afs, color = "darksalmon")
+rgl.snapshot("DummyHeadMesh.png")
+
+command <-
+  "magick convert DummyHeadCloud.png DummyHeadMesh.png +append DummyHead.png"
+system(command)
+
+
+
+
 data(bunny, package = "onion")
 open3d(windowRect = c(50, 50, 450, 450))
 view3d(0, 0, zoom = 0.8)

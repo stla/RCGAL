@@ -49,6 +49,10 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/Bunny.png)
 
+*Dummy head:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/DummyHead.png)
+
 
 
 ## Elevated Delaunay triangulation
