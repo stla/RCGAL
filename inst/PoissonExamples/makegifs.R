@@ -3,6 +3,25 @@ library(RCGAL)
 
 setwd("C:/SL/MyPackages/RCGAL/inst/PoissonExamples")
 
+
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(-30, 0, zoom = 0.75)
+points3d(StanfordDragon)
+rgl.snapshot("StanfordDragonCloud.png")
+
+psr <- PoissonReconstruction(StanfordDragon)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(-30, 0, zoom = 0.75)
+shade3d(psr, color = "forestgreen")
+wire3d(psr, color = "black")
+rgl.snapshot("StanfordDragonMesh.png")
+
+command <-
+  "magick convert StanfordDragonCloud.png StanfordDragonMesh.png +append StanfordDragon.png"
+system(command)
+
+
+
 open3d(windowRect = c(50, 50, 450, 450))
 view3d(20, 70, zoom = 0.65)
 points3d(Orthocircle)

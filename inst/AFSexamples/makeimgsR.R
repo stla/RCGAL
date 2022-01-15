@@ -4,6 +4,23 @@ library(RCGAL)
 setwd("C:/SL/MyPackages/RCGAL/inst/AFSexamples")
 
 
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(-30, 0, zoom = 0.75)
+points3d(StanfordDragon)
+rgl.snapshot("StanfordDragonCloud.png")
+
+afs <- AFSreconstruction(StanfordDragon)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(-30, 0, zoom = 0.75)
+shade3d(afs, color = "forestgreen")
+rgl.snapshot("StanfordDragonMesh.png")
+
+command <-
+  "magick convert StanfordDragonCloud.png StanfordDragonMesh.png +append StanfordDragon.png"
+system(command)
+
+
+
 data(dummyhead, package = "Rvcg")
 dummyhead <- t(dummyhead.mesh$vb[-4L, ])
 open3d(windowRect = c(50, 50, 450, 450))

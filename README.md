@@ -51,6 +51,9 @@ parameter (0.05, 0.02, 0.005):
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/StanfordBunny.png)
 
+*Stanford dragon:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/StanfordDragon.png)
 
 
 ## Advanced front surface reconstruction
@@ -58,6 +61,10 @@ parameter (0.05, 0.02, 0.005):
 *Stanford bunny:*
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/Bunny.png)
+
+*Stanford dragon:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/StanfordDragon.png)
 
 *Dummy head:*
 
