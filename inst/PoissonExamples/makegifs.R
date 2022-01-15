@@ -176,5 +176,5 @@ for(i in seq_along(s_)){
 }
 
 command <-
-  "magick convert -dispose previous -delay 8 -duplicate 1,-2-1 zzpic*.png SolidMobiusStripAnim.gif"
+  "magick convert -dispose previous -delay 1x2 -duplicate 1,-2-1 zzpic*.png SolidMobiusStripAnim.gif"
 system(command)

@@ -29,6 +29,12 @@ the `spacing` parameter of the `PoissonReconstruction` function:
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/HopfTorusMesh_spacing02.png)
 
+Here is a series of three images which show the effect of this `spacing` 
+parameter (0.05, 0.02, 0.005):
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/SolidMobiusStrip_spacings.png)
+
+
 *Dupin cyclide:*
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/cyclide.png)
