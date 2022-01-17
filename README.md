@@ -93,3 +93,9 @@ parameter (0.05, 0.02, 0.005):
 This package is provided under the GPL-3 license. If you wish to use CGAL for 
 commercial purposes, you must obtain a license from the 
 [GeometryFactory](https://geometryfactory.com).
+
+
+
+## Blog post
+
+I wrote a [blog post](https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html) devoted to **RCGAL**.
