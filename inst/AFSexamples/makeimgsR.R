@@ -4,6 +4,24 @@ library(RCGAL)
 setwd("C:/SL/MyPackages/RCGAL/inst/AFSexamples")
 
 
+
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(60, 0, zoom = 0.8)
+points3d(Skull)
+rgl.snapshot("SkullCloud.png")
+
+afs <- AFSreconstruction(Skull)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(60, 0, zoom = 0.8)
+shade3d(afs, color = "whitesmoke")
+rgl.snapshot("SkullMesh.png")
+
+command <-
+  "magick convert SkullCloud.png SkullMesh.png +append Skull.png"
+system(command)
+
+
+
 open3d(windowRect = c(50, 50, 450, 450))
 view3d(-30, 0, zoom = 0.75)
 points3d(StanfordDragon)
@@ -37,7 +55,6 @@ rgl.snapshot("DummyHeadMesh.png")
 command <-
   "magick convert DummyHeadCloud.png DummyHeadMesh.png +append DummyHead.png"
 system(command)
-
 
 
 

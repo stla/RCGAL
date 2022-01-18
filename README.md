@@ -74,6 +74,9 @@ parameter (0.05, 0.02, 0.005):
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/DummyHead.png)
 
+*Skull:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/AFSexamples/Skull.png)
 
 
 ## Elevated Delaunay triangulation
