@@ -47,6 +47,10 @@ parameter (0.05, 0.02, 0.005):
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/Orthocircle.png)
 
+*ICN5D's eight-like surface:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/ICN5D_eight.png)
+
 *Stanford bunny:*
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/PoissonExamples/StanfordBunny.png)

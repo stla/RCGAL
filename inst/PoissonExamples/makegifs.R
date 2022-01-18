@@ -4,6 +4,25 @@ library(RCGAL)
 setwd("C:/SL/MyPackages/RCGAL/inst/PoissonExamples")
 
 
+
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(30, -30, zoom = 0.75)
+points3d(ICN5D_eight)
+rgl.snapshot("ICN5D_eightCloud.png")
+
+psr <- PoissonReconstruction(ICN5D_eight, spacing = 0.02, sm_distance = 1)
+open3d(windowRect = c(50, 50, 450, 450))
+view3d(30, -30, zoom = 0.75)
+shade3d(psr, color = "orangered")
+wire3d(psr, color = "black")
+rgl.snapshot("ICN5D_eightMesh.png")
+
+command <-
+  "magick convert ICN5D_eightCloud.png ICN5D_eightMesh.png +append ICN5D_eight.png"
+system(command)
+
+
+
 open3d(windowRect = c(50, 50, 450, 450))
 view3d(-30, 0, zoom = 0.75)
 points3d(StanfordDragon)
