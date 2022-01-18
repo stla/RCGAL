@@ -78,6 +78,10 @@ parameter (0.05, 0.02, 0.005):
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/DelaunayExamples/bivariateGaussian.png)
 
+*Volcano:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/DelaunayExamples/volcano.png)
+
 
 
 ## Convex hull
