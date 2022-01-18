@@ -4,7 +4,7 @@
 \alias{getSomeNormals}
 \title{Normals for a points could}
 \usage{
-getSomeNormals(points, nbNeighbors, method = "pca")
+getSomeNormals(nbNeighbors, method = "pca")
 }
 \arguments{
 \item{nbNeighbors}{integer, number of neighbors used to compute the normals}
