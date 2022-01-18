@@ -1,36 +1,31 @@
 #' @title Normals for a points could
-#' @description Compute some normals for a 3D points cloud.
+#' @description Returns a function which computes some normals for a 3D points
+#'   cloud.
 #'
-#' @param points matrix of points, one point per row
 #' @param nbNeighbors integer, number of neighbors used to compute the normals
 #' @param method one of \code{"pca"} or \code{"jet"}
 #'
-#' @return A matrix of the same size as the \code{points} matrix, giving one
+#' @return A function which takes just one argument: a numeric matrix with
+#'   three columns, each row represents a point, and the function returns a
+#'   matrix of the same size as the input matrix, whose each row gives one
 #'   unit normal for each point.
+#'
+#' @note The \code{getSomeNormals} function is intended to be used in the
+#'   \code{\link{PoissonReconstruction}} function. If you want to use it for
+#'   another purpose, be careful because the function it returns does not
+#'   check the matrix it takes as argument.
 #' @export
-getSomeNormals <- function(points, nbNeighbors, method = "pca"){
+getSomeNormals <- function(nbNeighbors, method = "pca"){
   method <- match.arg(method, c("pca", "jet"))
-  if(!is.matrix(points) || !is.numeric(points)){
-    stop("The `points` argument must be a numeric matrix.", call. = TRUE)
-  }
-  dimension <- ncol(points)
-  if(dimension != 3L){
-    stop("Points must be 3-dimensional.", call. = TRUE)
-  }
-  if(nrow(points) <= dimension){
-    stop("Insufficient number of points.", call. = TRUE)
-  }
-  if(any(is.na(points))){
-    stop("Points with missing values are not allowed.", call. = TRUE)
-  }
-  storage.mode(points) <- "double"
   nbNeighbors <- as.integer(nbNeighbors)
   if(nbNeighbors <= 2L){
     stop("There must be at least two neighbors.", call. = TRUE)
   }
   if(method == "pca"){
-    pca_normals_cpp(points, nbNeighbors)
+    out <- function(points) pca_normals_cpp(points, nbNeighbors)
   }else{
-    jet_normals_cpp(points, nbNeighbors)
+    out <- function(points) jet_normals_cpp(points, nbNeighbors)
   }
+  class(out) <- "CGALnormalsFunc"
+  out
 }

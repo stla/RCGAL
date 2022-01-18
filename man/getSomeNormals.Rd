@@ -7,16 +7,23 @@
 getSomeNormals(points, nbNeighbors, method = "pca")
 }
 \arguments{
-\item{points}{matrix of points, one point per row}
-
 \item{nbNeighbors}{integer, number of neighbors used to compute the normals}
 
 \item{method}{one of \code{"pca"} or \code{"jet"}}
 }
 \value{
-A matrix of the same size as the \code{points} matrix, giving one
+A function which takes just one argument: a numeric matrix with
+  three columns, each row represents a point, and the function returns a
+  matrix of the same size as the input matrix, whose each row gives one
   unit normal for each point.
 }
 \description{
-Compute some normals for a 3D points cloud.
+Returns a function which computes some normals for a 3D points
+  cloud.
+}
+\note{
+The \code{getSomeNormals} function is intended to be used in the
+  \code{\link{PoissonReconstruction}} function. If you want to use it for
+  another purpose, be careful because the function it returns does not
+  check the matrix it takes as argument.
 }

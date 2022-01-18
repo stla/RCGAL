@@ -37,40 +37,48 @@ PoissonReconstruction <- function(
   if(!is.matrix(points) || !is.numeric(points)){
     stop("The `points` argument must be a numeric matrix.", call. = TRUE)
   }
-  if(!is.null(normals) && (!is.matrix(normals) || !is.numeric(normals))){
-    stop(
-      "The `normals` argument must be `NULL` or a numeric matrix.",
-      call. = TRUE
-    )
+  if(anyNA(points)){
+    stop("Missing values in the `points` matrix are not allowed.", call. = TRUE)
   }
+  # if(!is.null(normals) && (!is.matrix(normals) || !is.numeric(normals))){
+  #   stop(
+  #     "The `normals` argument must be `NULL` or a numeric matrix.",
+  #     call. = TRUE
+  #   )
+  # }
   dimension <- ncol(points)
   if(dimension != 3L){
     stop("The `points` matrix must have three columns.", call. = TRUE)
   }
-  if(!is.null(normals)){
-    dimension <- ncol(normals)
-    if(dimension != 3L){
-      stop("The `normals` matrix must have three columns.", call. = TRUE)
-    }
-    if(nrow(points) != nrow(normals)){
-      stop(
-        "The `points` matrix and the `normals` matrix must have the same ",
-        "number of rows.", call. = TRUE
-      )
-    }
-  }
-  if(nrow(points) <= dimension){
-    stop("Insufficient number of points.", call. = TRUE)
-  }
-  if(any(is.na(points)) || (!is.null(normals) && any(is.na(normals)))){
-    stop("Points or normals with missing values are not allowed.", call. = TRUE)
-  }
   storage.mode(points) <- "double"
   if(is.null(normals)){
     normals <- t(vcgUpdateNormals(points, silent = TRUE)[["normals"]][-4L, ])
+  }else if(is.function(normals) && inherits(normals, "CGALnormalsFunc")){
+    normals <- normals(points)
   }else{
-    storage.mode(normals) <- "double"
+    stop(
+      "Invalid argument `normals`: it must be `NULL` or a function returned ",
+      "by the `getSomeNormals` function."
+    )
   }
+  # if(!is.null(normals)){
+  #   dimension <- ncol(normals)
+  #   if(dimension != 3L){
+  #     stop("The `normals` matrix must have three columns.", call. = TRUE)
+  #   }
+  #   if(nrow(points) != nrow(normals)){
+  #     stop(
+  #       "The `points` matrix and the `normals` matrix must have the same ",
+  #       "number of rows.", call. = TRUE
+  #     )
+  #   }
+  # }
+  if(nrow(points) <= dimension){
+    stop("Insufficient number of points.", call. = TRUE)
+  }
+  # if(any(is.na(points)) || (!is.null(normals) && any(is.na(normals)))){
+  #   stop("Points or normals with missing values are not allowed.", call. = TRUE)
+  # }
   if(is.null(spacing)){
     spacing <- -1
   }else{
