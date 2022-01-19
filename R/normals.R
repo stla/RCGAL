@@ -15,6 +15,13 @@
 #'   another purpose, be careful because the function it returns does not
 #'   check the matrix it takes as argument.
 #' @export
+#'
+#' @examples library(RCGAL)
+#' library(rgl)
+#' psr <- PoissonReconstruction(ICN5D_eight, getSomeNormals(6))
+#' open3d()
+#' shade3d(psr, color = "cyan")
+#' wire3d(psr)
 getSomeNormals <- function(nbNeighbors, method = "pca"){
   method <- match.arg(method, c("pca", "jet"))
   nbNeighbors <- as.integer(nbNeighbors)

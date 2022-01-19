@@ -27,3 +27,11 @@ The \code{getSomeNormals} function is intended to be used in the
   another purpose, be careful because the function it returns does not
   check the matrix it takes as argument.
 }
+\examples{
+library(RCGAL)
+library(rgl)
+psr <- PoissonReconstruction(ICN5D_eight, getSomeNormals(6))
+open3d()
+shade3d(psr, color = "cyan")
+wire3d(psr)
+}
