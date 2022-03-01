@@ -50,11 +50,11 @@
 #'         \code{volume}. The \code{mesh} field is an object of class
 #'         \code{mesh3d}, ready for plotting with the \strong{rgl} package. The
 #'         \code{edges} field provides the indices of the edges, given as an
-#'         integer matrix with two columns. The \code{faceVolumes} is a numeric
-#'         vector, it provides the volumes under the faces that can be found in
-#'         the \code{mesh} field. Finally the \code{volume} field provides the
-#'         sum of these volumes, that is to say the total volume under the
-#'         triangulated surface.
+#'         integer matrix with two columns. The \code{faceVolumes} field is a
+#'         numeric vector, it provides the volumes under the faces that can be
+#'         found in the \code{mesh} field. Finally the \code{volume} field
+#'         provides the sum of these volumes, that is to say the total volume
+#'         under the triangulated surface.
 #' }
 #' @export
 #' @importFrom rgl tmesh3d addNormals
