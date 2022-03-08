@@ -4,7 +4,7 @@
 \alias{delaunay}
 \title{Delaunay tessellation}
 \usage{
-delaunay(points, elevation = FALSE)
+delaunay(points, elevation = FALSE, constraints = NULL)
 }
 \arguments{
 \item{points}{numeric matrix which stores the points, one point per row}
@@ -13,11 +13,17 @@ delaunay(points, elevation = FALSE)
 then the function performs an elevated two-dimensional Delaunay
 triangulation, using the \code{z} coordinates of the points for the
 elevations; see the example}
+
+\item{constraints}{\emph{for 2D only}, some edges to perform a constrained
+Delaunay triangulation, given as an integer matrix with two columns (each
+row provides the indices of the two points forming the edge);
+\code{NULL} for no constraint}
 }
 \value{
 The Delaunay tessellation.
 \itemize{
-  \item \strong{If the dimension is 2}, the returned value is a list with
+  \item \strong{If the dimension is 2} and \code{constraints=NULL},
+        the returned value is a list with
         two fields: \code{faces} and \code{edges}. The \code{faces} field
         contains an integer matrix with three columns; each row represents a
         triangle whose each vertex is given by the index (row number) of
@@ -27,6 +33,23 @@ The Delaunay tessellation.
         edge. The third column, named \code{border}, only contains some
         zeros and some ones; a border (exterior) edge is labelled by a
         \code{1}.
+  \item \strong{If the dimension is 2} and \code{constraints} is not
+        \code{NULL}, the returned value is a list with
+        three fields: \code{faces}, \code{edges} and \code{constraints}.
+        The \code{faces} field
+        contains an integer matrix with three columns; each row represents a
+        triangle whose each vertex is given by the index (row number) of
+        this point in the \code{points} matrix. The \code{edges} field
+        is a dataframe with four columns. The first two columns provide
+        the edges of the triangulation; they are given by row, the two
+        integers of a row are the indices of the two points which form the
+        edge. Each integer of the third column is the index of the face
+        the corresponding edge belongs to. The fourth column,
+        named \code{border}, only contains some
+        zeros and some ones; a border edge is labelled by a
+        \code{1}.
+        Finally, the \code{constraints} field is an integer matrix with
+        two columns, it represents the constraint edges.
   \item \strong{If the dimension is 3}, the returned value is a list with
         four fields: \code{cells}, \code{facets}, \code{edges}, and
         \code{volume}. The \code{cells} field represents the tetrahedra

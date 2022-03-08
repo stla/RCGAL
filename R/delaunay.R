@@ -13,7 +13,8 @@
 #'
 #' @return The Delaunay tessellation.
 #' \itemize{
-#'   \item \strong{If the dimension is 2}, the returned value is a list with
+#'   \item \strong{If the dimension is 2} and \code{constraints=NULL},
+#'         the returned value is a list with
 #'         two fields: \code{faces} and \code{edges}. The \code{faces} field
 #'         contains an integer matrix with three columns; each row represents a
 #'         triangle whose each vertex is given by the index (row number) of
@@ -23,6 +24,23 @@
 #'         edge. The third column, named \code{border}, only contains some
 #'         zeros and some ones; a border (exterior) edge is labelled by a
 #'         \code{1}.
+#'   \item \strong{If the dimension is 2} and \code{constraints} is not
+#'         \code{NULL}, the returned value is a list with
+#'         three fields: \code{faces}, \code{edges} and \code{constraints}.
+#'         The \code{faces} field
+#'         contains an integer matrix with three columns; each row represents a
+#'         triangle whose each vertex is given by the index (row number) of
+#'         this point in the \code{points} matrix. The \code{edges} field
+#'         is a dataframe with four columns. The first two columns provide
+#'         the edges of the triangulation; they are given by row, the two
+#'         integers of a row are the indices of the two points which form the
+#'         edge. Each integer of the third column is the index of the face
+#'         the corresponding edge belongs to. The fourth column,
+#'         named \code{border}, only contains some
+#'         zeros and some ones; a border edge is labelled by a
+#'         \code{1}.
+#'         Finally, the \code{constraints} field is an integer matrix with
+#'         two columns, it represents the constraint edges.
 #'   \item \strong{If the dimension is 3}, the returned value is a list with
 #'         four fields: \code{cells}, \code{facets}, \code{edges}, and
 #'         \code{volume}. The \code{cells} field represents the tetrahedra
@@ -62,6 +80,7 @@
 #' }
 #' @export
 #' @importFrom rgl tmesh3d addNormals
+#' @importFrom Rvcg vcgGetEdge
 #'
 #' @examples library(RCGAL)
 #' # elevated Delaunay triangulation ####
@@ -137,14 +156,18 @@ delaunay <- function(
       stop("There are some invalid constraints.", call. = TRUE)
     }
     triangles <- del2d_constrained_cpp(points, constraints)
-    edges <- apply(triangles, 1L, function(x){
-      rbind(c(x[1L], x[2L]), c(x[1L], x[3L]), c(x[2L], x[3L]))
-    }, simplify = FALSE)
-    edges <- do.call(rbind, edges)
-    edges <- edges[!duplicated(edges), ]
+    # edges <- apply(triangles, 1L, function(x){
+    #   rbind(c(x[1L], x[2L]), c(x[1L], x[3L]), c(x[2L], x[3L]))
+    # }, simplify = FALSE)
+    # edges <- do.call(rbind, edges)
+    # edges <- edges[!duplicated(edges), ]
+    mesh <- tmesh3d(
+      vertices = t(cbind(points, 0)),
+      indices = t(triangles)
+    )
     out <- list(
       "faces"       = triangles,
-      "edges"       = edges,
+      "edges"       = vcgGetEdge(mesh),
       "constraints" = constraints
     )
     attr(out, "constrained") <- TRUE
