@@ -1,3 +1,13 @@
+delaunayArea <- function(vertices, triangles){
+  ntriangles <- nrow(triangles)
+  areas <- numeric(ntriangles)
+  for(i in 1L:ntriangles){
+    points <- vertices[triangles[i, ], ]
+    areas[i] <- triangleArea(points[1L, ], points[2L, ], points[3L, ])
+  }
+  sum(areas)
+}
+
 #' @title Delaunay tessellation
 #' @description Delaunay tessellation of a set of 2D or 3D points.
 #'
@@ -14,8 +24,8 @@
 #' @return The Delaunay tessellation.
 #' \itemize{
 #'   \item \strong{If the dimension is 2} and \code{constraints=NULL},
-#'         the returned value is a list with
-#'         two fields: \code{faces} and \code{edges}. The \code{faces} field
+#'         the returned value is a list with three fields:
+#'         \code{faces}, \code{edges} and \code{area}. The \code{faces} field
 #'         contains an integer matrix with three columns; each row represents a
 #'         triangle whose each vertex is given by the index (row number) of
 #'         this point in the \code{points} matrix. The \code{edges} field
@@ -23,11 +33,13 @@
 #'         integers of a row are the indices of the two points which form the
 #'         edge. The third column, named \code{border}, only contains some
 #'         zeros and some ones; a border (exterior) edge is labelled by a
-#'         \code{1}.
+#'         \code{1}. The \code{area} field contains only a number: the area
+#'         of the triangulated region (that is, the area of the convex hull of
+#'         the points).
 #'   \item \strong{If the dimension is 2} and \code{constraints} is not
 #'         \code{NULL}, the returned value is a list with
-#'         three fields: \code{faces}, \code{edges} and \code{constraints}.
-#'         The \code{faces} field
+#'         four fields: \code{faces}, \code{edges}, \code{constraints}, and
+#'         \code{area}. The \code{faces} field
 #'         contains an integer matrix with three columns; each row represents a
 #'         triangle whose each vertex is given by the index (row number) of
 #'         this point in the \code{points} matrix. The \code{edges} field
@@ -39,8 +51,10 @@
 #'         named \code{border}, only contains some
 #'         zeros and some ones; a border edge is labelled by a
 #'         \code{1}.
-#'         Finally, the \code{constraints} field is an integer matrix with
+#'         The \code{constraints} field is an integer matrix with
 #'         two columns, it represents the constraint edges.
+#'         Finally, the \code{area} field contains only a number: the area
+#'         of the triangulated region.
 #'   \item \strong{If the dimension is 3}, the returned value is a list with
 #'         four fields: \code{cells}, \code{facets}, \code{edges}, and
 #'         \code{volume}. The \code{cells} field represents the tetrahedra
@@ -168,11 +182,13 @@ delaunay <- function(
     out <- list(
       "faces"       = triangles,
       "edges"       = vcgGetEdge(mesh),
-      "constraints" = constraints
+      "constraints" = constraints,
+      "area"        = delaunayArea(points, triangles)
     )
     attr(out, "constrained") <- TRUE
   }else if(dimension == 2L && is.null(constraints)){
     out <- del2d_cpp(points)
+    out[["area"]] <- delaunayArea(points, out[["faces"]])
   }else{
     if(elevation){
       del <- del2d_xy_cpp(points)
