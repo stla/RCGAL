@@ -5,26 +5,23 @@
 \title{Plot 2D Delaunay triangulation}
 \usage{
 plotDelaunay2D(
-  tessellation,
-  border = "black",
-  color = "distinct",
+  triangulation,
+  col_edges = "black",
+  col_borders = "red",
+  col_constraints = "green",
+  fillcolor = "distinct",
   hue = "random",
   luminosity = "light",
-  lty = par("lty"),
-  lwd = par("lwd"),
+  lty_edges = par("lty"),
+  lwd_edges = par("lwd"),
+  lty_borders = par("lty"),
+  lwd_borders = par("lwd"),
+  lty_constraints = par("lty"),
+  lwd_constraints = par("lwd"),
   ...
 )
 }
 \arguments{
-\item{hue, luminosity}{if \code{color = "random"}, these arguments are passed
-to \code{\link[randomcoloR]{randomColor}}}
-
-\item{...}{arguments passed to \code{\link{plot}} for the vertices, such as
-\code{type="n"} or \code{asp=1}}
-
-\item{del}{an output of \code{\link{delaunay}} without constraints
-(\code{constraints=NULL}) or with constraints}
-
 \item{col_edges}{the color of the edges of the triangles which are not
 border edges nor constraint edges; \code{NULL} for no color}
 
@@ -41,6 +38,9 @@ of the constraint edges which are not border edges;
 colors with \code{\link[randomcoloR]{randomColor}}, or \code{"distinct"}
 get multiple colors with \code{\link[randomcoloR]{distinctColorPalette}}}
 
+\item{hue, luminosity}{if \code{color = "random"}, these arguments are passed
+to \code{\link[randomcoloR]{randomColor}}}
+
 \item{lty_edges, lwd_edges}{graphical parameters for the edges which are not
 border edges nor constraint edges}
 
@@ -49,6 +49,12 @@ border edges nor constraint edges}
 \item{lty_constraints, lwd_constraints}{in the case of a constrained Delaunay
 triangulation, graphical parameters for the constraintt edges which are
 not border edges}
+
+\item{...}{arguments passed to \code{\link{plot}} for the vertices, such as
+\code{type="n"} or \code{asp=1}}
+
+\item{del}{an output of \code{\link{delaunay}} without constraints
+(\code{constraints=NULL}) or with constraints}
 }
 \value{
 No value, just renders a 2D plot.
