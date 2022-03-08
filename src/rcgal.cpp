@@ -58,6 +58,9 @@
 
 #include <CGAL/Projection_traits_xy_3.h>
 
+#include <CGAL/Constrained_Delaunay_triangulation_2.h>
+#include <CGAL/Triangulation_face_base_with_info_2.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -114,6 +117,20 @@ typedef CGAL::Projection_traits_xy_3<K> Pxy;
 typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, Pxy> Vb_xy;
 typedef CGAL::Triangulation_data_structure_2<Vb_xy> Tds_xy;
 typedef CGAL::Delaunay_triangulation_2<Pxy, Tds_xy> Delaunay_xy;
+
+struct FaceInfo2 {
+  FaceInfo2() {}
+  int nesting_level;
+  bool in_domain() { return nesting_level % 2 == 1; }
+};
+
+typedef CGAL::Triangulation_face_base_with_info_2<FaceInfo2, K> Tfbi2;
+typedef CGAL::Constrained_triangulation_face_base_2<K, Tfbi2> Ctfb2;
+typedef CGAL::Triangulation_data_structure_2<Vb2, Ctfb2> Tds22;
+typedef CGAL::Exact_predicates_tag Itag;
+typedef CGAL::Constrained_Delaunay_triangulation_2<K, Tds22, Itag> CDT;
+typedef CDT::Point CDPoint;
+typedef CDT::Face_handle CDFace_handle;
 
 typedef Rcpp::NumericVector Dvector;
 
@@ -897,4 +914,89 @@ Rcpp::List del2d_xy_cpp(Rcpp::NumericMatrix pts) {
   return Rcpp::List::create(Rcpp::Named("faces") = faces,
                             Rcpp::Named("edges") = edges,
                             Rcpp::Named("volume") = totalVolume);
+}
+
+//// ---- Constrained Delaunay -------------------------------------------- ////
+void mark_domains0(CDT& ct,
+                   CDFace_handle start,
+                   int index,
+                   std::list<CDT::Edge>& border) {
+  if(start->info().nesting_level != -1) {
+    return;
+  }
+  std::list<CDFace_handle> queue;
+  queue.push_back(start);
+  while(!queue.empty()) {
+    CDFace_handle fh = queue.front();
+    queue.pop_front();
+    if(fh->info().nesting_level == -1) {
+      fh->info().nesting_level = index;
+      for(int i = 0; i < 3; i++) {
+        CDT::Edge e(fh, i);
+        CDFace_handle n = fh->neighbor(i);
+        if(n->info().nesting_level == -1) {
+          if(ct.is_constrained(e))
+            border.push_back(e);
+          else
+            queue.push_back(n);
+        }
+      }
+    }
+  }
+}
+
+void mark_domains(CDT& cdt)
+{
+  for(CDFace_handle f : cdt.all_face_handles()){
+    f->info().nesting_level = -1;
+  }
+  std::list<CDT::Edge> border;
+  mark_domains0(cdt, cdt.infinite_face(), 0, border);
+  while(! border.empty()){
+    CDT::Edge e = border.front();
+    border.pop_front();
+    CDFace_handle n = e.first->neighbor(e.second);
+    if(n->info().nesting_level == -1){
+      mark_domains0(cdt, n, e.first->info().nesting_level+1, border);
+    }
+  }
+}
+
+// [[Rcpp::export]]
+Rcpp::IntegerMatrix del2d_constrained_cpp(Rcpp::NumericMatrix pts,
+                                          Rcpp::IntegerMatrix edges) {
+  const unsigned npoints = pts.nrow();
+  std::vector<std::pair<CDT::Point, unsigned>> points(npoints);
+  for(unsigned i = 0; i < npoints; ++i) {
+    points[i] = std::make_pair(CDT::Point(pts(i, 0), pts(i, 1)), i);
+  }
+  CDT cdt;
+  {
+    const size_t nedges = edges.nrow();
+    for(size_t k = 0; k < nedges; ++k) {
+      cdt.insert_constraint(points[edges(k, 0) - 1].first,
+                            points[edges(k, 1) - 1].first);
+    }
+  }
+  cdt.insert(points.begin(), points.end());
+  const size_t nfaces = cdt.number_of_faces();
+  Rcpp::IntegerMatrix faces(nfaces, 3);
+  mark_domains(cdt);
+  size_t nfaces_out;
+  {
+    size_t i = 0;
+    for(CDFace_handle f : cdt.finite_face_handles()){
+      if(f->info().in_domain()){
+        unsigned i0 = f->vertex(0)->info();
+        unsigned i1 = f->vertex(1)->info();
+        unsigned i2 = f->vertex(2)->info();
+        faces(i, 0) = i0 + 1;
+        faces(i, 1) = i1 + 1;
+        faces(i, 2) = i2 + 1;
+        ++i;
+      }
+    }
+    nfaces_out = i;
+  }
+  return faces(Rcpp::Range(0, nfaces_out-1), Rcpp::_);
 }
