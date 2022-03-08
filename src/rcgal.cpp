@@ -987,12 +987,14 @@ Rcpp::IntegerMatrix del2d_constrained_cpp(Rcpp::NumericMatrix pts,
     size_t i = 0;
     for(CDFace_handle f : cdt.finite_face_handles()){
       if(f->info().in_domain()){
-        unsigned i0 = f->vertex(0)->info();
-        unsigned i1 = f->vertex(1)->info();
-        unsigned i2 = f->vertex(2)->info();
-        faces(i, 0) = i0 + 1;
-        faces(i, 1) = i1 + 1;
-        faces(i, 2) = i2 + 1;
+        unsigned id0 = f->vertex(0)->info();
+        unsigned id1 = f->vertex(1)->info();
+        unsigned id2 = f->vertex(2)->info();
+        std::array<unsigned, 3> ids = {id0 + 1, id1 + 1, id2 + 1};
+        std::sort(ids.begin(), ids.end());
+        faces(i, 0) = ids[0];
+        faces(i, 1) = ids[1];
+        faces(i, 2) = ids[2];
         ++i;
       }
     }

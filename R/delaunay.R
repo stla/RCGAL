@@ -6,6 +6,10 @@
 #'   then the function performs an elevated two-dimensional Delaunay
 #'   triangulation, using the \code{z} coordinates of the points for the
 #'   elevations; see the example
+#' @param constraints \emph{for 2D only}, some edges to perform a constrained
+#'   Delaunay triangulation, given as an integer matrix with two columns (each
+#'   row provides the indices of the two points forming the edge);
+#'   \code{NULL} for no constraint
 #'
 #' @return The Delaunay tessellation.
 #' \itemize{
@@ -77,7 +81,7 @@
 #' #   approximate the integral of the function:
 #' del[["volume"]]
 delaunay <- function(
-  points, elevation = FALSE
+  points, elevation = FALSE, constraints = NULL
 ){
   stopifnot(isBoolean(elevation))
   if(!is.matrix(points) || !is.numeric(points)){
@@ -103,7 +107,48 @@ delaunay <- function(
     stop("Points with missing values are not allowed.", call. = TRUE)
   }
   storage.mode(points) <- "double"
-  if(dimension == 2L){
+  if(!is.null(constraints)){
+    if(dimension == 3L){
+      stop(
+        "If you set some constraints, you must provide two-dimensional points.",
+        call. = TRUE
+      )
+    }
+    if(
+      !is.matrix(constraints) || !is.numeric(constraints) ||
+      ncol(constraints) != 2L
+    ){
+      stop(
+        "The `constraints` argument must be an integer matrix with two columns.",
+        call. = TRUE
+      )
+    }
+    if(any(is.na(constraints))){
+      stop("Missing values in `constraints` are not allowed.", call. = TRUE)
+    }
+    storage.mode(constraints) <- "integer"
+    stopifnot(all(constraints >= 1L))
+    stopifnot(all(constraints <= nrow(points)))
+    constraints <- t(apply(constraints, 1L, sort))
+    if(anyDuplicated(constraints)){
+      stop("There are some duplicated constraints.", call. = TRUE)
+    }
+    if(any(constraints[, 1L] == constraints[, 2L])){
+      stop("There are some invalid constraints.", call. = TRUE)
+    }
+    triangles <- del2d_constrained_cpp(points, constraints)
+    edges <- apply(triangles, 1L, function(x){
+      rbind(c(x[1L], x[2L]), c(x[1L], x[3L]), c(x[2L], x[3L]))
+    }, simplify = FALSE)
+    edges <- do.call(rbind, edges)
+    edges <- edges[!duplicated(edges), ]
+    out <- list(
+      "faces"       = triangles,
+      "edges"       = edges,
+      "constraints" = constraints
+    )
+    attr(out, "constrained") <- TRUE
+  }else if(dimension == 2L && is.null(constraints)){
     out <- del2d_cpp(points)
   }else{
     if(elevation){
