@@ -41,3 +41,7 @@ del2d_xy_cpp <- function(pts) {
     .Call(`_RCGAL_del2d_xy_cpp`, pts)
 }
 
+del2d_constrained_cpp <- function(pts, edges) {
+    .Call(`_RCGAL_del2d_constrained_cpp`, pts, edges)
+}
+
