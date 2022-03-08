@@ -213,83 +213,173 @@ delaunay <- function(
 }
 
 
-#' @title Plot 2D Delaunay tessellation
-#' @description Plot a 2D Delaunay tessellation.
+
+#' @title Plot 2D Delaunay triangulation
+#' @description Plot a constrained or unconstrained 2D Delaunay triangulation.
 #'
-#' @param tessellation the output of \code{\link{delaunay}} used with 2D points
-#' @param border the color of the borders of the triangles; \code{NULL} for
-#'   no borders
-#' @param color controls the filling colors of the triangles, either
-#'   \code{FALSE} for no color, \code{"random"} to use
-#'   \code{\link[randomcoloR]{randomColor}}, or \code{"distinct"} to use
-#'   \code{\link[randomcoloR]{distinctColorPalette}}
+#' @param del an output of \code{\link{delaunay}} without constraints
+#'   (\code{constraints=NULL}) or with constraints
+#' @param col_edges the color of the edges of the triangles which are not
+#'   border edges nor constraint edges; \code{NULL} for no color
+#' @param col_borders the color of the border edges; note that the border
+#'   edges can contain the constraint edges for a constrained
+#'   Delaunay tessellation; \code{NULL} for no color
+#' @param col_constraints for a constrained Delaunay tessellation, the color
+#'   of the constraint edges which are not border edges;
+#'   \code{NULL} for no color
+#' @param fillcolor controls the filling colors of the triangles, either
+#'   \code{NULL} for no color, a single color, \code{"random"} to get multiple
+#'   colors with \code{\link[randomcoloR]{randomColor}}, or \code{"distinct"}
+#'   get multiple colors with \code{\link[randomcoloR]{distinctColorPalette}}
 #' @param hue,luminosity if \code{color = "random"}, these arguments are passed
 #'   to \code{\link[randomcoloR]{randomColor}}
-#' @param lty,lwd graphical parameters
-#' @param ... arguments passed to \code{\link{plot}}
+#' @param lty_edges,lwd_edges graphical parameters for the edges which are not
+#'   border edges nor constraint edges
+#' @param lty_borders,lwd_borders graphical parameters for the border edges
+#' @param lty_constraints,lwd_constraints in the case of a constrained Delaunay
+#'   triangulation, graphical parameters for the constraintt edges which are
+#'   not border edges
+#' @param ... arguments passed to \code{\link{plot}} for the vertices, such as
+#'   \code{type="n"} or \code{asp=1}
 #'
 #' @return No value, just renders a 2D plot.
 #' @export
 #' @importFrom randomcoloR randomColor distinctColorPalette
 #' @importFrom graphics plot polygon par segments
+#' @importFrom gplots col2hex
 #'
-#' @examples # random points in a square ####
-#' set.seed(314)
-#' library(uniformly)
+#' @examples library(RCGAL)
+#' # random points in a square ####
 #' square <- rbind(
 #'   c(-1, 1), c(1, 1), c(1, -1), c(-1, -1)
 #' )
-#' ptsin <- runif_in_cube(10L, d = 2L)
-#' pts <- rbind(square, ptsin)
+#' library(uniformly)
+#' set.seed(314)
+#' ptsinsquare <- runif_in_cube(10L, d = 2L)
+#' pts <- rbind(square, ptsinsquare)
 #' d <- delaunay(pts)
 #' opar <- par(mar = c(0, 0, 0, 0))
 #' plotDelaunay2D(
-#'   d, xlab = NA, ylab = NA, asp = 1, color = "random", luminosity = "dark"
+#'   d, type = "n", xlab = NA, ylab = NA, asp = 1,
+#'   fillcolor = "random", luminosity = "dark", lwd_borders = 3
 #' )
 #' par(opar)
+#'
+#' # a constrained Delaunay triangulation: outer and inner hexagons ####
+#' nsides <- 6L
+#' angles <- seq(0, 2*pi, length.out = nsides+1L)[-1L]
+#' outer_points <- cbind(cos(angles), sin(angles))
+#' inner_points <- outer_points / 2
+#' points <- rbind(outer_points, inner_points)
+#' # constraint edges
+#' indices <- 1L:nsides
+#' edges <- cbind(
+#'   indices, c(indices[-1L], indices[1L])
+#' )
+#' edges <- rbind(edges, edges + nsides)
+#' # constrained Delaunay triangulation
+#' d <- delaunay(points, constraints = edges)
+#' opar <- par(mar = c(0, 0, 0, 0))
+#' plotDelaunay2D(
+#'   d, type = "p", pch = 19, xlab = NA, ylab = NA, asp = 1,
+#'   fillcolor = "orange", lwd_borders = 3
+#' )
+#' par(opar)
+#'
+#' # another constrained Delaunay tesselation: a face
 plotDelaunay2D <- function(
-  tessellation, border = "black", color = "distinct", hue = "random",
-  luminosity = "light", lty = par("lty"), lwd = par("lwd"), ...
+  triangulation,
+  col_edges = "black", col_borders = "red", col_constraints = "green",
+  fillcolor = "distinct", hue = "random", luminosity = "light",
+  lty_edges = par("lty"), lwd_edges = par("lwd"),
+  lty_borders = par("lty"), lwd_borders = par("lwd"),
+  lty_constraints = par("lty"), lwd_constraints = par("lwd"), ...
 ){
-  if(!inherits(tessellation, "delaunay")){
+  if(!inherits(triangulation, "delaunay")){
     stop(
-      "The argument `tessellation` must be an output of the `delaunay` function.",
+      "The argument `triangulation` must be an output of the `delaunay` function.",
       call. = TRUE
     )
   }
-  vertices <- attr(tessellation, "points")
+  vertices <- attr(triangulation, "points")
   if(ncol(vertices) != 2L){
     stop(
       sprintf("Invalid dimension (%d instead of 2).", ncol(vertices)),
       call. = TRUE
     )
   }
-  plot(vertices, type = "n", ...)
-  if(!isFALSE(color)){
-    color <- match.arg(color, c("random", "distinct"))
-    trianglesIds <- tessellation[["faces"]]
-    ntriangles <- nrow(trianglesIds)
-    if(color == "random"){
+  plot(vertices, ...)
+  if(!isFalsy(fillcolor)){
+    fillcolor <- tryCatch({
+      col2hex(fillcolor)
+    }, error = function(e){
+      match.arg(fillcolor, c("random", "distinct"))
+    })
+    triangles <- triangulation[["faces"]]
+    ntriangles <- nrow(triangles)
+    if(fillcolor == "random"){
       colors <- randomColor(ntriangles, hue = hue, luminosity = luminosity)
-    }else{
+    }else if(fillcolor == "distinct"){
       colors <- distinctColorPalette(ntriangles)
+    }else{
+      colors <- rep(fillcolor, ntriangles)
     }
     for(i in 1L:ntriangles){
-      triangle <- vertices[trianglesIds[i, ], ]
+      triangle <- makeTriangle(vertices, triangles[i, ])
       polygon(triangle, border = NA, col = colors[i])
     }
   }
-  if(!is.null(border)){
-    edges <- tessellation[["edges"]][, c(1L, 2L)]
+  constraintEdges <- triangulation[["constraints"]]
+  allEdges <- as.matrix(triangulation[["edges"]])
+  borderEdges <- allEdges[allEdges[, "border"] == 1L, c(1L, 2L)]
+  allEdges <- allEdges[, c(1L, 2L)]
+  specialEdges <- unionEdges(borderEdges, constraintEdges)
+  constraintEdges <- subtractEdges(specialEdges, borderEdges)
+  otherEdges <- subtractEdges(allEdges, specialEdges)
+  if(!isFalsy(col_edges)){
+    # if(is.null(constraintEdges)){
+    #   edges <- otherEdges
+    # }else{
+    #   if(!isFalsy(col_constraints)){
+    #     edges <- subtractEdges()
+    #   }
+    # }
+    edges <- otherEdges
     for(i in 1L:nrow(edges)){
       edge <- edges[i, ]
       p0 <- vertices[edge[1L], ]
       p1 <- vertices[edge[2L], ]
       segments(
-        p0[1L], p0[2L], p1[1L], p1[2L], col = border, lty = lty, lwd = lwd
+        p0[1L], p0[2L], p1[1L], p1[2L], col = col_edges,
+        lty = lty_edges, lwd = lwd_edges
       )
     }
   }
+  if(!isFalsy(col_borders)){
+    edges <- borderEdges
+    for(i in 1L:nrow(edges)){
+      edge <- edges[i, ]
+      p0 <- vertices[edge[1L], ]
+      p1 <- vertices[edge[2L], ]
+      segments(
+        p0[1L], p0[2L], p1[1L], p1[2L], col = col_borders,
+        lty = lty_borders, lwd = lwd_borders
+      )
+    }
+  }
+  if(!is.null(constraintEdges) && !isFalsy(col_constraints)){
+    edges <- constraintEdges
+    for(i in 1L:nrow(edges)){
+      edge <- edges[i, ]
+      p0 <- vertices[edge[1L], ]
+      p1 <- vertices[edge[2L], ]
+      segments(
+        p0[1L], p0[2L], p1[1L], p1[2L], col = col_constraints,
+        lty = lty_constraints, lwd = lwd_constraints
+      )
+    }
+  }
+  invisible(NULL)
 }
 
 
