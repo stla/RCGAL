@@ -2,7 +2,7 @@
 % Please edit documentation in R/delaunay.R
 \name{plotDelaunay2D}
 \alias{plotDelaunay2D}
-\title{Plot 2D Delaunay tessellation}
+\title{Plot 2D Delaunay triangulation}
 \usage{
 plotDelaunay2D(
   tessellation,
@@ -16,42 +16,98 @@ plotDelaunay2D(
 )
 }
 \arguments{
-\item{tessellation}{the output of \code{\link{delaunay}} used with 2D points}
-
-\item{border}{the color of the borders of the triangles; \code{NULL} for
-no borders}
-
-\item{color}{controls the filling colors of the triangles, either
-\code{FALSE} for no color, \code{"random"} to use
-\code{\link[randomcoloR]{randomColor}}, or \code{"distinct"} to use
-\code{\link[randomcoloR]{distinctColorPalette}}}
-
 \item{hue, luminosity}{if \code{color = "random"}, these arguments are passed
 to \code{\link[randomcoloR]{randomColor}}}
 
-\item{lty, lwd}{graphical parameters}
+\item{...}{arguments passed to \code{\link{plot}} for the vertices, such as
+\code{type="n"} or \code{asp=1}}
 
-\item{...}{arguments passed to \code{\link{plot}}}
+\item{del}{an output of \code{\link{delaunay}} without constraints
+(\code{constraints=NULL}) or with constraints}
+
+\item{col_edges}{the color of the edges of the triangles which are not
+border edges nor constraint edges; \code{NULL} for no color}
+
+\item{col_borders}{the color of the border edges; note that the border
+edges can contain the constraint edges for a constrained
+Delaunay tessellation; \code{NULL} for no color}
+
+\item{col_constraints}{for a constrained Delaunay tessellation, the color
+of the constraint edges which are not border edges;
+\code{NULL} for no color}
+
+\item{fillcolor}{controls the filling colors of the triangles, either
+\code{NULL} for no color, a single color, \code{"random"} to get multiple
+colors with \code{\link[randomcoloR]{randomColor}}, or \code{"distinct"}
+get multiple colors with \code{\link[randomcoloR]{distinctColorPalette}}}
+
+\item{lty_edges, lwd_edges}{graphical parameters for the edges which are not
+border edges nor constraint edges}
+
+\item{lty_borders, lwd_borders}{graphical parameters for the border edges}
+
+\item{lty_constraints, lwd_constraints}{in the case of a constrained Delaunay
+triangulation, graphical parameters for the constraintt edges which are
+not border edges}
 }
 \value{
 No value, just renders a 2D plot.
 }
 \description{
-Plot a 2D Delaunay tessellation.
+Plot a constrained or unconstrained 2D Delaunay triangulation.
 }
 \examples{
+library(RCGAL)
 # random points in a square ####
-set.seed(314)
-library(uniformly)
 square <- rbind(
   c(-1, 1), c(1, 1), c(1, -1), c(-1, -1)
 )
-ptsin <- runif_in_cube(10L, d = 2L)
-pts <- rbind(square, ptsin)
+library(uniformly)
+set.seed(314)
+ptsinsquare <- runif_in_cube(10L, d = 2L)
+pts <- rbind(square, ptsinsquare)
 d <- delaunay(pts)
 opar <- par(mar = c(0, 0, 0, 0))
 plotDelaunay2D(
-  d, xlab = NA, ylab = NA, asp = 1, color = "random", luminosity = "dark"
+  d, type = "n", xlab = NA, ylab = NA, axes = FALSE, asp = 1,
+  fillcolor = "random", luminosity = "dark", lwd_borders = 3
+)
+par(opar)
+
+# a constrained Delaunay triangulation: outer and inner hexagons ####
+nsides <- 6L
+angles <- seq(0, 2*pi, length.out = nsides+1L)[-1L]
+outer_points <- cbind(cos(angles), sin(angles))
+inner_points <- outer_points / 2
+points <- rbind(outer_points, inner_points)
+# constraint edges
+indices <- 1L:nsides
+edges <- cbind(
+  indices, c(indices[-1L], indices[1L])
+)
+edges <- rbind(edges, edges + nsides)
+# constrained Delaunay triangulation
+d <- delaunay(points, constraints = edges)
+opar <- par(mar = c(0, 0, 0, 0))
+plotDelaunay2D(
+  d, type = "p", pch = 19, xlab = NA, ylab = NA, axes = FALSE, asp = 1,
+  fillcolor = "orange", lwd_borders = 3
+)
+par(opar)
+
+# another constrained Delaunay tesselation: a face ####
+V <- as.matrix(read.table(
+  system.file("extdata", "face_vertices.txt", package = "RCGAL")
+))[, c(2L, 3L)]
+E <- as.matrix(read.table(
+  system.file("extdata", "face_edges.txt", package = "RCGAL")
+))[, c(2L, 3L)]
+d <- delaunay(points = V, constraints = E)
+opar <- par(mar = c(0, 0, 0, 0))
+plotDelaunay2D(
+  d, type = "n", xlab = NA, ylab = NA, axes = FALSE, asp = 1,
+  fillcolor = "salmon", col_borders = "black",
+  lwd_borders = 3, lwd_constraints = 2, lty_edges = "dashed"
 )
 par(opar)
 }

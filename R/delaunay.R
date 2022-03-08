@@ -260,7 +260,7 @@ delaunay <- function(
 #' d <- delaunay(pts)
 #' opar <- par(mar = c(0, 0, 0, 0))
 #' plotDelaunay2D(
-#'   d, type = "n", xlab = NA, ylab = NA, asp = 1,
+#'   d, type = "n", xlab = NA, ylab = NA, axes = FALSE, asp = 1,
 #'   fillcolor = "random", luminosity = "dark", lwd_borders = 3
 #' )
 #' par(opar)
@@ -281,12 +281,26 @@ delaunay <- function(
 #' d <- delaunay(points, constraints = edges)
 #' opar <- par(mar = c(0, 0, 0, 0))
 #' plotDelaunay2D(
-#'   d, type = "p", pch = 19, xlab = NA, ylab = NA, asp = 1,
+#'   d, type = "p", pch = 19, xlab = NA, ylab = NA, axes = FALSE, asp = 1,
 #'   fillcolor = "orange", lwd_borders = 3
 #' )
 #' par(opar)
 #'
-#' # another constrained Delaunay tesselation: a face
+#' # another constrained Delaunay tesselation: a face ####
+#' V <- as.matrix(read.table(
+#'   system.file("extdata", "face_vertices.txt", package = "RCGAL")
+#' ))[, c(2L, 3L)]
+#' E <- as.matrix(read.table(
+#'   system.file("extdata", "face_edges.txt", package = "RCGAL")
+#' ))[, c(2L, 3L)]
+#' d <- delaunay(points = V, constraints = E)
+#' opar <- par(mar = c(0, 0, 0, 0))
+#' plotDelaunay2D(
+#'   d, type = "n", xlab = NA, ylab = NA, axes = FALSE, asp = 1,
+#'   fillcolor = "salmon", col_borders = "black",
+#'   lwd_borders = 3, lwd_constraints = 2, lty_edges = "dashed"
+#' )
+#' par(opar)
 plotDelaunay2D <- function(
   triangulation,
   col_edges = "black", col_borders = "red", col_constraints = "green",
