@@ -217,7 +217,7 @@ delaunay <- function(
 #' @title Plot 2D Delaunay triangulation
 #' @description Plot a constrained or unconstrained 2D Delaunay triangulation.
 #'
-#' @param del an output of \code{\link{delaunay}} without constraints
+#' @param triangulation an output of \code{\link{delaunay}} without constraints
 #'   (\code{constraints=NULL}) or with constraints
 #' @param col_edges the color of the edges of the triangles which are not
 #'   border edges nor constraint edges; \code{NULL} for no color

@@ -22,6 +22,9 @@ plotDelaunay2D(
 )
 }
 \arguments{
+\item{triangulation}{an output of \code{\link{delaunay}} without constraints
+(\code{constraints=NULL}) or with constraints}
+
 \item{col_edges}{the color of the edges of the triangles which are not
 border edges nor constraint edges; \code{NULL} for no color}
 
@@ -52,9 +55,6 @@ not border edges}
 
 \item{...}{arguments passed to \code{\link{plot}} for the vertices, such as
 \code{type="n"} or \code{asp=1}}
-
-\item{del}{an output of \code{\link{delaunay}} without constraints
-(\code{constraints=NULL}) or with constraints}
 }
 \value{
 No value, just renders a 2D plot.

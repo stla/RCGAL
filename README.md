@@ -90,6 +90,12 @@ parameter (0.05, 0.02, 0.005):
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/DelaunayExamples/volcano.png)
 
 
+## Constrained Delaunay triangulation
+
+*Face:*
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/DelaunayExamples/face.png)
+
 
 ## Convex hull
 
