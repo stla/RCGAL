@@ -243,6 +243,9 @@ delaunay <- function(
 #'   \code{type="n"} or \code{asp=1}
 #'
 #' @return No value, just renders a 2D plot.
+#'
+#' @seealso \code{\link{mesh2d}} for an interactive plot
+#'
 #' @export
 #' @importFrom randomcoloR randomColor distinctColorPalette
 #' @importFrom graphics plot polygon par segments
@@ -397,15 +400,50 @@ plotDelaunay2D <- function(
 }
 
 #' @title Convert a 2D Delaunay triangulation to a 'rgl' mesh
+#' @description Makes a 'rgl' mesh (\code{\link[rgl]{mesh3d}} object) from
+#'   a 2D Delaunay triangulation, unconstrained or constrained.
 #'
 #' @param triangulation an output of \code{\link{delaunay}} executed with
 #'   2D points
 #'
-#' @return A \code{\link[rgl]{mesh3d}} object.
+#' @return A list with three fields; \code{mesh}, a \code{\link[rgl]{mesh3d}}
+#'   object, \code{borderEdges}, a numeric matrix that can be used with
+#'   \code{\link[rgl]{segments3d}} to plot the border edges, and
+#'   \code{constraintEdges}, a numeric matrix that can be used with
+#'   \code{\link[rgl]{segments3d}} to plot the constraint edges which are
+#'   not border edges.
+#'
+#' @seealso \code{\link{plotDelaunay2D}}
+#'
 #' @export
 #' @importFrom rgl tmesh3d
 #'
 #' @examples library(RCGAL)
+#' # outer and inner hexagons ####
+#' nsides <- 6L
+#' angles <- seq(0, 2*pi, length.out = nsides+1L)[-1L]
+#' outer_points <- cbind(cos(angles), sin(angles))
+#' inner_points <- outer_points / 2
+#' points <- rbind(outer_points, inner_points)
+#' # constraint edges
+#' indices <- 1L:nsides
+#' edges <- cbind(
+#'   indices, c(indices[-1L], indices[1L])
+#' )
+#' edges <- rbind(edges, edges + nsides)
+#' # constrained Delaunay triangulation
+#' del <- delaunay(points, constraints = edges)
+#' # mesh
+#' m2d <- mesh2d(del)
+#' mesh <- m2d[["mesh"]]
+#' # plot all edges with `wire3d`
+#' open3d(windowRect = c(100, 100, 612, 612))
+#' shade3d(mesh, color = "red", specular = "orangered")
+#' wire3d(mesh, color = "black", lwd = 3, specular = "black")
+#' # plot only the border edges
+#' open3d(windowRect = c(100, 100, 612, 612))
+#' shade3d(mesh, color = "darkred", specular = "firebrick")
+#' segments3d(m2d[["borderEdges"]], lwd = 3)
 mesh2d <- function(triangulation){
   if(!inherits(triangulation, "delaunay")){
     stop(

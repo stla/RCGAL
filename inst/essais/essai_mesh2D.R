@@ -37,7 +37,7 @@ open3d(windowRect = c(100, 100, 612, 612))
 shade3d(mesh, color = "red", specular = "red")
 segments3d(m$borderEdges, lwd = 3)
 
-# hexagon ####
+# outer and inner hexagons ####
 nsides <- 6L
 angles <- seq(0, 2*pi, length.out = nsides+1L)[-1L]
 outer_points <- cbind(cos(angles), sin(angles))
@@ -46,20 +46,19 @@ points <- rbind(outer_points, inner_points)
 # constraint edges
 indices <- 1L:nsides
 edges <- cbind(
-  indices,
-  c(indices[-1L], indices[1L])
+  indices, c(indices[-1L], indices[1L])
 )
 edges <- rbind(edges, edges + nsides)
 # constrained Delaunay triangulation
 del <- delaunay(points, constraints = edges)
-
-m <- mesh2d(del)
-mesh <- m[["mesh"]]
-
+# mesh
+m2d <- mesh2d(del)
+mesh <- m2d[["mesh"]]
+# plot all edges with `wire3d`
 open3d(windowRect = c(100, 100, 612, 612))
-shade3d(mesh, color = "red", specular = "red")
+shade3d(mesh, color = "red", specular = "orangered")
 wire3d(mesh, color = "black", lwd = 3, specular = "black")
-
+# plot only the border edges
 open3d(windowRect = c(100, 100, 612, 612))
-shade3d(mesh, color = "red", specular = "red")
-segments3d(m$borderEdges, lwd = 3)
+shade3d(mesh, color = "darkred", specular = "firebrick")
+segments3d(m2d[["borderEdges"]], lwd = 3)

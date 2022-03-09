@@ -117,3 +117,6 @@ plotDelaunay2D(
 )
 par(opar)
 }
+\seealso{
+\code{\link{mesh2d}} for an interactive plot
+}
