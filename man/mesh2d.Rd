@@ -42,6 +42,7 @@ del <- delaunay(points, constraints = edges)
 m2d <- mesh2d(del)
 mesh <- m2d[["mesh"]]
 # plot all edges with `wire3d`
+library(rgl)
 open3d(windowRect = c(100, 100, 612, 612))
 shade3d(mesh, color = "red", specular = "orangered")
 wire3d(mesh, color = "black", lwd = 3, specular = "black")
