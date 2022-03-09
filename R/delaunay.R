@@ -396,6 +396,58 @@ plotDelaunay2D <- function(
   invisible(NULL)
 }
 
+#' @title Convert a 2D Delaunay triangulation to a 'rgl' mesh
+#'
+#' @param triangulation an output of \code{\link{delaunay}} executed with
+#'   2D points
+#'
+#' @return A \code{\link[rgl]{mesh3d}} object.
+#' @export
+#' @importFrom rgl tmesh3d
+#'
+#' @examples library(RCGAL)
+mesh2d <- function(triangulation){
+  if(!inherits(triangulation, "delaunay")){
+    stop(
+      "The argument `triangulation` must be an output of the `delaunay` function.",
+      call. = TRUE
+    )
+  }
+  vertices <- attr(triangulation, "points")
+  if(ncol(vertices) != 2L){
+    stop(
+      sprintf("Invalid dimension (%d instead of 2).", ncol(vertices)),
+      call. = TRUE
+    )
+  }
+  vertices <- cbind(vertices, 0)
+  mesh <- tmesh3d(
+    vertices = t(vertices),
+    indices = t(triangulation[["faces"]])
+  )
+  constraintEdges <- triangulation[["constraints"]]
+  allEdges <- as.matrix(triangulation[["edges"]])
+  borderEdges <- allEdges[allEdges[, "border"] == 1L, c(1L, 2L)]
+  constraints <- NULL
+  if(!is.null(constraintEdges)){
+    specialEdges <- unionEdges(borderEdges, constraintEdges)
+    constraintEdges <- subtractEdges(specialEdges, borderEdges)
+    if(!is.null(constraintEdges)){
+      constraints <- do.call(rbind, apply(
+        constraintEdges, 1L, function(ij) vertices[ij,], simplify = FALSE
+      ))
+    }
+  }
+  borders <- do.call(rbind, apply(
+    borderEdges, 1L, function(ij) vertices[ij,], simplify = FALSE
+  ))
+  list(
+    "mesh"            = mesh,
+    "borderEdges"     = borders,
+    "constraintEdges" = constraints
+  )
+}
+
 
 #' @title Plot 3D Delaunay tessellation
 #' @description Plot a 3D Delaunay tessellation with \strong{rgl}.
