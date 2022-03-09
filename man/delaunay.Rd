@@ -81,15 +81,17 @@ The Delaunay tessellation.
         field provides only one number, the volume of the tessellation (i.e.
         the volume of the convex hull of the points).
   \item \strong{If} \code{elevation=TRUE}, the returned value is a list with
-        four fields: \code{mesh}, \code{edges}, \code{faceVolumes}, and
-        \code{volume}. The \code{mesh} field is an object of class
-        \code{mesh3d}, ready for plotting with the \strong{rgl} package. The
-        \code{edges} field provides the indices of the edges, given as an
-        integer matrix with two columns. The \code{faceVolumes} field is a
-        numeric vector, it provides the volumes under the faces that can be
-        found in the \code{mesh} field. Finally the \code{volume} field
+        five fields: \code{mesh}, \code{edges}, \code{faceVolumes},
+        \code{volume} and \code{area}. The \code{mesh} field is an object of
+        class \code{mesh3d}, ready for plotting with the \strong{rgl}
+        package. The \code{edges} field provides the indices of the edges,
+        given as an integer matrix with two columns. The \code{faceVolumes}
+        field is a numeric vector, it provides the volumes under the faces
+        that can be found in the \code{mesh} field. The \code{volume} field
         provides the sum of these volumes, that is to say the total volume
-        under the triangulated surface.
+        under the triangulated surface. Finally, the \code{area} field
+        provides the sum of the areas of all triangles, thereby
+        approximating the area of the triangulated surface.
 }
 }
 \description{

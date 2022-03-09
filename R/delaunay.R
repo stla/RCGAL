@@ -82,15 +82,17 @@ delaunayArea <- function(vertices, triangles){
 #'         field provides only one number, the volume of the tessellation (i.e.
 #'         the volume of the convex hull of the points).
 #'   \item \strong{If} \code{elevation=TRUE}, the returned value is a list with
-#'         four fields: \code{mesh}, \code{edges}, \code{faceVolumes}, and
-#'         \code{volume}. The \code{mesh} field is an object of class
-#'         \code{mesh3d}, ready for plotting with the \strong{rgl} package. The
-#'         \code{edges} field provides the indices of the edges, given as an
-#'         integer matrix with two columns. The \code{faceVolumes} field is a
-#'         numeric vector, it provides the volumes under the faces that can be
-#'         found in the \code{mesh} field. Finally the \code{volume} field
+#'         five fields: \code{mesh}, \code{edges}, \code{faceVolumes},
+#'         \code{volume} and \code{area}. The \code{mesh} field is an object of
+#'         class \code{mesh3d}, ready for plotting with the \strong{rgl}
+#'         package. The \code{edges} field provides the indices of the edges,
+#'         given as an integer matrix with two columns. The \code{faceVolumes}
+#'         field is a numeric vector, it provides the volumes under the faces
+#'         that can be found in the \code{mesh} field. The \code{volume} field
 #'         provides the sum of these volumes, that is to say the total volume
-#'         under the triangulated surface.
+#'         under the triangulated surface. Finally, the \code{area} field
+#'         provides the sum of the areas of all triangles, thereby
+#'         approximating the area of the triangulated surface.
 #' }
 #' @export
 #' @importFrom rgl tmesh3d addNormals
@@ -192,16 +194,27 @@ delaunay <- function(
   }else{
     if(elevation){
       del <- del2d_xy_cpp(points)
+      triangles <- del[["faces"]]
+      ntriangles <- nrow(triangles)
+      areas <- numeric(ntriangles)
+      for(i in 1L:ntriangles){
+        triangle <- triangles[i, ]
+        vertices <- points[triangle, ]
+        areas[i] <- triangleArea(
+          vertices[1L, ], vertices[2L, ], vertices[3L, ]
+        )
+      }
       out <- list(
-        mesh = addNormals(
+        "mesh"        = addNormals(
           tmesh3d(
             vertices = t(points),
-            indices = t(del[["faces"]])
+            indices = t(triangles)
           )
         ),
-        edges = del[["edges"]],
-        faceVolumes = attr(del[["faces"]], "volumes"),
-        volume = del[["volume"]]
+        "edges"       = del[["edges"]],
+        "faceVolumes" = attr(triangles, "volumes"),
+        "volume"      = del[["volume"]],
+        "area"        = sum(areas)
       )
     }else{
       out <- del3d_cpp(points)
