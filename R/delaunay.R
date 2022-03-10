@@ -183,7 +183,9 @@ delaunay <- function(
     )
     out <- list(
       "faces"       = triangles,
-      "edges"       = vcgGetEdge(mesh),
+      "edges"       = `colnames<-`(
+        as.matrix(vcgGetEdge(mesh))[, c(1L, 2L, 4L)], c("v1", "v2", "border")
+      ),
       "constraints" = constraints,
       "area"        = delaunayArea(points, triangles)
     )
@@ -360,7 +362,7 @@ plotDelaunay2D <- function(
     }
   }
   constraintEdges <- triangulation[["constraints"]]
-  allEdges <- as.matrix(triangulation[["edges"]])
+  allEdges <- triangulation[["edges"]]
   borderEdges <- allEdges[allEdges[, "border"] == 1L, c(1L, 2L)]
   allEdges <- allEdges[, c(1L, 2L)]
   specialEdges <- unionEdges(borderEdges, constraintEdges)
@@ -478,7 +480,7 @@ mesh2d <- function(triangulation){
     indices = t(triangulation[["faces"]])
   )
   constraintEdges <- triangulation[["constraints"]]
-  allEdges <- as.matrix(triangulation[["edges"]])
+  allEdges <- triangulation[["edges"]]
   borderEdges <- allEdges[allEdges[, "border"] == 1L, c(1L, 2L)]
   constraints <- NULL
   if(!is.null(constraintEdges)){
