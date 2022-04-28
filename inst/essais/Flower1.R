@@ -20,9 +20,10 @@ tris <- parametric3d(
   engine = "none"
 )
 
-mesh00 <- misc3d:::t2ve(tris)
-mesh0 <- tmesh3d(mesh00$vb, mesh00$ib)
-mesh <- Rvcg::vcgUniformRemesh(mesh0)
+# mesh00 <- misc3d:::t2ve(tris)
+# mesh0 <- tmesh3d(mesh00$vb, mesh00$ib)
+# mesh0 <- Rvcg::vcgClean(mesh0, sel = 7)
+mesh <- Rvcg::vcgUniformRemesh(mesh0, discretize = TRUE)
 flower <- t(mesh0$vb[-4L, ])
 
 psr <- PoissonReconstruction(flower, spacing = 0.005)

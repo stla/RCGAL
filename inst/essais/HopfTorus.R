@@ -71,8 +71,9 @@ hmesh <- function(nu, nv, normals = TRUE, nlobes = 3, A = 0.44, ...){
 }
 
 hopf <- addNormals(hmesh(200, 100, normals = FALSE))
+hopfpoints <- Rvcg::vcgUniformRemesh(hopf)
 hopf <- Rvcg::vcgIsotropicRemeshing(hopf, TargetLen = 0.5)
-points <- t(hopf$vb[-4L, ])
+points <- t(hopfpoints$vb[-4L, ])
 points3d(points)
 mesh <- PoissonReconstruction(points, getSomeNormals(points, 10))#, spacing = 0.05, sm_distance = 0.1)
 shade3d(mesh, color = "red")
