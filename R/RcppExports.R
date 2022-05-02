@@ -17,16 +17,12 @@ del3d_cpp <- function(pts) {
     .Call(`_RCGAL_del3d_cpp`, pts)
 }
 
-AFSreconstruction_cpp <- function(pts) {
-    .Call(`_RCGAL_AFSreconstruction_cpp`, pts)
+del2d_xy_cpp <- function(pts) {
+    .Call(`_RCGAL_del2d_xy_cpp`, pts)
 }
 
-AFSreconstruction_perimeter_cpp <- function(pts, per) {
-    .Call(`_RCGAL_AFSreconstruction_perimeter_cpp`, pts, per)
-}
-
-Poisson_reconstruction_cpp <- function(pts, normals, spacing, sm_angle, sm_radius, sm_distance) {
-    .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals, spacing, sm_angle, sm_radius, sm_distance)
+del2d_constrained_cpp <- function(pts, edges) {
+    .Call(`_RCGAL_del2d_constrained_cpp`, pts, edges)
 }
 
 jet_normals_cpp <- function(pts, nb_neighbors) {
@@ -37,11 +33,15 @@ pca_normals_cpp <- function(pts, nb_neighbors) {
     .Call(`_RCGAL_pca_normals_cpp`, pts, nb_neighbors)
 }
 
-del2d_xy_cpp <- function(pts) {
-    .Call(`_RCGAL_del2d_xy_cpp`, pts)
+AFSreconstruction_cpp <- function(pts) {
+    .Call(`_RCGAL_AFSreconstruction_cpp`, pts)
 }
 
-del2d_constrained_cpp <- function(pts, edges) {
-    .Call(`_RCGAL_del2d_constrained_cpp`, pts, edges)
+AFSreconstruction_perimeter_cpp <- function(pts, per) {
+    .Call(`_RCGAL_AFSreconstruction_perimeter_cpp`, pts, per)
+}
+
+Poisson_reconstruction_cpp <- function(pts, normals, spacing, sm_angle, sm_radius, sm_distance) {
+    .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals, spacing, sm_angle, sm_radius, sm_distance)
 }
 

@@ -2,6 +2,7 @@ library(RCGAL)
 library(rgl)
 
 HT <- function(u, v, nlobes, A){
+  # u <- u + pi/3
   p2 <- sin(pi/2 - (pi/2-A)*cos(u*nlobes)) * cos(u+A*sin(2*u*nlobes))
   p3 <- sin(pi/2 - (pi/2-A)*cos(u*nlobes)) * sin(u+A*sin(2*u*nlobes))
   p1 <- cos(pi/2 - (pi/2-A)*cos(u*nlobes))
@@ -23,7 +24,10 @@ xprod <- function(v, w){
 hmesh <- function(nu, nv, normals = TRUE, nlobes = 3, A = 0.44, ...){
   vs <- matrix(NA_real_, nrow=3, ncol=nu*nv)
   u_ <- seq(0, 2*pi, length.out = nu+1)[-1]
+  # ss <- (seq(-1, 1, length.out = nu+1)^3)[-1]
+  # u_ <- pi/3*c(ss-2, ss, ss+2)-pi/3+pi
   v_ <- seq(0, 2*pi, length.out = nv+1)[-1]
+  # v_ <- pi*seq(-1, 1, length.out = nv+1)[-1]^3
   for(i in 1:nu){
     for(j in 1:nv){
       vs[,(i-1)*nv+j] <- HT(u_[i], v_[j], nlobes, A)
@@ -70,7 +74,7 @@ hmesh <- function(nu, nv, normals = TRUE, nlobes = 3, A = 0.44, ...){
   )
 }
 
-hopf <- addNormals(hmesh(200, 100, normals = FALSE))
+hopf <- addNormals(hmesh(60, 65, normals = FALSE))
 hopfpoints <- Rvcg::vcgUniformRemesh(hopf)
 hopf <- Rvcg::vcgIsotropicRemeshing(hopf, TargetLen = 0.5)
 points <- t(hopfpoints$vb[-4L, ])
