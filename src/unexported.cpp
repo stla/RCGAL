@@ -115,7 +115,7 @@ std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
   return faces;
 }
 
-Mesh makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
+Polyhedron makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
   Points3 points = matrix_to_points3(M);
   std::vector<std::vector<size_t>> faces = matrix_to_faces(I);
   bool success =
@@ -123,13 +123,13 @@ Mesh makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
   if(!success) {
     Rcpp::stop("Polygon orientation failed.");
   }
-  Mesh mesh;
+  Polyhedron mesh;
   CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
                                                               mesh);
   return mesh;
 }
 
-Rcpp::List RMesh(Mesh mesh) {
+Rcpp::List RMesh(Polyhedron mesh) {
   const size_t nvertices = num_vertices(mesh);  // or number_of_vertices
   // const size_t nedges = num_edges(mesh);        // or number_of_edges
   const size_t nfaces = num_faces(mesh);

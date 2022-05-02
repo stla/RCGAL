@@ -176,6 +176,6 @@ Points3 matrix_to_points3(const Rcpp::NumericMatrix);
 
 std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
 
-Mesh makeMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
+Polyhedron makeMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
 
-Rcpp::List RMesh(Mesh);
+Rcpp::List RMesh(Polyhedron);
