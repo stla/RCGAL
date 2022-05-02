@@ -142,6 +142,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// testMesh
+Rcpp::List testMesh(const Rcpp::NumericMatrix points, const Rcpp::IntegerMatrix faces);
+RcppExport SEXP _RCGAL_testMesh(SEXP pointsSEXP, SEXP facesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type faces(facesSEXP);
+    rcpp_result_gen = Rcpp::wrap(testMesh(points, faces));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
@@ -155,6 +167,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
+    {"_RCGAL_testMesh", (DL_FUNC) &_RCGAL_testMesh, 2},
     {NULL, NULL, 0}
 };
 

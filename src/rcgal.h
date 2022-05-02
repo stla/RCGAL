@@ -65,6 +65,10 @@
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_face_base_with_info_2.h>
 
+#include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
+#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+#include <CGAL/Polygon_mesh_processing/orientation.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -78,6 +82,7 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef K::Point_2 Point2;
 typedef K::Point_3 Point3;
 typedef std::vector<Point2> Points2;
+typedef std::vector<Point3> Points3;
 typedef std::pair<Point3, unsigned> IPoint3;
 
 typedef CGAL::
@@ -90,6 +95,7 @@ typedef CGAL::Extreme_points_traits_adapter_3<Pmap,
                                                 CHT;
 
 typedef CGAL::Surface_mesh<IPoint3> Mesh;
+typedef CGAL::Surface_mesh<Point3>      Mesh3;
 
 typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
@@ -165,3 +171,11 @@ void mark_domains0(CDT&,
                    std::list<CDT::Edge>&);
 
 void mark_domains(CDT&);
+
+Points3 matrix_to_points3(const Rcpp::NumericMatrix);
+
+std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
+
+Mesh makeMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
+
+Rcpp::List RMesh(Mesh);

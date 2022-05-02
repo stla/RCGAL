@@ -10,15 +10,15 @@ bool approxEqual(double x, double y, double epsilon) {
 
 bool approxEqualVectors(Vector3 v, Vector3 w, double epsilon) {
   return approxEqual(v.x(), w.x(), epsilon) &&
-    approxEqual(v.y(), w.y(), epsilon) &&
-    approxEqual(v.z(), w.z(), epsilon);
+         approxEqual(v.y(), w.y(), epsilon) &&
+         approxEqual(v.z(), w.z(), epsilon);
 }
 
 Rcpp::String stringPair(const size_t i, const size_t j) {
   const size_t i0 = std::min(i, j);
   const size_t i1 = std::max(i, j);
   const Rcpp::CharacterVector stringids = Rcpp::CharacterVector::create(
-    std::to_string(i0), "-", std::to_string(i1));
+      std::to_string(i0), "-", std::to_string(i1));
   return Rcpp::collapse(stringids);
 }
 
@@ -30,7 +30,7 @@ std::array<Rcpp::String, 3> triangleEdges(const size_t i0,
 
 Rcpp::String stringTriple(const size_t i, const size_t j, const size_t k) {
   const Rcpp::CharacterVector stringids = Rcpp::CharacterVector::create(
-    std::to_string(i), "-", std::to_string(j), "-", std::to_string(k));
+      std::to_string(i), "-", std::to_string(j), "-", std::to_string(k));
   return Rcpp::collapse(stringids);
 }
 
@@ -45,7 +45,7 @@ double volume_under_triangle(Dvector v0, Dvector v1, Dvector v2) {
   double y2 = v2(1);
   double z2 = v2(2);
   return (z0 + z1 + z2) *
-    (x0 * y1 - x1 * y0 + x1 * y2 - x2 * y1 + x2 * y0 - x0 * y2) / 6.0;
+         (x0 * y1 - x1 * y0 + x1 * y2 - x2 * y1 + x2 * y0 - x0 * y2) / 6.0;
 }
 
 void mark_domains0(CDT& ct,
@@ -76,21 +76,104 @@ void mark_domains0(CDT& ct,
   }
 }
 
-void mark_domains(CDT& cdt)
-{
-  for(CDFace_handle f : cdt.all_face_handles()){
+void mark_domains(CDT& cdt) {
+  for(CDFace_handle f : cdt.all_face_handles()) {
     f->info().nesting_level = -1;
   }
   std::list<CDT::Edge> border;
   mark_domains0(cdt, cdt.infinite_face(), 0, border);
-  while(! border.empty()){
+  while(!border.empty()) {
     CDT::Edge e = border.front();
     border.pop_front();
     CDFace_handle n = e.first->neighbor(e.second);
-    if(n->info().nesting_level == -1){
-      mark_domains0(cdt, n, e.first->info().nesting_level+1, border);
+    if(n->info().nesting_level == -1) {
+      mark_domains0(cdt, n, e.first->info().nesting_level + 1, border);
     }
   }
 }
 
+Points3 matrix_to_points3(const Rcpp::NumericMatrix M) {
+  const size_t npoints = M.ncol();
+  Points3 points;
+  points.reserve(npoints);
+  for(size_t i = 0; i < npoints; i++) {
+    const Rcpp::NumericVector pt = M(Rcpp::_, i);
+    points.emplace_back(Point3(pt(0), pt(1), pt(2)));
+  }
+  return points;
+}
 
+std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
+  const size_t nfaces = I.ncol();
+  std::vector<std::vector<size_t>> faces;
+  faces.reserve(nfaces);
+  for(size_t i = 0; i < nfaces; i++) {
+    const Rcpp::IntegerVector face_rcpp = I(Rcpp::_, i);
+    std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
+    faces.emplace_back(face);
+  }
+  return faces;
+}
+
+Mesh makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
+  Points3 points = matrix_to_points(M);
+  std::vector<std::vector<size_t>> faces = matrix_to_faces(I);
+  bool success =
+      CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
+  if(!success) {
+    Rcpp::stop("Polygon orientation failed.");
+  }
+  Mesh mesh;
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
+                                                              mesh);
+  return mesh;
+}
+
+Rcpp::List RMesh(Mesh mesh) {
+  const size_t nvertices = num_vertices(mesh);  // or number_of_vertices
+  // const size_t nedges = num_edges(mesh);        // or number_of_edges
+  const size_t nfaces = num_faces(mesh);
+
+  Rcpp::NumericMatrix vertices(3, nvertices);
+  Rcpp::IntegerVector ids(nvertices);
+  {
+    size_t i = 0;
+    for(vertex_descriptor vd : mesh.vertices()) {
+      const IPoint3 ivertex = mesh.point(vd);
+      Rcpp::NumericMatrix::Column col_i = vertices(Rcpp::_, i);
+      col_i(0) = ivertex.first.x();
+      col_i(1) = ivertex.first.y();
+      col_i(2) = ivertex.first.z();
+      const unsigned id = ivertex.second;
+      ids(i) = id;
+      i++;
+    }
+  }
+
+  Rcpp::IntegerMatrix faces(nfaces, 3);
+  {
+    size_t i = 0;
+    for(face_descriptor fa : mesh.faces()) {
+      size_t j = 0;
+      Rcpp::IntegerMatrix::Column col_i = faces(Rcpp::_, i);
+      for(vertex_descriptor vd :
+          vertices_around_face(mesh.halfedge(fa), mesh)) {
+        const IPoint3 ivertex = mesh.point(vd);
+        face(j) = ivertex.second;
+        j++;
+      }
+      i++;
+    }
+  }
+
+  return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
+                            Rcpp::Named("ids") = ids,
+                            Rcpp::Named("faces") = faces);
+}
+
+// [[Rcpp::export]]
+Rcpp::List testMesh(const Rcpp::NumericMatrix points,
+                    const Rcpp::IntegerMatrix faces) {
+  Mesh mesh = makeMesh(points, faces);
+  return RMesh(mesh);
+}
