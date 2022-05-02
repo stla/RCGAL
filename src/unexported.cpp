@@ -116,7 +116,7 @@ std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
 }
 
 Mesh makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
-  Points3 points = matrix_to_points(M);
+  Points3 points = matrix_to_points3(M);
   std::vector<std::vector<size_t>> faces = matrix_to_faces(I);
   bool success =
       CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
@@ -140,10 +140,11 @@ Rcpp::List RMesh(Mesh mesh) {
     size_t i = 0;
     for(vertex_descriptor vd : mesh.vertices()) {
       const IPoint3 ivertex = mesh.point(vd);
-      Rcpp::NumericMatrix::Column col_i = vertices(Rcpp::_, i);
+      Rcpp::NumericVector col_i(3);
       col_i(0) = ivertex.first.x();
       col_i(1) = ivertex.first.y();
       col_i(2) = ivertex.first.z();
+      vertices(Rcpp::_, i) = col_i;
       const unsigned id = ivertex.second;
       ids(i) = id;
       i++;
@@ -155,13 +156,14 @@ Rcpp::List RMesh(Mesh mesh) {
     size_t i = 0;
     for(face_descriptor fa : mesh.faces()) {
       size_t j = 0;
-      Rcpp::IntegerMatrix::Column col_i = faces(Rcpp::_, i);
+      Rcpp::IntegerVector col_i(3);
       for(vertex_descriptor vd :
           vertices_around_face(mesh.halfedge(fa), mesh)) {
         const IPoint3 ivertex = mesh.point(vd);
-        face(j) = ivertex.second;
+        col_i(j) = ivertex.second;
         j++;
       }
+      faces(Rcpp::_, i) = col_i;
       i++;
     }
   }
