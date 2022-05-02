@@ -130,52 +130,89 @@ Polyhedron makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
 }
 
 Rcpp::List RMesh(Polyhedron mesh) {
-  const size_t nvertices = num_vertices(mesh);  // or number_of_vertices
-  // const size_t nedges = num_edges(mesh);        // or number_of_edges
-  const size_t nfaces = num_faces(mesh);
+  int id = 1;
+  for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
+      vit != mesh.vertices_end(); ++vit) {
+    vit->id() = id;
+    id++;
+  }
 
+  const size_t nfacets = mesh.size_of_facets();
+  const size_t nvertices = mesh.size_of_vertices();
+
+  // const size_t nvertices = num_vertices(mesh);  // or number_of_vertices
+  // // const size_t nedges = num_edges(mesh);        // or number_of_edges
+  // const size_t nfaces = num_faces(mesh);
   Rcpp::NumericMatrix vertices(3, nvertices);
-  Rcpp::IntegerVector ids(nvertices);
   {
     size_t i = 0;
-    for(vertex_descriptor vd : mesh.vertices()) {
-      const IPoint3 ivertex = mesh.point(vd);
+    for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
+        vit != mesh.vertices_end(); vit++) {
       Rcpp::NumericVector col_i(3);
-      col_i(0) = ivertex.first.x();
-      col_i(1) = ivertex.first.y();
-      col_i(2) = ivertex.first.z();
+      col_i(0) = vit->point().x();
+      col_i(1) = vit->point().y();
+      col_i(2) = vit->point().z();
       vertices(Rcpp::_, i) = col_i;
-      const unsigned id = ivertex.second;
-      ids(i) = id;
       i++;
     }
   }
 
-  Rcpp::IntegerMatrix faces(nfaces, 3);
+  // Rcpp::NumericMatrix vertices(3, nvertices);
+  // Rcpp::IntegerVector ids(nvertices);
+  // {
+  //   size_t i = 0;
+  //   for(vertex_descriptor vd : mesh.vertices()) {
+  //     const IPoint3 ivertex = mesh.point(vd);
+  //     Rcpp::NumericVector col_i(3);
+  //     col_i(0) = ivertex.first.x();
+  //     col_i(1) = ivertex.first.y();
+  //     col_i(2) = ivertex.first.z();
+  //     vertices(Rcpp::_, i) = col_i;
+  //     const unsigned id = ivertex.second;
+  //     ids(i) = id;
+  //     i++;
+  //   }
+  // }
+
+  Rcpp::IntegerMatrix facets(3, nfacets);
   {
     size_t i = 0;
-    for(face_descriptor fa : mesh.faces()) {
-      size_t j = 0;
+    for(Polyhedron::Facet_iterator fit = mesh.facets_begin();
+        fit != mesh.facets_end(); fit++) {
       Rcpp::IntegerVector col_i(3);
-      for(vertex_descriptor vd :
-          vertices_around_face(mesh.halfedge(fa), mesh)) {
-        const IPoint3 ivertex = mesh.point(vd);
-        col_i(j) = ivertex.second;
-        j++;
-      }
-      faces(Rcpp::_, i) = col_i;
+      col_i(0) = fit->halfedge()->vertex()->id();
+      col_i(1) = fit->halfedge()->next()->vertex()->id();
+      col_i(2) = fit->halfedge()->opposite()->vertex()->id();
+      facets(Rcpp::_, i) = col_i;
       i++;
     }
   }
+
+  // Rcpp::IntegerMatrix faces(nfaces, 3);
+  // {
+  //   size_t i = 0;
+  //   for(face_descriptor fa : mesh.faces()) {
+  //     size_t j = 0;
+  //     Rcpp::IntegerVector col_i(3);
+  //     for(vertex_descriptor vd :
+  //         vertices_around_face(mesh.halfedge(fa), mesh)) {
+  //       const IPoint3 ivertex = mesh.point(vd);
+  //       col_i(j) = ivertex.second;
+  //       j++;
+  //     }
+  //     faces(Rcpp::_, i) = col_i;
+  //     i++;
+  //   }
+  // }
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            Rcpp::Named("ids") = ids,
-                            Rcpp::Named("faces") = faces);
+                            //Rcpp::Named("ids") = ids,
+                            Rcpp::Named("faces") = facets);
 }
 
 // [[Rcpp::export]]
 Rcpp::List testMesh(const Rcpp::NumericMatrix points,
                     const Rcpp::IntegerMatrix faces) {
-  Mesh mesh = makeMesh(points, faces);
+  Polyhedron mesh = makeMesh(points, faces);
   return RMesh(mesh);
 }
