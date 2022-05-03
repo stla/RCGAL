@@ -272,7 +272,7 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
       Rcpp::IntegerVector col_i;
       for(m3_vertex_descriptor vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
-        col_i.push_back(vd + 1);
+        col_i.push_back(vd);// + 1);
       }
       Faces(i) = col_i;
       i++;

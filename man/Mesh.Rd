@@ -2,23 +2,28 @@
 % Please edit documentation in R/meshes.R
 \name{Mesh}
 \alias{Mesh}
-\title{xxx}
+\title{Make a 3D mesh}
 \usage{
 Mesh(vertices, faces, normals = TRUE)
 }
 \arguments{
-\item{vertices}{xxx}
-\item{faces}{xxx}
-\item{normals}{xxx}
+\item{vertices}{a numeric matrix with three columns}
+
+\item{faces}{either an integer matrix (each row provides the vertex indices
+of the corresponding face) or a list of integer vectors, each one
+providing the vertex indices of the corresponding face}
+
+\item{normals}{Boolean, whether to compute the normals}
 }
 \value{
-xxx
+A list giving the vertices, the edges, the faces of the mesh, and
+  optionally the normals.
 }
 \description{
-xxx
+Make a 3D mesh from given vertices and faces; the returned
+  faces are coherently oriented and normals are computed if desired.
 }
 \examples{
-library(RCGAL)
 # a tetrahedron with ill-oriented faces:
 vertices <- rbind(
   c(-1, -1, -1),
