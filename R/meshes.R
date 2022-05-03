@@ -10,6 +10,8 @@
 #'
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
 #'   optionally the normals.
+#'
+#' @importFrom data.table nunique
 #' @export
 #'
 #' @examples

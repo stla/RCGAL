@@ -231,7 +231,7 @@ Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M, const Rcpp::List L) {
   if(!success) {
     Rcpp::stop("Polygon orientation failed.");
   }
-  Polyhedron mesh;
+  Mesh3 mesh;
   CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
                                                               mesh);
   return mesh;
