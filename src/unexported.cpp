@@ -260,5 +260,7 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
 Mesh3 Poly2Mesh3(Polyhedron poly) {
   Mesh3 mesh;
   CGAL::copy_face_graph(poly, mesh);
+  auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>("v:normals", CGAL::NULL_VECTOR).first;
+  CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals);
   return mesh;
 }

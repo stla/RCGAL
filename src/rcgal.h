@@ -68,6 +68,7 @@
 #include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
 #include <CGAL/Polygon_mesh_processing/orientation.h>
 #include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+#include <CGAL/Polygon_mesh_processing/compute_normal.h>
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -104,6 +105,8 @@ typedef Mesh::Face_index face_descriptor;
 typedef Mesh3::Vertex_index m3_vertex_descriptor;
 typedef Mesh3::Face_index m3_face_descriptor;
 typedef Mesh3::Edge_index m3_edge_descriptor;
+
+typedef boost::graph_traits<Mesh3>::vertex_descriptor      boost_vertex_descriptor;
 
 typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb2;
 typedef CGAL::Triangulation_data_structure_2<Vb2> Tds2;
