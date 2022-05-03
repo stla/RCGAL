@@ -155,25 +155,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // SurfMesh
-Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::IntegerMatrix faces);
+Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces);
 RcppExport SEXP _RCGAL_SurfMesh(SEXP pointsSEXP, SEXP facesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type faces(facesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type faces(facesSEXP);
     rcpp_result_gen = Rcpp::wrap(SurfMesh(points, faces));
     return rcpp_result_gen;
 END_RCPP
 }
 // SurfMeshWithNormals
-Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points, const Rcpp::IntegerMatrix faces);
+Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points, const Rcpp::List faces);
 RcppExport SEXP _RCGAL_SurfMeshWithNormals(SEXP pointsSEXP, SEXP facesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type faces(facesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type faces(facesSEXP);
     rcpp_result_gen = Rcpp::wrap(SurfMeshWithNormals(points, faces));
     return rcpp_result_gen;
 END_RCPP

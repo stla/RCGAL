@@ -187,6 +187,8 @@ Polyhedron makePolyMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
 
 Rcpp::List RPolyMesh(Polyhedron);
 
+Mesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List);
+
 Rcpp::List RSurfMesh(Mesh3);
 
 Mesh3 Poly2Mesh3(Polyhedron);

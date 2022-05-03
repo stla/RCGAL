@@ -42,3 +42,7 @@ unionEdges <- function(edges1, edges2){
   # strings2 <- paste0(edges2[, 1L], "-", edges2[, 2L])
   # strings <- union(strings1, strings2)
 }
+
+isAtomicVector <- function(x){
+  is.atomic(x) && is.vector(x)
+}

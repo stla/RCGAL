@@ -223,6 +223,20 @@ Rcpp::List RPolyMesh(Polyhedron mesh) {
                             Rcpp::Named("faces") = facets);
 }
 
+Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M, const Rcpp::List L) {
+  Points3 points = matrix_to_points3(M);
+  std::vector<std::vector<size_t>> faces = list_to_faces(L);
+  bool success =
+      CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
+  if(!success) {
+    Rcpp::stop("Polygon orientation failed.");
+  }
+  Polyhedron mesh;
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
+                                                              mesh);
+  return mesh;
+}
+
 Rcpp::List RSurfMesh(Mesh3 mesh) {
   const size_t nedges = mesh.number_of_edges();
   Rcpp::IntegerMatrix Edges(2, nedges);
@@ -230,8 +244,8 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
     size_t i = 0;
     for(m3_edge_descriptor ed : mesh.edges()) {
       Rcpp::IntegerVector col_i(2);
-      col_i(0) = source(ed, mesh);
-      col_i(1) = target(ed, mesh);
+      col_i(0) = source(ed, mesh) + 1;
+      col_i(1) = target(ed, mesh) + 1;
       Edges(Rcpp::_, i) = col_i;
       i++;
     }
@@ -258,7 +272,7 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
       Rcpp::IntegerVector col_i;
       for(m3_vertex_descriptor vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
-        col_i.push_back(vd);
+        col_i.push_back(vd + 1);
       }
       Faces(i) = col_i;
       i++;
@@ -272,8 +286,10 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
 Mesh3 Poly2Mesh3(Polyhedron poly) {
   Mesh3 mesh;
   CGAL::copy_face_graph(poly, mesh);
-  //auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>("v:normals", CGAL::NULL_VECTOR).first;
-  //auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>("f:normals", CGAL::NULL_VECTOR).first;
-  //CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
+  // auto vnormals = mesh.add_property_map<boost_vertex_descriptor,
+  // Vector3>("v:normals", CGAL::NULL_VECTOR).first; auto fnormals =
+  // mesh.add_property_map<boost_face_descriptor, Vector3>("f:normals",
+  // CGAL::NULL_VECTOR).first;
+  // CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
   return mesh;
 }
