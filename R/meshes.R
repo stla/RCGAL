@@ -11,7 +11,7 @@
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
 #'   optionally the normals.
 #'
-#' @importFrom data.table nunique
+#' @importFrom data.table uniqueN
 #' @export
 #'
 #' @examples
@@ -74,7 +74,7 @@ Mesh <- function(vertices, faces, normals = TRUE){
         "number of vertices."
       )
     }
-    homogeneousFaces <- nunique(sizes) == 1L
+    homogeneousFaces <- uniqueN(sizes) == 1L
   }else{
     stop("The `faces` argument must be a list or a matrix.")
   }
