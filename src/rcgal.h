@@ -107,6 +107,7 @@ typedef Mesh3::Face_index m3_face_descriptor;
 typedef Mesh3::Edge_index m3_edge_descriptor;
 
 typedef boost::graph_traits<Mesh3>::vertex_descriptor      boost_vertex_descriptor;
+typedef boost::graph_traits<Mesh3>::face_descriptor      boost_face_descriptor;
 
 typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb2;
 typedef CGAL::Triangulation_data_structure_2<Vb2> Tds2;
