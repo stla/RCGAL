@@ -120,7 +120,8 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
   std::vector<std::vector<size_t>> faces;
   faces.reserve(nfaces);
   for(size_t i = 0; i < nfaces; i++) {
-    const Rcpp::IntegerVector face_rcpp = L(i);
+    Rcpp::IntegerVector face_rcpp = L(i);
+    face_rcpp = face_rcpp - 1;
     std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
     faces.emplace_back(face);
   }
@@ -272,7 +273,7 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
       Rcpp::IntegerVector col_i;
       for(m3_vertex_descriptor vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
-        col_i.push_back(vd);// + 1);
+        col_i.push_back(vd + 1);
       }
       Faces(i) = col_i;
       i++;
