@@ -115,6 +115,18 @@ std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
   return faces;
 }
 
+std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
+  const size_t nfaces = L.size();
+  std::vector<std::vector<size_t>> faces;
+  faces.reserve(nfaces);
+  for(size_t i = 0; i < nfaces; i++) {
+    const Rcpp::IntegerVector face_rcpp = L(i) - 1;
+    std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
+    faces.emplace_back(face);
+  }
+  return faces;
+}
+
 Polyhedron makePolyMesh(const Rcpp::NumericMatrix M,
                         const Rcpp::IntegerMatrix I) {
   Points3 points = matrix_to_points3(M);
