@@ -115,7 +115,8 @@ std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
   return faces;
 }
 
-Polyhedron makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
+Polyhedron makePolyMesh(const Rcpp::NumericMatrix M,
+                        const Rcpp::IntegerMatrix I) {
   Points3 points = matrix_to_points3(M);
   std::vector<std::vector<size_t>> faces = matrix_to_faces(I);
   bool success =
@@ -129,7 +130,7 @@ Polyhedron makeMesh(const Rcpp::NumericMatrix M, const Rcpp::IntegerMatrix I) {
   return mesh;
 }
 
-Rcpp::List RMesh(Polyhedron mesh) {
+Rcpp::List RPolyMesh(Polyhedron mesh) {
   int id = 1;
   for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
       vit != mesh.vertices_end(); ++vit) {
@@ -206,13 +207,59 @@ Rcpp::List RMesh(Polyhedron mesh) {
   // }
 
   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            //Rcpp::Named("ids") = ids,
+                            // Rcpp::Named("ids") = ids,
                             Rcpp::Named("faces") = facets);
 }
 
-// [[Rcpp::export]]
-Rcpp::List testMesh(const Rcpp::NumericMatrix points,
-                    const Rcpp::IntegerMatrix faces) {
-  Polyhedron mesh = makeMesh(points, faces);
-  return RMesh(mesh);
+Rcpp::List RSurfMesh(Mesh3 mesh) {
+  const size_t nedges = mesh.number_of_edges();
+  Rcpp::IntegerMatrix Edges(2, nedges);
+  {
+    size_t i = 0;
+    for(m3_edge_descriptor ed : mesh.edges()) {
+      Rcpp::IntegerVector col_i(2);
+      col_i(0) = source(ed, mesh);
+      col_i(1) = target(ed, mesh);
+      Edges(Rcpp::_, i) = col_i;
+      i++;
+    }
+  }
+  const size_t nvertices = mesh.number_of_vertices();
+  Rcpp::NumericMatrix Vertices(3, nvertices);
+  {
+    size_t i = 0;
+    for(m3_vertex_descriptor vd : mesh.vertices()) {
+      Rcpp::NumericVector col_i(3);
+      const Point3 vertex = mesh.point(vd);
+      Rcpp::NumericVector col_i(3);
+      col_i(0) = vertex.x();
+      col_i(1) = vertex.y();
+      col_i(2) = vertex.z();
+      Vertices(Rcpp::_, i) = col_i;
+      i++;
+    }
+  }
+  const size_t nfaces = mesh.number_of_faces();
+  Rcpp::List Faces(nfaces);
+  {
+    size_t i = 0;
+    for(m3_face_descriptor fd : mesh.faces()) {
+      Rcpp::IntegerVector col_i;
+      for(m3_vertex_descriptor vd :
+          vertices_around_face(mesh.halfedge(fd), mesh)) {
+        col_i.push_back(vd);
+      }
+      Faces(i) = col_i;
+      i++;
+    }
+  }
+  return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
+                            Rcpp::Named("edges") = Edges,
+                            Rcpp::Named("faces") = Faces);
+}
+
+Mesh3 Poly2Mesh3(Polyhedron poly) {
+  Mesh3 mesh;
+  CGAL::copy_face_graph(poly, mesh);
+  return mesh;
 }

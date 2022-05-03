@@ -66,8 +66,8 @@
 #include <CGAL/Triangulation_face_base_with_info_2.h>
 
 #include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
-#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
 #include <CGAL/Polygon_mesh_processing/orientation.h>
+#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -86,20 +86,24 @@ typedef std::vector<Point3> Points3;
 typedef std::pair<Point3, unsigned> IPoint3;
 
 typedef CGAL::
-  Convex_hull_traits_adapter_2<K, CGAL::Pointer_property_map<Point2>::type>
-  CHT2;
+    Convex_hull_traits_adapter_2<K, CGAL::Pointer_property_map<Point2>::type>
+        CHT2;
 
 typedef CGAL::First_of_pair_property_map<IPoint3> Pmap;
 typedef CGAL::Extreme_points_traits_adapter_3<Pmap,
                                               CGAL::Convex_hull_traits_3<K>>
-                                                CHT;
+    CHT;
 
 typedef CGAL::Surface_mesh<IPoint3> Mesh;
-typedef CGAL::Surface_mesh<Point3>      Mesh3;
+typedef CGAL::Surface_mesh<Point3> Mesh3;
 
 typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
 typedef Mesh::Face_index face_descriptor;
+
+typedef Mesh3::Vertex_index m3_vertex_descriptor;
+typedef Mesh3::Face_index m3_face_descriptor;
+typedef Mesh3::Edge_index m3_edge_descriptor;
 
 typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb2;
 typedef CGAL::Triangulation_data_structure_2<Vb2> Tds2;
@@ -145,10 +149,10 @@ typedef CDT::Face_handle CDFace_handle;
 typedef Rcpp::NumericVector Dvector;
 
 typedef Eigen::
-  Matrix<unsigned, Eigen::Dynamic, 3, Eigen::RowMajor | Eigen::AutoAlign>
-  Imatrix;
+    Matrix<unsigned, Eigen::Dynamic, 3, Eigen::RowMajor | Eigen::AutoAlign>
+        Imatrix;
 typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign>
-  Ivector;
+    Ivector;
 
 // -------------------------------------------------------------------------- //
 bool approxEqual(double, double, double);
@@ -159,16 +163,13 @@ Rcpp::String stringPair(const size_t, const size_t);
 
 std::array<Rcpp::String, 3> triangleEdges(const size_t,
                                           const size_t,
-                                          const size_t );
+                                          const size_t);
 
 Rcpp::String stringTriple(const size_t, const size_t, const size_t);
 
 double volume_under_triangle(Dvector, Dvector, Dvector);
 
-void mark_domains0(CDT&,
-                   CDFace_handle,
-                   int,
-                   std::list<CDT::Edge>&);
+void mark_domains0(CDT&, CDFace_handle, int, std::list<CDT::Edge>&);
 
 void mark_domains(CDT&);
 
@@ -176,6 +177,10 @@ Points3 matrix_to_points3(const Rcpp::NumericMatrix);
 
 std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
 
-Polyhedron makeMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
+Polyhedron makePolyMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
 
-Rcpp::List RMesh(Polyhedron);
+Rcpp::List RPolyMesh(Polyhedron);
+
+Rcpp::List RSurfMesh(Mesh3);
+
+Mesh3 Poly2Mesh3(Polyhedron);
