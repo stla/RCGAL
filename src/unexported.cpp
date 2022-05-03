@@ -231,7 +231,6 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
     for(m3_vertex_descriptor vd : mesh.vertices()) {
       Rcpp::NumericVector col_i(3);
       const Point3 vertex = mesh.point(vd);
-      Rcpp::NumericVector col_i(3);
       col_i(0) = vertex.x();
       col_i(1) = vertex.y();
       col_i(2) = vertex.z();
