@@ -53,3 +53,7 @@ SurfMesh <- function(points, faces) {
     .Call(`_RCGAL_SurfMesh`, points, faces)
 }
 
+SurfMeshWithNormals <- function(points, faces) {
+    .Call(`_RCGAL_SurfMeshWithNormals`, points, faces)
+}
+

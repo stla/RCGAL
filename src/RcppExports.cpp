@@ -166,6 +166,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SurfMeshWithNormals
+Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points, const Rcpp::IntegerMatrix faces);
+RcppExport SEXP _RCGAL_SurfMeshWithNormals(SEXP pointsSEXP, SEXP facesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type faces(facesSEXP);
+    rcpp_result_gen = Rcpp::wrap(SurfMeshWithNormals(points, faces));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
@@ -181,6 +193,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_PolyMesh", (DL_FUNC) &_RCGAL_PolyMesh, 2},
     {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 2},
+    {"_RCGAL_SurfMeshWithNormals", (DL_FUNC) &_RCGAL_SurfMeshWithNormals, 2},
     {NULL, NULL, 0}
 };
 
