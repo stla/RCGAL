@@ -82,6 +82,24 @@
 #' )
 #' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
 #' shade3d(tmesh, color = "green")
+#'
+#' # illustration of the `triangulate` option ####
+#' # the faces of the truncated icosahedron are hexagonal or pentagonal:
+#' truncatedIcosahedron[["faces"]]
+#' # so we triangulate them:
+#' mesh <- Mesh(
+#'   truncatedIcosahedron[["vertices"]],
+#'   truncatedIcosahedron[["faces"]],
+#'   triangulate = TRUE, normals = FALSE
+#' )
+#' # now we can plot the truncated icosahedron
+#' tmesh <- tmesh3d(
+#'   vertices = t(mesh[["vertices"]]),
+#'   indices = t(mesh[["faces"]]),
+#'   homogeneous = FALSE
+#' )
+#' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
+#' shade3d(tmesh, color = "orange")
 Mesh <- function(
   vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE
 ){
