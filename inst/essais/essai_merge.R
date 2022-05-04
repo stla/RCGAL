@@ -16,14 +16,14 @@ cont <- computeContour3d(voxel, level = 0, x = x, y = y, z = z)
 idx <- matrix(1:nrow(cont), ncol = 3, byrow = TRUE)
 
 library(RCGAL)
-mesh <- Mesh(cont, idx, merge = FALSE)
+mesh <- Mesh(cont, idx, merge = TRUE)
 
 library(rgl)
 tmesh <- tmesh3d(
   vertices = t(mesh[["vertices"]]),
   indices = t(mesh[["faces"]]),
-  normals = NULL, #t(mesh[["normals"]]),
+  normals = mesh[["normals"]],
   homogeneous = FALSE
 )
 
-shade3d(addNormals(tmesh), color = "green")
+shade3d(tmesh, color = "green")
