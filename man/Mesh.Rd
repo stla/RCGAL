@@ -13,9 +13,9 @@ Mesh(vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE)
 of the corresponding face) or a list of integer vectors, each one
 providing the vertex indices of the corresponding face}
 
-\item{triangulate}{Boolean, whether to compute the normals}
+\item{triangulate}{Boolean, whether to triangulate the faces}
 
-\item{merge}{Boolean, whether to compute the normals}
+\item{merge}{Boolean, whether to merge duplicaed vertices}
 
 \item{normals}{Boolean, whether to compute the normals}
 }

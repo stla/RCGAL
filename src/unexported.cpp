@@ -227,14 +227,14 @@ Rcpp::List RPolyMesh(Polyhedron mesh) {
 Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M, const Rcpp::List L, const bool merge) {
   Points3 points = matrix_to_points3(M);
   std::vector<std::vector<size_t>> faces = list_to_faces(L);
-  if(merge){
-    size_t nremoved = CGAL::Polygon_mesh_processing::merge_duplicate_points_in_polygon_soup(points, faces); 
-    Rcpp::Rcout << "Number of points removed: " << nremoved << "\n";
-  }
   bool success =
       CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
   if(!success) {
     Rcpp::stop("Polygon orientation failed.");
+  }
+  if(merge){
+    size_t nremoved = CGAL::Polygon_mesh_processing::merge_duplicate_points_in_polygon_soup(points, faces); 
+    Rcpp::Rcout << "Number of points removed: " << nremoved << ".\n";
   }
   Mesh3 mesh;
   CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
