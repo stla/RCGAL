@@ -50,7 +50,7 @@ Mesh <- function(vertices, faces, normals = TRUE){
       stop("Faces cannot contain indices higher than the number of vertices.")
     }
     homogeneousFaces <- TRUE
-    faces <- lapply(1L:nrow(faces), function(i) faces[i, ])
+    faces <- lapply(1L:nrow(faces), function(i) faces[i, ] - 1L)
   }else if(is.list(faces)){
     check <- all(vapply(faces, isAtomicVector, logical(1L)))
     if(!check){
@@ -60,13 +60,13 @@ Mesh <- function(vertices, faces, normals = TRUE){
     if(check){
       stop("Found missing values in `faces`.")
     }
-    faces <- lapply(faces, as.integer)
+    faces <- lapply(faces, function(x) as.integer(x) - 1L)
     sizes <- lengths(faces)
     if(any(sizes < 3L)){
       stop("Faces must be given by at least three indices.")
     }
     check <- any(vapply(faces, function(f){
-      any(f < 1L) || any(f > nrow(vertices))
+      any(f < 0L) || any(f >= nrow(vertices))
     }, logical(1L)))
     if(check){
       stop(

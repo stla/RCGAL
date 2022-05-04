@@ -121,7 +121,7 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
   faces.reserve(nfaces);
   for(size_t i = 0; i < nfaces; i++) {
     Rcpp::IntegerVector face_rcpp = Rcpp::as<Rcpp::IntegerVector>(L(i));
-    face_rcpp = face_rcpp - 1;
+    //face_rcpp = face_rcpp - 1;
     std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
     faces.emplace_back(face);
   }
