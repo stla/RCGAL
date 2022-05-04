@@ -37,3 +37,6 @@ for(i in 1:nrow(edges)){
   shade3d(cylinder3d(rbind(pt1, pt2), radius = 0.05), color = "red")
 }
 
+mesh <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
+points <- mesh$vertices
+edges <- mesh$edges

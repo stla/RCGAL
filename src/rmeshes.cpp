@@ -19,11 +19,12 @@ Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, co
 
 // [[Rcpp::export]]
 Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points,
-                               const Rcpp::List faces) {
+                               const Rcpp::List faces,
+                               const bool merge) {
   // Polyhedron poly = makePolyMesh(points, faces);
   // Mesh3 mesh;
   // CGAL::copy_face_graph(poly, mesh);
-  Mesh3 mesh = makeSurfMesh(points, faces, false);
+  Mesh3 mesh = makeSurfMesh(points, faces, merge);
   auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
                           "v:normals", CGAL::NULL_VECTOR)
                       .first;

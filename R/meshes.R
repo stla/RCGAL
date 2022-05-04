@@ -81,7 +81,7 @@ Mesh <- function(vertices, faces, triangulate = FALSE, merge = FALSE, normals = 
     stop("The `faces` argument must be a list or a matrix.")
   }
   mesh <- if(normals){
-    SurfMeshWithNormals(t(vertices), faces)
+    SurfMeshWithNormals(t(vertices), faces, merge)
   }else{
     if(triangulate){
       SurfTMesh(t(vertices), faces, merge)
