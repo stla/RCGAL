@@ -4,7 +4,7 @@
 \alias{Mesh}
 \title{Make a 3D mesh}
 \usage{
-Mesh(vertices, faces, normals = TRUE)
+Mesh(vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE)
 }
 \arguments{
 \item{vertices}{a numeric matrix with three columns}
@@ -12,6 +12,10 @@ Mesh(vertices, faces, normals = TRUE)
 \item{faces}{either an integer matrix (each row provides the vertex indices
 of the corresponding face) or a list of integer vectors, each one
 providing the vertex indices of the corresponding face}
+
+\item{triangulate}{Boolean, whether to compute the normals}
+
+\item{merge}{Boolean, whether to compute the normals}
 
 \item{normals}{Boolean, whether to compute the normals}
 }

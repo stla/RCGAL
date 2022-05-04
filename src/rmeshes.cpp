@@ -10,10 +10,10 @@ Rcpp::List PolyMesh(const Rcpp::NumericMatrix points,
 }
 
 // [[Rcpp::export]]
-Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces) {
+Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool merge) {
   // Polyhedron poly = makePolyMesh(points, faces);
   // Mesh3 mesh = Poly2Mesh3(poly);
-  Mesh3 mesh = makeSurfMesh(points, faces);
+  Mesh3 mesh = makeSurfMesh(points, faces, merge);
   return RSurfMesh(mesh);
 }
 
@@ -23,7 +23,7 @@ Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points,
   // Polyhedron poly = makePolyMesh(points, faces);
   // Mesh3 mesh;
   // CGAL::copy_face_graph(poly, mesh);
-  Mesh3 mesh = makeSurfMesh(points, faces);
+  Mesh3 mesh = makeSurfMesh(points, faces, false);
   auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
                           "v:normals", CGAL::NULL_VECTOR)
                       .first;
@@ -51,8 +51,8 @@ Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points,
 }
 
 // [[Rcpp::export]]
-Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces) {
-  Mesh3 mesh = makeSurfMesh(points, faces);
+Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool merge) {
+  Mesh3 mesh = makeSurfMesh(points, faces, merge);
   bool success = CGAL::Polygon_mesh_processing::triangulate_faces(mesh);
   if(!success){
     Rcpp::stop("Triangulation has failed.");

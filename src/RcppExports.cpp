@@ -155,14 +155,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // SurfMesh
-Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces);
-RcppExport SEXP _RCGAL_SurfMesh(SEXP pointsSEXP, SEXP facesSEXP) {
+Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool merge);
+RcppExport SEXP _RCGAL_SurfMesh(SEXP pointsSEXP, SEXP facesSEXP, SEXP mergeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type faces(facesSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfMesh(points, faces));
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    rcpp_result_gen = Rcpp::wrap(SurfMesh(points, faces, merge));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -179,14 +180,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // SurfTMesh
-Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces);
-RcppExport SEXP _RCGAL_SurfTMesh(SEXP pointsSEXP, SEXP facesSEXP) {
+Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool merge);
+RcppExport SEXP _RCGAL_SurfTMesh(SEXP pointsSEXP, SEXP facesSEXP, SEXP mergeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type faces(facesSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfTMesh(points, faces));
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    rcpp_result_gen = Rcpp::wrap(SurfTMesh(points, faces, merge));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -204,9 +206,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_PolyMesh", (DL_FUNC) &_RCGAL_PolyMesh, 2},
-    {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 2},
+    {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 3},
     {"_RCGAL_SurfMeshWithNormals", (DL_FUNC) &_RCGAL_SurfMeshWithNormals, 2},
-    {"_RCGAL_SurfTMesh", (DL_FUNC) &_RCGAL_SurfTMesh, 2},
+    {"_RCGAL_SurfTMesh", (DL_FUNC) &_RCGAL_SurfTMesh, 3},
     {NULL, NULL, 0}
 };
 

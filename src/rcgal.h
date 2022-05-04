@@ -68,6 +68,7 @@
 #include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
 #include <CGAL/Polygon_mesh_processing/orientation.h>
 #include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+#include <CGAL/Polygon_mesh_processing/repair_polygon_soup.h>
 #include <CGAL/Polygon_mesh_processing/compute_normal.h>
 
 #include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
@@ -189,7 +190,7 @@ Polyhedron makePolyMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
 
 Rcpp::List RPolyMesh(Polyhedron);
 
-Mesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List);
+Mesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
 
 Rcpp::List RSurfMesh(Mesh3);
 

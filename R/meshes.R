@@ -7,6 +7,7 @@
 #'   of the corresponding face) or a list of integer vectors, each one
 #'   providing the vertex indices of the corresponding face
 #' @param triangulate Boolean, whether to triangulate the faces
+#' @param merge Boolean, whether to merge duplicaed vertices
 #' @param normals Boolean, whether to compute the normals
 #'
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
@@ -30,7 +31,7 @@
 #'   c(4, 3, 1)
 #' )
 #' Mesh(vertices, faces, normals = FALSE)
-Mesh <- function(vertices, faces, triangulate = FALSE, normals = TRUE){
+Mesh <- function(vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE){
   if(!is.matrix(vertices) || ncol(vertices) != 3L){
     stop("The `vertices` argument must be a matrix with three columns.")
   }
@@ -83,9 +84,9 @@ Mesh <- function(vertices, faces, triangulate = FALSE, normals = TRUE){
     SurfMeshWithNormals(t(vertices), faces)
   }else{
     if(triangulate){
-      SurfTMesh(t(vertices), faces)
+      SurfTMesh(t(vertices), faces, merge)
     }else{
-      SurfMesh(t(vertices), faces)
+      SurfMesh(t(vertices), faces, merge)
     }
   }
   mesh[["vertices"]] <- t(mesh[["vertices"]])
