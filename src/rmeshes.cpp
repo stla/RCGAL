@@ -49,3 +49,13 @@ Rcpp::List SurfMeshWithNormals(const Rcpp::NumericMatrix points,
   surfmesh["normals"] = Normals;
   return surfmesh;
 }
+
+// [[Rcpp::export]]
+Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces) {
+  Mesh3 mesh = makeSurfMesh(points, faces);
+  bool success = CGAL::Polygon_mesh_processing::triangulate_faces(mesh);
+  if(!success){
+    Rcpp::stop("Triangulation has failed.")
+  }
+  return RSurfMesh(mesh);
+}
