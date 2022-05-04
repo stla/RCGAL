@@ -6,6 +6,7 @@
 #' @param faces either an integer matrix (each row provides the vertex indices
 #'   of the corresponding face) or a list of integer vectors, each one
 #'   providing the vertex indices of the corresponding face
+#' @param triangulate Boolean, whether to triangulate the faces
 #' @param normals Boolean, whether to compute the normals
 #'
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
@@ -29,7 +30,7 @@
 #'   c(4, 3, 1)
 #' )
 #' Mesh(vertices, faces, normals = FALSE)
-Mesh <- function(vertices, faces, normals = TRUE){
+Mesh <- function(vertices, faces, triangulate = FALSE, normals = TRUE){
   if(!is.matrix(vertices) || ncol(vertices) != 3L){
     stop("The `vertices` argument must be a matrix with three columns.")
   }
@@ -81,11 +82,15 @@ Mesh <- function(vertices, faces, normals = TRUE){
   mesh <- if(normals){
     SurfMeshWithNormals(t(vertices), faces)
   }else{
-    SurfMesh(t(vertices), faces)
+    if(triangulate){
+      SurfTMesh(t(vertices), faces)
+    }else{
+      SurfMesh(t(vertices), faces)
+    }
   }
   mesh[["vertices"]] <- t(mesh[["vertices"]])
   mesh[["edges"]] <- t(mesh[["edges"]])
-  if(homogeneousFaces){
+  if(triangulate || homogeneousFaces){
     mesh[["faces"]] <- do.call(rbind, mesh[["faces"]])
   }
   if("normals" %in% names(mesh)){
