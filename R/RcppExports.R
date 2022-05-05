@@ -61,3 +61,7 @@ SurfTMesh <- function(points, faces, merge) {
     .Call(`_RCGAL_SurfTMesh`, points, faces, merge)
 }
 
+Intersection <- function(rmeshes, merge, triangulate) {
+    .Call(`_RCGAL_Intersection`, rmeshes, merge, triangulate)
+}
+
