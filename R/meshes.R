@@ -7,7 +7,7 @@
 #'   of the corresponding face) or a list of integer vectors, each one
 #'   providing the vertex indices of the corresponding face
 #' @param triangulate Boolean, whether to triangulate the faces
-#' @param merge Boolean, whether to merge duplicaed vertices
+#' @param merge Boolean, whether to merge duplicated vertices
 #' @param normals Boolean, whether to compute the normals
 #'
 #' @return A list giving the vertices, the edges, the faces of the mesh, and

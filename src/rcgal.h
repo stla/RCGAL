@@ -73,6 +73,9 @@
 
 #include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
 
+#include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/boost/graph/convert_nef_polyhedron_to_polygon_mesh.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -152,6 +155,8 @@ typedef CGAL::Exact_predicates_tag Itag;
 typedef CGAL::Constrained_Delaunay_triangulation_2<K, Tds22, Itag> CDT;
 typedef CDT::Point CDPoint;
 typedef CDT::Face_handle CDFace_handle;
+
+typedef CGAL::Nef_polyhedron_3<K> Nef;
 
 typedef Rcpp::NumericVector Dvector;
 

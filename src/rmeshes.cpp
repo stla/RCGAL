@@ -60,3 +60,30 @@ Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, c
   }
   return RSurfMesh(mesh);
 }
+
+// [[Rcpp::export]]
+Rcpp::List Intersection(const Rcpp::List rmeshes, const bool merge, const bool triangulate) {
+  const size_t nmeshes = rmeshes.size();
+  Rcpp::List rmesh = rmeshes(0);
+  Rcpp::NumericMatrix points = rmesh["vertices"];
+  Rcpp::List faces = rmesh["faces"];
+  Mesh3 mesh = makeSurfMesh(points, faces, merge);
+  Nef NP(mesh);
+  for(size_t i=1; i < nmeshes; i++){
+    rmesh = rmeshes(i);
+    points = rmesh["vertices"];
+    faces = rmesh["faces"];
+    mesh = makeSurfMesh(points, faces, merge);
+    Nef np(mesh);
+    NP = NP * np;
+  }
+  Mesh3 outmesh;
+  CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh);
+  if(triangulate){
+    bool success = CGAL::Polygon_mesh_processing::triangulate_faces(outmesh);
+    if(!success){
+      Rcpp::stop("Triangulation has failed.");
+    }
+  }
+  return RSurfMesh(outmesh);
+}
