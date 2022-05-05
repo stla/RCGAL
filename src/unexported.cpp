@@ -121,7 +121,7 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
   faces.reserve(nfaces);
   for(size_t i = 0; i < nfaces; i++) {
     Rcpp::IntegerVector face_rcpp = Rcpp::as<Rcpp::IntegerVector>(L(i));
-    //face_rcpp = face_rcpp - 1;
+    // face_rcpp = face_rcpp - 1;
     std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
     faces.emplace_back(face);
   }
@@ -224,7 +224,9 @@ Rcpp::List RPolyMesh(Polyhedron mesh) {
                             Rcpp::Named("faces") = facets);
 }
 
-Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M, const Rcpp::List L, const bool merge) {
+Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M,
+                   const Rcpp::List L,
+                   const bool merge) {
   Points3 points = matrix_to_points3(M);
   std::vector<std::vector<size_t>> faces = list_to_faces(L);
   bool success =
@@ -232,8 +234,10 @@ Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M, const Rcpp::List L, const bool m
   if(!success) {
     Rcpp::stop("Polygon orientation failed.");
   }
-  if(merge){
-    size_t nremoved = CGAL::Polygon_mesh_processing::merge_duplicate_points_in_polygon_soup(points, faces); 
+  if(merge) {
+    size_t nremoved =
+        CGAL::Polygon_mesh_processing::merge_duplicate_points_in_polygon_soup(
+            points, faces);
     Rcpp::Rcout << "Number of points removed: " << nremoved << ".\n";
   }
   Mesh3 mesh;
@@ -242,7 +246,7 @@ Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M, const Rcpp::List L, const bool m
   return mesh;
 }
 
-Rcpp::List RSurfMesh(Mesh3 mesh) {
+Rcpp::IntegerMatrix getEdges(Mesh3 mesh) {
   const size_t nedges = mesh.number_of_edges();
   Rcpp::IntegerMatrix Edges(2, nedges);
   {
@@ -255,6 +259,11 @@ Rcpp::List RSurfMesh(Mesh3 mesh) {
       i++;
     }
   }
+  return Edges;
+}
+
+Rcpp::List RSurfMesh(Mesh3 mesh) {
+  Rcpp::IntegerMatrix Edges = getEdges(mesh);
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Vertices(3, nvertices);
   {

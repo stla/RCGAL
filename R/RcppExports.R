@@ -49,16 +49,8 @@ PolyMesh <- function(points, faces) {
     .Call(`_RCGAL_PolyMesh`, points, faces)
 }
 
-SurfMesh <- function(points, faces, merge) {
-    .Call(`_RCGAL_SurfMesh`, points, faces, merge)
-}
-
-SurfMeshWithNormals <- function(points, faces, merge) {
-    .Call(`_RCGAL_SurfMeshWithNormals`, points, faces, merge)
-}
-
-SurfTMesh <- function(points, faces, merge) {
-    .Call(`_RCGAL_SurfTMesh`, points, faces, merge)
+SurfMesh <- function(points, faces, triangulate, merge, normals) {
+    .Call(`_RCGAL_SurfMesh`, points, faces, triangulate, merge, normals)
 }
 
 Intersection <- function(rmeshes, merge, triangulate) {

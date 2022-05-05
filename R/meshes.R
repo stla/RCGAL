@@ -11,7 +11,9 @@
 #' @param normals Boolean, whether to compute the normals
 #'
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
-#'   optionally the normals.
+#'   optionally the normals. This list has an additional component
+#'   \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
+#'   triangulation.
 #'
 #' @importFrom data.table uniqueN
 #' @export
@@ -151,22 +153,26 @@ Mesh <- function(
   }else{
     stop("The `faces` argument must be a list or a matrix.")
   }
-  mesh <- if(normals){
-    SurfMeshWithNormals(t(vertices), faces, merge)
-  }else{
-    if(triangulate){
-      SurfTMesh(t(vertices), faces, merge)
-    }else{
-      SurfMesh(t(vertices), faces, merge)
-    }
-  }
+  mesh <- SurfMesh(t(vertices), faces, triangulate, merge, normals)
+  # mesh <- if(normals){
+  #   SurfMeshWithNormals(t(vertices), faces, merge)
+  # }else{
+  #   if(triangulate){
+  #     SurfTMesh(t(vertices), faces, merge)
+  #   }else{
+  #     SurfMesh(t(vertices), faces, merge)
+  #   }
+  # }
   mesh[["vertices"]] <- t(mesh[["vertices"]])
   mesh[["edges"]] <- t(mesh[["edges"]])
+  if(triangulate){
+    mesh[["edges0"]] <- t(mesh[["edges0"]])
+  }
+  if(normals){
+    mesh[["normals"]] <- t(mesh[["normals"]])
+  }
   if(triangulate || homogeneousFaces){
     mesh[["faces"]] <- do.call(rbind, mesh[["faces"]])
-  }
-  if("normals" %in% names(mesh)){
-    mesh[["normals"]] <- t(mesh[["normals"]])
   }
   mesh
 }
