@@ -78,7 +78,7 @@ Rcpp::List Intersection(const Rcpp::List rmeshes, const bool merge, const bool t
     NP = NP * np;
   }
   Mesh3 outmesh;
-  CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh);
+  CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh, true);
   if(triangulate){
     bool success = CGAL::Polygon_mesh_processing::triangulate_faces(outmesh);
     if(!success){
