@@ -170,15 +170,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // Intersection
-Rcpp::List Intersection(const Rcpp::List rmeshes, const bool merge, const bool triangulate);
-RcppExport SEXP _RCGAL_Intersection(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP triangulateSEXP) {
+Rcpp::List Intersection(const Rcpp::List rmeshes, const bool triangulate, const bool merge, const bool normals);
+RcppExport SEXP _RCGAL_Intersection(SEXP rmeshesSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
     Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
-    rcpp_result_gen = Rcpp::wrap(Intersection(rmeshes, merge, triangulate));
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Intersection(rmeshes, triangulate, merge, normals));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -197,7 +198,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_PolyMesh", (DL_FUNC) &_RCGAL_PolyMesh, 2},
     {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 5},
-    {"_RCGAL_Intersection", (DL_FUNC) &_RCGAL_Intersection, 3},
+    {"_RCGAL_Intersection", (DL_FUNC) &_RCGAL_Intersection, 4},
     {NULL, NULL, 0}
 };
 
