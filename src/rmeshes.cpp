@@ -65,13 +65,13 @@ Rcpp::List SurfTMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, c
 Rcpp::List Intersection(const Rcpp::List rmeshes, const bool merge, const bool triangulate) {
   const size_t nmeshes = rmeshes.size();
   Rcpp::List rmesh = rmeshes(0);
-  Rcpp::NumericMatrix points = Rcpp:as<Rcpp::NumericMatrix>(rmesh["vertices"]);
+  Rcpp::NumericMatrix points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
   Rcpp::List faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
   Mesh3 mesh = makeSurfMesh(points, faces, merge);
   Nef NP(mesh);
   for(size_t i=1; i < nmeshes; i++){
     rmesh = rmeshes(i);
-    points = Rcpp:as<Rcpp::NumericMatrix>(rmesh["vertices"]);
+    points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
     faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
     mesh = makeSurfMesh(points, faces, merge);
     Nef np(mesh);
