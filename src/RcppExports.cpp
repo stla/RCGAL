@@ -183,6 +183,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Intersection2
+Rcpp::List Intersection2(const Rcpp::List rmeshes, const bool merge, const bool normals);
+RcppExport SEXP _RCGAL_Intersection2(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Intersection2(rmeshes, merge, normals));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
@@ -199,6 +212,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_PolyMesh", (DL_FUNC) &_RCGAL_PolyMesh, 2},
     {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 5},
     {"_RCGAL_Intersection", (DL_FUNC) &_RCGAL_Intersection, 4},
+    {"_RCGAL_Intersection2", (DL_FUNC) &_RCGAL_Intersection2, 3},
     {NULL, NULL, 0}
 };
 

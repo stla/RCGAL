@@ -76,6 +76,8 @@
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/boost/graph/convert_nef_polyhedron_to_polygon_mesh.h>
 
+#include <CGAL/Polygon_mesh_processing/corefinement.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>

@@ -57,3 +57,7 @@ Intersection <- function(rmeshes, triangulate, merge, normals) {
     .Call(`_RCGAL_Intersection`, rmeshes, triangulate, merge, normals)
 }
 
+Intersection2 <- function(rmeshes, merge, normals) {
+    .Call(`_RCGAL_Intersection2`, rmeshes, merge, normals)
+}
+
