@@ -124,7 +124,7 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
   //CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh, false);
   Points3 points;
   std::vector<std::vector<size_t>> faces;
-  CGAL::convert_nef_polyhedron_to_polygon_soup(points, faces, false);
+  CGAL::convert_nef_polyhedron_to_polygon_soup(NP, points, faces, false);
   bool success =
       CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
   if(!success) {
