@@ -121,7 +121,17 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
     NP = NP * Nef(mesh);
   }
   Mesh3 outmesh;
-  CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh, true);
+  //CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh, false);
+  Points3 points;
+  std::vector<std::vector<size_t>> faces;
+  CGAL::convert_nef_polyhedron_to_polygon_soup(points, faces, false);
+  bool success =
+      CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
+  if(!success) {
+    Rcpp::stop("Polygon orientation failed XXX.");
+  }
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
+                                                              outmesh);
   Rcpp::IntegerMatrix Edges0;
   if(triangulate) {
     Edges0 = getEdges(outmesh);

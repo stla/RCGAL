@@ -1,5 +1,13 @@
 library(rgl)
 
+plotEdges <- function(vertices, edges, ...){
+  for(i in 1L:nrow(edges)){
+    edge <- edges[i, ]
+    lines3d(rbind(vertices[edge[1L], ], vertices[edge[2L], ]), ...)
+  }
+  invisible(NULL)
+}
+
 phi <- (1+sqrt(5))/2
 a <- 1/sqrt(3)
 b <- a/phi
@@ -65,7 +73,14 @@ mesh5 <- list(
 )
 
 ii <- RCGAL:::Intersection(
-  list(mesh1, mesh2, mesh3),#, mesh4, mesh5),
+  list(mesh1, mesh3),#, mesh3, mesh4, mesh5),
+  FALSE, FALSE, FALSE
+)
+ii <- RCGAL:::Intersection(
+  list(
+    list(vertices = ii$vertices, faces = lapply(ii$faces, function(x) x-1L)),
+    mesh5
+  ),
   TRUE, FALSE, FALSE
 )
 
@@ -74,10 +89,15 @@ tmesh <- tmesh3d(
   indices = do.call(cbind, ii$faces),
   homogeneous = FALSE
 )
+t2 <- tmesh3d(
+  vertices = mesh2$vertices,
+  indices = t(faces),
+  homogeneous = FALSE
+)
 
 
 open3d()
-shade3d(t1, color = "cyan", alpha = 0.2)
+#shade3d(t1, color = "cyan", alpha = 0.2)
 shade3d(t2, color = "palegreen", alpha = 0.4)
 
 shade3d(tmesh, color="red")
