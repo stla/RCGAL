@@ -113,12 +113,13 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
   Rcpp::List faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
   Mesh3 mesh = makeSurfMesh(points, faces, merge);
   Nef NP(mesh);
+  Nef np;
   for(size_t i = 1; i < nmeshes; i++) {
     rmesh = rmeshes(i);
     points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
     faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
     mesh = makeSurfMesh(points, faces, merge);
-    Nef np(mesh);
+    np = np(mesh);
     NP = NP * np;
   }
   Mesh3 outmesh;

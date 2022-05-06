@@ -15,13 +15,15 @@ providing the vertex indices of the corresponding face}
 
 \item{triangulate}{Boolean, whether to triangulate the faces}
 
-\item{merge}{Boolean, whether to merge duplicaed vertices}
+\item{merge}{Boolean, whether to merge duplicated vertices}
 
 \item{normals}{Boolean, whether to compute the normals}
 }
 \value{
 A list giving the vertices, the edges, the faces of the mesh, and
-  optionally the normals.
+  optionally the normals. This list has an additional component
+  \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
+  triangulation.
 }
 \description{
 Make a 3D mesh from given vertices and faces; the returned
