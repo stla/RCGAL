@@ -113,14 +113,12 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
   Rcpp::List faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
   Mesh3 mesh = makeSurfMesh(points, faces, merge);
   Nef NP(mesh);
-  Nef np;
   for(size_t i = 1; i < nmeshes; i++) {
     rmesh = rmeshes(i);
     points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
     faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
     mesh = makeSurfMesh(points, faces, merge);
-    np = np(mesh);
-    NP = NP * np;
+    NP = NP * Nef(mesh);
   }
   Mesh3 outmesh;
   CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh, true);
