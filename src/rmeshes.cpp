@@ -190,20 +190,22 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
                          const bool merge,
                          const bool normals) {
   const size_t nmeshes = rmeshes.size();
+  std::vector<Mesh3> meshes(nmeshes);
   Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
   Rcpp::NumericMatrix points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
   Rcpp::List faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
-  Mesh3 mesh = makeSurfMesh(points, faces, merge);
+  meshes[0] = makeSurfMesh(points, faces, merge);
   for(size_t i = 1; i < nmeshes; i++) {
     Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
     Rcpp::NumericMatrix points_i =
         Rcpp::as<Rcpp::NumericMatrix>(rmesh_i["vertices"]);
     Rcpp::List faces_i = Rcpp::as<Rcpp::List>(rmesh_i["faces"]);
-    Mesh3 mesh_i = makeSurfMesh(points_i, faces_i, merge);
+    //Mesh3 mesh_i = makeSurfMesh(points_i, faces_i, merge);
     bool ok = CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(
-        mesh, mesh_i, mesh);
+        meshes[i-1], mesh_i, meshes[i]);
     Rcpp::Rcout << "intersection: " << ok << "\n";
   }
+  Mesh3 mesh = meshes[nmeshes-1];
   Rcpp::List routmesh = RSurfMesh(mesh);
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Normals(3, nvertices);
