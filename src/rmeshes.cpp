@@ -122,15 +122,15 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
   }
   Mesh3 outmesh;
   //CGAL::convert_nef_polyhedron_to_polygon_mesh(NP, outmesh, false);
-  Points3 vertices;
+  Points3 verts;
   std::vector<std::vector<size_t>> indices;
-  CGAL::convert_nef_polyhedron_to_polygon_soup(NP, vertices, indices, false);
+  CGAL::convert_nef_polyhedron_to_polygon_soup(NP, verts, indices, false);
   bool success =
-      CGAL::Polygon_mesh_processing::orient_polygon_soup(vertices, indices);
+      CGAL::Polygon_mesh_processing::orient_polygon_soup(verts, indices);
   if(!success) {
     Rcpp::stop("Polygon orientation failed XXX.");
   }
-  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(vertices, indices,
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(verts, indices,
                                                               outmesh);
   Rcpp::IntegerMatrix Edges0;
   if(triangulate) {
