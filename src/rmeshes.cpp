@@ -200,7 +200,7 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
     Rcpp::NumericMatrix points_i =
         Rcpp::as<Rcpp::NumericMatrix>(rmesh_i["vertices"]);
     Rcpp::List faces_i = Rcpp::as<Rcpp::List>(rmesh_i["faces"]);
-    //Mesh3 mesh_i = makeSurfMesh(points_i, faces_i, merge);
+    Mesh3 mesh_i = makeSurfMesh(points_i, faces_i, merge);
     bool ok = CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(
         meshes[i-1], mesh_i, meshes[i]);
     Rcpp::Rcout << "intersection: " << ok << "\n";
