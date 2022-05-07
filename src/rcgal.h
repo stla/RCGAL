@@ -78,6 +78,8 @@
 
 #include <CGAL/Polygon_mesh_processing/corefinement.h>
 
+#include <CGAL/number_utils.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -201,8 +203,8 @@ Mesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
 
 Rcpp::IntegerMatrix getEdges(Mesh3);
 
-Rcpp::IntegerMatrix getEdges2(Mesh3);
+Rcpp::IntegerMatrix getEdges2(Mesh3, const double);
 
-Rcpp::List RSurfMesh(Mesh3, const bool);
+Rcpp::List RSurfMesh(Mesh3, const bool, const double);
 
 Mesh3 Poly2Mesh3(Polyhedron);

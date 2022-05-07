@@ -9,6 +9,10 @@
 #' @param triangulate Boolean, whether to triangulate the faces
 #' @param merge Boolean, whether to merge duplicated vertices
 #' @param normals Boolean, whether to compute the normals
+#' @param epsilon if the mesh is triangulated or if \code{triangulate=TRUE},
+#'   then \code{epsilon} is used in the detection of exterior edges (see the
+#'   \strong{Value} section); the higher value of \code{epsilon}, the lower
+#'   number of exterior edges
 #'
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
 #'   optionally the normals. This list has an additional component
@@ -107,8 +111,10 @@
 #' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
 #' shade3d(tmesh, color = "orange")
 Mesh <- function(
-  vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE
+  vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE,
+  epsilon = 0
 ){
+  stopifnot(epsilon >= 0)
   if(!is.matrix(vertices) || ncol(vertices) != 3L){
     stop("The `vertices` argument must be a matrix with three columns.")
   }
@@ -160,7 +166,9 @@ Mesh <- function(
   }else{
     stop("The `faces` argument must be a list or a matrix.")
   }
-  mesh <- SurfMesh(t(vertices), faces, isTriangle, triangulate, merge, normals)
+  mesh <- SurfMesh(
+    t(vertices), faces, isTriangle, triangulate, merge, normals, epsilon
+  )
   if(triangulate && isTriangle){
     message(
       "Ignored option `triangulate`, since the mesh is already triangulated."

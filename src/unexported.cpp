@@ -262,7 +262,7 @@ Rcpp::IntegerMatrix getEdges(Mesh3 mesh) {
   return Edges;
 }
 
-Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
+Rcpp::IntegerMatrix getEdges2(Mesh3 mesh, const double epsilon) {
   const size_t nedges = mesh.number_of_edges();
   Rcpp::IntegerMatrix Edges(3, nedges);
   {
@@ -280,7 +280,13 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
       points[2] = mesh.point(mesh.target(mesh.next(h0)));
       Mesh3::Halfedge_index h1 = mesh.halfedge(ed, 1);
       points[3] = mesh.point(mesh.target(mesh.next(h1)));
-      bool exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
+      bool exterior;
+      if(epsilon == 0){
+        exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
+      }else{
+        K::FT vol = CGAL::volume(points[0], points[1], points[2], points[3]);
+        exterior = CGAL::abs(vol) > epsilon;
+      }
       col_i(2) = (int)exterior;
       Edges(Rcpp::_, i) = col_i;
       i++;      
@@ -292,10 +298,10 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
   return Edges;
 }
 
-Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle) {
+Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle, const double epsilon) {
   Rcpp::IntegerMatrix Edges;
   if(isTriangle){
-    Edges = getEdges2(mesh);
+    Edges = getEdges2(mesh, epsilon);
   }else{
     Edges = getEdges(mesh);
   }

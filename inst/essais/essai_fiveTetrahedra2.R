@@ -36,7 +36,7 @@ vertices <-
     c( c,  0,  b),
     c(-a, -a, -a)
   )
-vertices <- round(vertices, 4)
+vertices <- round(vertices, 8)
 
 vs1 <- vertices[c(17, 14, 2, 11), ]
 vs2 <- vertices[c(18, 1, 4, 5), ]
@@ -100,6 +100,13 @@ iiii <- RCGAL:::Intersection2(
   ),
   FALSE, FALSE
 )
+
+edg <- t(iiii$edges[1:2, iiii$edges[3,]==1])
+
+hull <- cxhull::cxhullEdges(t(iiii$vertices))
+
+
+plotEdges(t(iiii$vertices), hull$edges)
 
 tmesh <- tmesh3d(
   vertices = iiii$vertices,

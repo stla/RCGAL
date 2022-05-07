@@ -4,7 +4,14 @@
 \alias{Mesh}
 \title{Make a 3D mesh}
 \usage{
-Mesh(vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE)
+Mesh(
+  vertices,
+  faces,
+  triangulate = FALSE,
+  merge = FALSE,
+  normals = TRUE,
+  epsilon = 0
+)
 }
 \arguments{
 \item{vertices}{a numeric matrix with three columns}
@@ -18,6 +25,11 @@ providing the vertex indices of the corresponding face}
 \item{merge}{Boolean, whether to merge duplicated vertices}
 
 \item{normals}{Boolean, whether to compute the normals}
+
+\item{epsilon}{if the mesh is triangulated or if \code{triangulate=TRUE},
+then \code{epsilon} is used in the detection of exterior edges (see the
+\strong{Value} section); the higher value of \code{epsilon}, the lower
+number of exterior edges}
 }
 \value{
 A list giving the vertices, the edges, the faces of the mesh, and

@@ -15,7 +15,8 @@ Rcpp::List SurfMesh(const Rcpp::NumericMatrix points,
                     const bool isTriangle,
                     const bool triangulate,
                     const bool merge,
-                    const bool normals) {
+                    const bool normals,
+                    const double epsilon) {
   // Polyhedron poly = makePolyMesh(points, faces);
   // Mesh3 mesh = Poly2Mesh3(poly);
   Mesh3 mesh = makeSurfMesh(points, faces, merge);
@@ -28,7 +29,7 @@ Rcpp::List SurfMesh(const Rcpp::NumericMatrix points,
       Rcpp::stop("Triangulation has failed.");
     }
   }
-  Rcpp::List routmesh = RSurfMesh(mesh, isTriangle || triangulate);
+  Rcpp::List routmesh = RSurfMesh(mesh, isTriangle || triangulate, epsilon);
   if(really_triangulate) {
     routmesh["edges0"] = Edges0;
   }
@@ -154,7 +155,7 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
       Rcpp::stop("Triangulation has failed.");
     }
   }
-  Rcpp::List routmesh = RSurfMesh(outmesh, triangulate);
+  Rcpp::List routmesh = RSurfMesh(outmesh, triangulate, 0);
   if(triangulate) {
     routmesh["edges0"] = Edges0;
   }
@@ -208,7 +209,7 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
     Rcpp::Rcout << "intersection: " << ok << "\n";
   }
   Mesh3 mesh = meshes[nmeshes-1];
-  Rcpp::List routmesh = RSurfMesh(mesh, true);
+  Rcpp::List routmesh = RSurfMesh(mesh, true, 0);
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Normals(3, nvertices);
   if(normals) {
