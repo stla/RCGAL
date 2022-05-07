@@ -36,7 +36,7 @@ vertices <-
     c( c,  0,  b),
     c(-a, -a, -a)
   )
-vertices <- round(vertices, 8)
+vertices <- round(vertices, 6)
 
 vs1 <- vertices[c(17, 14, 2, 11), ]
 vs2 <- vertices[c(18, 1, 4, 5), ]
@@ -74,31 +74,31 @@ mesh5 <- list(
   faces = lfaces
 )
 
-ii <- RCGAL:::Intersection2_K(
+ii <- RCGAL:::Intersection_EK(
   list(mesh1, mesh2, mesh3),
-  FALSE, FALSE
+  FALSE, FALSE, FALSE
 )
 vv = ii$vertices
 ff = lapply(ii$faces, function(x) x-1L)
 mm = list(vertices = vv, faces = ff)
-iii <- RCGAL:::Intersection2_K(
+iii <- RCGAL:::Intersection_EK(
   list(
     mesh3,
     mesh4,
     mesh5
   ),
-  FALSE, FALSE
+  FALSE, FALSE, FALSE
 )
 vv = iii$vertices
 ff = lapply(iii$faces, function(x) x-1L)
 mmm = list(vertices = vv, faces = ff)
 
-iiii <- RCGAL:::Intersection2_K(
+iiii <- RCGAL:::Intersection_EK(
   list(
     mm,
     mmm
   ),
-  FALSE, FALSE
+  TRUE, FALSE, FALSE
 )
 
 edg <- t(iiii$edges[1:2, iiii$edges[3,]==1])
