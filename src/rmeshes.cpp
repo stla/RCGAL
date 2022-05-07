@@ -47,7 +47,7 @@ Rcpp::List SurfMesh(const Rcpp::NumericMatrix points,
       size_t i = 0;
       for(boost_vertex_descriptor vd : vertices(mesh)) {
         Rcpp::NumericVector col_i(3);
-        const Vector3 normal = vnormals[vd];
+        const EK::Vector_3 normal = vnormals[vd];
         col_i(0) = normal.x();
         col_i(1) = normal.y();
         col_i(2) = normal.z();
