@@ -280,8 +280,8 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
       points[2] = mesh.point(mesh.target(mesh.next(h0)));
       Mesh3::Halfedge_index h1 = mesh.halfedge(ed, 1);
       points[3] = mesh.point(mesh.target(mesh.next(h1)));
-      bool coplanar = CGAL::coplanar(points[0], points[1], points[2], points[3]);
-      col_i(2) = (int)coplanar;
+      bool exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
+      col_i(2) = (int)exterior;
       Edges(Rcpp::_, i) = col_i;
       i++;      
     }

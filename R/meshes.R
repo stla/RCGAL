@@ -15,9 +15,9 @@
 #'   \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
 #'   triangulation, unless the mesh is already triangulated, in which case
 #'   the \code{triangulate} option is ignored. If the mesh is already
-#'   triangulated, the \code{edges} matrix given in the output has an
-#'   additional 0/1 column \code{exterior}, indicating whether an edge is
-#'   exterior.
+#'   triangulated or if \code{triangulate=TRUE}, the output list has an
+#'   additional component \code{exteriorEdges}, giving the exterior edges
+#'   of the mesh.
 #'
 #' @importFrom data.table uniqueN
 #' @export
@@ -177,7 +177,11 @@ Mesh <- function(
   #   }
   # }
   mesh[["vertices"]] <- t(mesh[["vertices"]])
-  mesh[["edges"]] <- t(mesh[["edges"]])
+  edges <- unname(t(mesh[["edges"]]))
+  if(triangulate || isTriangle){
+    mesh[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+    mesh[["edges"]] <- edges[, c(1L, 2L)]
+  }
   if(triangulate){
     mesh[["edges0"]] <- t(mesh[["edges0"]])
   }

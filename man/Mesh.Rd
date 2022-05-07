@@ -23,7 +23,11 @@ providing the vertex indices of the corresponding face}
 A list giving the vertices, the edges, the faces of the mesh, and
   optionally the normals. This list has an additional component
   \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
-  triangulation.
+  triangulation, unless the mesh is already triangulated, in which case
+  the \code{triangulate} option is ignored. If the mesh is already
+  triangulated or if \code{triangulate=TRUE}, the output list has an
+  additional component \code{exteriorEdges}, giving the exterior edges
+  of the mesh.
 }
 \description{
 Make a 3D mesh from given vertices and faces; the returned
