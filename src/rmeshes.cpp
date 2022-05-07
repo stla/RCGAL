@@ -178,7 +178,7 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
         const EVector3 normal = vnormals[vd];
         col_i(0) = CGAL::to_double(normal.x());
         col_i(1) = CGAL::to_double(normal.y());
-        col_i(2) = CGAL::to_double(normal.z();
+        col_i(2) = CGAL::to_double(normal.z());
         Normals(Rcpp::_, i) = col_i;
         i++;
       }
