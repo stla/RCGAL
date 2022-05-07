@@ -262,8 +262,38 @@ Rcpp::IntegerMatrix getEdges(Mesh3 mesh) {
   return Edges;
 }
 
+Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
+  const size_t nedges = mesh.number_of_edges();
+  Rcpp::IntegerMatrix Edges(3, nedges);
+  {
+    size_t i = 0;
+    for(m3_edge_descriptor ed : mesh.edges()) {
+      Mesh3::Vertex_index s = source(ed, mesh);
+      Mesh3::Vertex_index t = target(ed, mesh);
+      Rcpp::IntegerVector col_i(3);
+      col_i(0) = (int)s + 1;
+      col_i(1) = (int)t + 1;
+      Edges(Rcpp::_, i) = col_i;
+      i++;      
+      std::vector<Point3> points(4);
+      points[0] = mesh.point(s);
+      points[1] = mesh.point(t);
+      Mesh3::Halfedge_index h0 = mesh.halfedge(ed, 0);
+      points[2] = mesh.point(mesh.target(mesh.next(h0)));
+      Mesh3::Halfedge_index h1 = mesh.halfedge(ed, 1);
+      points[3] = mesh.point(mesh.target(mesh.next(h1)));
+      bool coplanar = CGAL::coplanar(points[0], points[1], points[2], points[3]);
+      col_i(3) = (int)coplanar;
+    }
+  }
+  Rcpp::CharacterVector rowNames =
+    Rcpp::CharacterVector::create("i1", "i2", "exterior");
+  Rcpp::rownames(Edges) = rowNames;
+  return Edges;
+}
+
 Rcpp::List RSurfMesh(Mesh3 mesh) {
-  Rcpp::IntegerMatrix Edges = getEdges(mesh);
+  Rcpp::IntegerMatrix Edges = getEdges2(mesh);
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Vertices(3, nvertices);
   {

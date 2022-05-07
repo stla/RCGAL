@@ -14,7 +14,7 @@ b <- a/phi
 c <- a*phi
 
 vertices <-
-  rbind(
+  1000 * rbind(
     c( a,  a,  a),
     c( a,  a, -a),
     c( a, -a,  a),
@@ -36,6 +36,7 @@ vertices <-
     c( c,  0,  b),
     c(-a, -a, -a)
   )
+vertices <- round(vertices, 4)
 
 vs1 <- vertices[c(17, 14, 2, 11), ]
 vs2 <- vertices[c(18, 1, 4, 5), ]
@@ -74,23 +75,40 @@ mesh5 <- list(
 )
 
 ii <- RCGAL:::Intersection2(
-  list(mesh1, mesh2),#, mesh3, mesh4, mesh5),
+  list(mesh1, mesh2, mesh3),
   FALSE, FALSE
 )
 vv = ii$vertices
-ff = lapply(ii$faces, function(x) x-5L)
+ff = lapply(ii$faces, function(x) x-1L)
 mm = list(vertices = vv, faces = ff)
 iii <- RCGAL:::Intersection2(
   list(
-    mm,
-    mesh3
+    mesh3,
+    mesh4,
+    mesh5
   ),
-  TRUE, FALSE
+  FALSE, FALSE
+)
+vv = iii$vertices
+ff = lapply(iii$faces, function(x) x-1L)
+mmm = list(vertices = vv, faces = ff)
+
+iiii <- RCGAL:::Intersection2(
+  list(
+    mm,
+    mmm
+  ),
+  FALSE, FALSE
 )
 
 tmesh <- tmesh3d(
-  vertices = ii$vertices,
-  indices = do.call(cbind, lapply(ii$faces, function(x) x-4L)),
+  vertices = iiii$vertices,
+  indices = do.call(cbind, lapply(iiii$faces, function(x) x+0L)),
+  homogeneous = FALSE
+)
+t1 <- tmesh3d(
+  vertices = mesh1$vertices,
+  indices = t(faces),
   homogeneous = FALSE
 )
 t2 <- tmesh3d(
@@ -108,6 +126,16 @@ t4 <- tmesh3d(
   indices = t(faces),
   homogeneous = FALSE
 )
+t5 <- tmesh3d(
+  vertices = mesh5$vertices,
+  indices = t(faces),
+  homogeneous = FALSE
+)
+# vcgOffWrite(t1, "th1.off")
+# vcgOffWrite(t2, "th2.off")
+# vcgOffWrite(t3, "th3.off")
+# vcgOffWrite(t4, "th4.off")
+# vcgOffWrite(t5, "th5.off")
 
 
 open3d()

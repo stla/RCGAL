@@ -201,6 +201,8 @@ Mesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
 
 Rcpp::IntegerMatrix getEdges(Mesh3);
 
+Rcpp::IntegerMatrix getEdges2(Mesh3);
+
 Rcpp::List RSurfMesh(Mesh3);
 
 Mesh3 Poly2Mesh3(Polyhedron);
