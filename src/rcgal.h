@@ -80,6 +80,8 @@
 
 #include <CGAL/number_utils.h>
 
+#include <CGAL/Triangle_3.h>
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <algorithm>
@@ -88,7 +90,7 @@
 #include <map>
 #include <vector>
 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 
 typedef K::Point_2 Point2;
 typedef K::Point_3 Point3;

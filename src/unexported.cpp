@@ -284,8 +284,28 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh, const double epsilon) {
       if(epsilon == 0){
         exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
       }else{
-        K::FT vol = CGAL::volume(points[0], points[1], points[2], points[3]);
-        exterior = CGAL::abs(vol) > epsilon;
+        K::FT svol = CGAL::square(CGAL::volume(points[0], points[1], points[2], points[3]));
+        CGAL::Triangle_3<K> tr1(points[0], points[1], points[2]);
+        K::FT sarea1 = tr1.squared_area();
+        if(svol < epsilon*sarea1){
+          CGAL::Triangle_3<K> tr2(points[0], points[1], points[3]);
+          K::FT sarea2 = tr2.squared_area();
+          if(svol < epsilon*sarea2){
+            CGAL::Triangle_3<K> tr3(points[0], points[2], points[3]);
+            K::FT sarea3 = tr3.squared_area();
+            if(svol < epsilon*sarea3){
+              CGAL::Triangle_3<K> tr4(points[1], points[2], points[3]);
+              K::FT sarea4 = tr4.squared_area();
+              exterior = svol > epsilon*sarea4;
+            }else{
+              exterior = true;
+            } 
+          }else{
+            exterior = true;
+          } 
+        }else{
+          exterior = true;
+        } 
       }
       col_i(2) = (int)exterior;
       Edges(Rcpp::_, i) = col_i;

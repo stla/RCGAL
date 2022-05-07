@@ -102,10 +102,17 @@ iiii <- RCGAL:::Intersection2(
 )
 
 edg <- t(iiii$edges[1:2, iiii$edges[3,]==1])
+plotEdges(t(iiii$vertices), hull$edges)
+
+library(RCGAL)
+mesh <- Mesh(
+  t(iiii[["vertices"]]),
+  iiii[["faces"]],
+  triangulate = FALSE, normals = FALSE, epsilon = 1000
+)
+plotEdges(mesh$vertices, mesh$exteriorEdges)
 
 hull <- cxhull::cxhullEdges(t(iiii$vertices))
-
-
 plotEdges(t(iiii$vertices), hull$edges)
 
 tmesh <- tmesh3d(
