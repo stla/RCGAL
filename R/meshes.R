@@ -1,3 +1,65 @@
+#' @importFrom data.table uniqueN
+#' @noRd
+checkMesh <- function(vertices, faces){
+  if(!is.matrix(vertices) || ncol(vertices) != 3L){
+    stop("The `vertices` argument must be a matrix with three columns.")
+  }
+  storage.mode(vertices) <- "double"
+  homogeneousFaces <- FALSE
+  isTriangle <- FALSE
+  if(is.matrix(faces)){
+    if(ncol(faces) < 3L){
+      stop("Faces must be given by at least three indices.")
+    }
+    storage.mode(faces) <- "integer"
+    if(anyNA(faces)){
+      stop("Found missing values in `faces`.")
+    }
+    if(any(faces < 1L)){
+      stop("Faces cannot contain indices lower than 1.")
+    }
+    if(any(faces > nrow(vertices))){
+      stop("Faces cannot contain indices higher than the number of vertices.")
+    }
+    homogeneousFaces <- TRUE
+    isTriangle <- ncol(faces) == 3L
+    faces <- lapply(1L:nrow(faces), function(i) faces[i, ] - 1L)
+  }else if(is.list(faces)){
+    check <- all(vapply(faces, isAtomicVector, logical(1L)))
+    if(!check){
+      stop("The `faces` argument must be a list of integer vectors.")
+    }
+    check <- any(vapply(faces, anyNA, logical(1L)))
+    if(check){
+      stop("Found missing values in `faces`.")
+    }
+    faces <- lapply(faces, function(x) as.integer(x) - 1L)
+    sizes <- lengths(faces)
+    if(any(sizes < 3L)){
+      stop("Faces must be given by at least three indices.")
+    }
+    check <- any(vapply(faces, function(f){
+      any(f < 0L) || any(f >= nrow(vertices))
+    }, logical(1L)))
+    if(check){
+      stop(
+        "Faces cannot contain indices lower than 1 or higher than the ",
+        "number of vertices."
+      )
+    }
+    homogeneousFaces <- uniqueN(sizes) == 1L
+    isTriangle <- homogeneousFaces && sizes[1L] == 3L
+  }else{
+    stop("The `faces` argument must be a list or a matrix.")
+  }
+  list(
+    vertices = vertices,
+    faces = faces,
+    homogeneousFaces = homogeneousFaces,
+    isTriangle = isTriangle
+  )
+}
+
 #' @title Make a 3D mesh
 #' @description Make a 3D mesh from given vertices and faces; the returned
 #'   faces are coherently oriented and normals are computed if desired.
@@ -23,7 +85,6 @@
 #'   additional component \code{exteriorEdges}, giving the exterior edges
 #'   of the mesh.
 #'
-#' @importFrom data.table uniqueN
 #' @export
 #'
 #' @examples
@@ -115,57 +176,11 @@ Mesh <- function(
   epsilon = 0
 ){
   stopifnot(epsilon >= 0)
-  if(!is.matrix(vertices) || ncol(vertices) != 3L){
-    stop("The `vertices` argument must be a matrix with three columns.")
-  }
-  storage.mode(vertices) <- "double"
-  homogeneousFaces <- FALSE
-  isTriangle <- FALSE
-  if(is.matrix(faces)){
-    if(ncol(faces) < 3L){
-      stop("Faces must be given by at least three indices.")
-    }
-    storage.mode(faces) <- "integer"
-    if(anyNA(faces)){
-      stop("Found missing values in `faces`.")
-    }
-    if(any(faces < 1L)){
-      stop("Faces cannot contain indices lower than 1.")
-    }
-    if(any(faces > nrow(vertices))){
-      stop("Faces cannot contain indices higher than the number of vertices.")
-    }
-    homogeneousFaces <- TRUE
-    isTriangle <- ncol(faces) == 3L
-    faces <- lapply(1L:nrow(faces), function(i) faces[i, ] - 1L)
-  }else if(is.list(faces)){
-    check <- all(vapply(faces, isAtomicVector, logical(1L)))
-    if(!check){
-      stop("The `faces` argument must be a list of integer vectors.")
-    }
-    check <- any(vapply(faces, anyNA, logical(1L)))
-    if(check){
-      stop("Found missing values in `faces`.")
-    }
-    faces <- lapply(faces, function(x) as.integer(x) - 1L)
-    sizes <- lengths(faces)
-    if(any(sizes < 3L)){
-      stop("Faces must be given by at least three indices.")
-    }
-    check <- any(vapply(faces, function(f){
-      any(f < 0L) || any(f >= nrow(vertices))
-    }, logical(1L)))
-    if(check){
-      stop(
-        "Faces cannot contain indices lower than 1 or higher than the ",
-        "number of vertices."
-      )
-    }
-    homogeneousFaces <- uniqueN(sizes) == 1L
-    isTriangle <- homogeneousFaces && sizes[1L] == 3L
-  }else{
-    stop("The `faces` argument must be a list or a matrix.")
-  }
+  checkedMesh <- checkMesh(vertices, faces)
+  vertices <- checkedMesh[["vertices"]]
+  faces <- checkedMesh[["faces"]]
+  homogeneousFaces <- checkedMesh[["homogeneousFaces"]]
+  isTriangle <- checkedMesh[["isTriangle"]]
   mesh <- SurfMesh(
     t(vertices), faces, isTriangle, triangulate, merge, normals, epsilon
   )

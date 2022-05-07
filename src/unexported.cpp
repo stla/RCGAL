@@ -345,7 +345,7 @@ Rcpp::List RSurfMesh(EMesh3 mesh, bool isTriangle, const double epsilon) {
   Rcpp::List Faces(nfaces);
   {
     size_t i = 0;
-    for(EMesh3::Facee_index fd : mesh.faces()) {
+    for(EMesh3::Face_index fd : mesh.faces()) {
       Rcpp::IntegerVector col_i;
       for(EMesh3::Vertex_index vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
