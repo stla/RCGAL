@@ -162,58 +162,58 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
   if(triangulate) {
     routmesh["edges0"] = Edges0;
   }
-  const size_t nvertices = outmesh.number_of_vertices();
-  Rcpp::NumericMatrix Normals(3, nvertices);
-  if(normals) {
-    if(exact) {
-      auto vnormals = outmesh
-                          .add_property_map<boost_vertex_descriptor, EVector3>(
-                              "v:normals", CGAL::NULL_VECTOR)
-                          .first;
-      auto fnormals = outmesh
-                          .add_property_map<boost_face_descriptor, EVector3>(
-                              "f:normals", CGAL::NULL_VECTOR)
-                          .first;
-      CGAL::Polygon_mesh_processing::compute_normals(outmesh, vnormals,
-                                                     fnormals);
-      {
-        size_t i = 0;
-        for(boost_vertex_descriptor vd : vertices(outmesh)) {
-          Rcpp::NumericVector col_i(3);
-          const EVector3 normal = vnormals[vd];
-          col_i(0) = CGAL::to_double(normal.x());
-          col_i(1) = CGAL::to_double(normal.y());
-          col_i(2) = CGAL::to_double(normal.z());
-          Normals(Rcpp::_, i) = col_i;
-          i++;
-        }
-      }
-    } else {
-      auto vnormals = outmesh
-                          .add_property_map<boost_vertex_descriptor, Vector3>(
-                              "v:normals", CGAL::NULL_VECTOR)
-                          .first;
-      auto fnormals = outmesh
-                          .add_property_map<boost_face_descriptor, Vector3>(
-                              "f:normals", CGAL::NULL_VECTOR)
-                          .first;
-      CGAL::Polygon_mesh_processing::compute_normals(outmesh, vnormals,
-                                                     fnormals);
-      {
-        size_t i = 0;
-        for(boost_vertex_descriptor vd : vertices(outmesh)) {
-          Rcpp::NumericVector col_i(3);
-          const Vector3 normal = vnormals[vd];
-          col_i(0) = normal.x();
-          col_i(1) = normal.y();
-          col_i(2) = normal.z();
-          Normals(Rcpp::_, i) = col_i;
-          i++;
-        }
-      }
-    }
-    routmesh["normals"] = Normals;
-  }
+  // const size_t nvertices = outmesh.number_of_vertices();
+  // Rcpp::NumericMatrix Normals(3, nvertices);
+  // if(normals) {
+  //   if(exact) {
+  //     auto vnormals = outmesh
+  //                         .add_property_map<boost_vertex_descriptor, EVector3>(
+  //                             "v:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     auto fnormals = outmesh
+  //                         .add_property_map<boost_face_descriptor, EVector3>(
+  //                             "f:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     CGAL::Polygon_mesh_processing::compute_normals(outmesh, vnormals,
+  //                                                    fnormals);
+  //     {
+  //       size_t i = 0;
+  //       for(boost_vertex_descriptor vd : vertices(outmesh)) {
+  //         Rcpp::NumericVector col_i(3);
+  //         const EVector3 normal = vnormals[vd];
+  //         col_i(0) = CGAL::to_double(normal.x());
+  //         col_i(1) = CGAL::to_double(normal.y());
+  //         col_i(2) = CGAL::to_double(normal.z());
+  //         Normals(Rcpp::_, i) = col_i;
+  //         i++;
+  //       }
+  //     }
+  //   } else {
+  //     auto vnormals = outmesh
+  //                         .add_property_map<boost_vertex_descriptor, Vector3>(
+  //                             "v:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     auto fnormals = outmesh
+  //                         .add_property_map<boost_face_descriptor, Vector3>(
+  //                             "f:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     CGAL::Polygon_mesh_processing::compute_normals(outmesh, vnormals,
+  //                                                    fnormals);
+  //     {
+  //       size_t i = 0;
+  //       for(boost_vertex_descriptor vd : vertices(outmesh)) {
+  //         Rcpp::NumericVector col_i(3);
+  //         const Vector3 normal = vnormals[vd];
+  //         col_i(0) = normal.x();
+  //         col_i(1) = normal.y();
+  //         col_i(2) = normal.z();
+  //         Normals(Rcpp::_, i) = col_i;
+  //         i++;
+  //       }
+  //     }
+  //   }
+  //   routmesh["normals"] = Normals;
+  // }
   return routmesh;
 }
 
@@ -259,51 +259,51 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
   MeshT mesh = meshes[nmeshes - 1];
   Rcpp::List routmesh = RSurfMesh<KernelT, MeshT, PointT>(mesh, true, 0, exact);
   const size_t nvertices = mesh.number_of_vertices();
-  Rcpp::NumericMatrix Normals(3, nvertices);
-  if(normals) {
-    if(exact) {
-      auto vnormals = mesh.add_property_map<boost_vertex_descriptor, EVector3>(
-                              "v:normals", CGAL::NULL_VECTOR)
-                          .first;
-      auto fnormals = mesh.add_property_map<boost_face_descriptor, EVector3>(
-                              "f:normals", CGAL::NULL_VECTOR)
-                          .first;
-      CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
-      {
-        size_t i = 0;
-        for(boost_vertex_descriptor vd : vertices(mesh)) {
-          Rcpp::NumericVector col_i(3);
-          const EVector3 normal = vnormals[vd];
-          col_i(0) = CGAL::to_double(normal.x());
-          col_i(1) = CGAL::to_double(normal.y());
-          col_i(2) = CGAL::to_double(normal.z());
-          Normals(Rcpp::_, i) = col_i;
-          i++;
-        }
-      }
-    } else {
-      auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
-                              "v:normals", CGAL::NULL_VECTOR)
-                          .first;
-      auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
-                              "f:normals", CGAL::NULL_VECTOR)
-                          .first;
-      CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
-      {
-        size_t i = 0;
-        for(boost_vertex_descriptor vd : vertices(mesh)) {
-          Rcpp::NumericVector col_i(3);
-          const Vector3 normal = vnormals[vd];
-          col_i(0) = normal.x();
-          col_i(1) = normal.y();
-          col_i(2) = normal.z();
-          Normals(Rcpp::_, i) = col_i;
-          i++;
-        }
-      }
-    }
-    routmesh["normals"] = Normals;
-  }
+  // Rcpp::NumericMatrix Normals(3, nvertices);
+  // if(normals) {
+  //   if(exact) {
+  //     auto vnormals = mesh.add_property_map<boost_vertex_descriptor, EVector3>(
+  //                             "v:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     auto fnormals = mesh.add_property_map<boost_face_descriptor, EVector3>(
+  //                             "f:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
+  //     {
+  //       size_t i = 0;
+  //       for(boost_vertex_descriptor vd : vertices(mesh)) {
+  //         Rcpp::NumericVector col_i(3);
+  //         const EVector3 normal = vnormals[vd];
+  //         col_i(0) = CGAL::to_double(normal.x());
+  //         col_i(1) = CGAL::to_double(normal.y());
+  //         col_i(2) = CGAL::to_double(normal.z());
+  //         Normals(Rcpp::_, i) = col_i;
+  //         i++;
+  //       }
+  //     }
+  //   } else {
+  //     auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
+  //                             "v:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
+  //                             "f:normals", CGAL::NULL_VECTOR)
+  //                         .first;
+  //     CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
+  //     {
+  //       size_t i = 0;
+  //       for(boost_vertex_descriptor vd : vertices(mesh)) {
+  //         Rcpp::NumericVector col_i(3);
+  //         const Vector3 normal = vnormals[vd];
+  //         col_i(0) = normal.x();
+  //         col_i(1) = normal.y();
+  //         col_i(2) = normal.z();
+  //         Normals(Rcpp::_, i) = col_i;
+  //         i++;
+  //       }
+  //     }
+  //   }
+  //   routmesh["normals"] = Normals;
+  // }
   return routmesh;
 }
 
