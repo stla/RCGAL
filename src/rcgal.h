@@ -203,6 +203,6 @@ Rcpp::IntegerMatrix getEdges(Mesh3);
 
 Rcpp::IntegerMatrix getEdges2(Mesh3);
 
-Rcpp::List RSurfMesh(Mesh3);
+Rcpp::List RSurfMesh(Mesh3, const bool);
 
 Mesh3 Poly2Mesh3(Polyhedron);

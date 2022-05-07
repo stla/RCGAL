@@ -13,7 +13,11 @@
 #' @return A list giving the vertices, the edges, the faces of the mesh, and
 #'   optionally the normals. This list has an additional component
 #'   \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
-#'   triangulation.
+#'   triangulation, unless the mesh is already triangulated, in which case
+#'   the \code{triangulate} option is ignored. If the mesh is already
+#'   triangulated, the \code{edges} matrix given in the output has an
+#'   additional 0/1 column \code{exterior}, indicating whether an edge is
+#'   exterior.
 #'
 #' @importFrom data.table uniqueN
 #' @export
