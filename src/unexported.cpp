@@ -273,23 +273,23 @@ Rcpp::IntegerMatrix getEdges2(MeshT mesh, const double epsilon) {
   {
     size_t i = 0;
     for(typename MeshT::Edge_index ed : mesh.edges()) {
-      MeshT::Vertex_index s = source(ed, mesh);
-      MeshT::Vertex_index t = target(ed, mesh);
+      typename MeshT::Vertex_index s = source(ed, mesh);
+      typename MeshT::Vertex_index t = target(ed, mesh);
       Rcpp::IntegerVector col_i(3);
       col_i(0) = (int)s + 1;
       col_i(1) = (int)t + 1;
       std::vector<PointT> points(4);
       points[0] = mesh.point(s);
       points[1] = mesh.point(t);
-      MeshT::Halfedge_index h0 = mesh.halfedge(ed, 0);
+      typename MeshT::Halfedge_index h0 = mesh.halfedge(ed, 0);
       points[2] = mesh.point(mesh.target(mesh.next(h0)));
-      MeshT::Halfedge_index h1 = mesh.halfedge(ed, 1);
+      typename MeshT::Halfedge_index h1 = mesh.halfedge(ed, 1);
       points[3] = mesh.point(mesh.target(mesh.next(h1)));
       bool exterior;
       if(epsilon == 0) {
         exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
       } else {
-        KernelT::FT vol =
+        typename KernelT::FT vol =
             CGAL::volume(points[0], points[1], points[2], points[3]);
         exterior = CGAL::abs(vol) > epsilon;
         // K::FT svol = CGAL::square(CGAL::volume(points[0], points[1],
@@ -341,27 +341,27 @@ Rcpp::List RSurfMesh(MeshT mesh,
   Rcpp::NumericMatrix Vertices(3, nvertices);
   {
     size_t i = 0;
-    if(exact) {
-      for(EMesh3::Vertex_index vd : mesh.vertices()) {
+//    if(exact) {
+      for(typename MeshT::Vertex_index vd : mesh.vertices()) {
         Rcpp::NumericVector col_i(3);
-        const EPoint3 vertex = mesh.point(vd);
+        const PointT vertex = mesh.point(vd);
         col_i(0) = CGAL::to_double(vertex.x());
         col_i(1) = CGAL::to_double(vertex.y());
         col_i(2) = CGAL::to_double(vertex.z());
         Vertices(Rcpp::_, i) = col_i;
         i++;
       }
-    } else {
-      for(Mesh3::Vertex_index vd : mesh.vertices()) {
-        Rcpp::NumericVector col_i(3);
-        const Point3 vertex = mesh.point(vd);
-        col_i(0) = vertex.x();
-        col_i(1) = vertex.y();
-        col_i(2) = vertex.z();
-        Vertices(Rcpp::_, i) = col_i;
-        i++;
-      }
-    }
+    // } else {
+    //   for(Mesh3::Vertex_index vd : mesh.vertices()) {
+    //     Rcpp::NumericVector col_i(3);
+    //     const Point3 vertex = mesh.point(vd);
+    //     col_i(0) = vertex.x();
+    //     col_i(1) = vertex.y();
+    //     col_i(2) = vertex.z();
+    //     Vertices(Rcpp::_, i) = col_i;
+    //     i++;
+    //   }
+    // }
   }
   const size_t nfaces = mesh.number_of_faces();
   Rcpp::List Faces(nfaces);
@@ -369,7 +369,7 @@ Rcpp::List RSurfMesh(MeshT mesh,
     size_t i = 0;
     for(typename MeshT::Face_index fd : mesh.faces()) {
       Rcpp::IntegerVector col_i;
-      for(MeshT::Vertex_index vd :
+      for(typename MeshT::Vertex_index vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
         col_i.push_back(vd + 1);
       }
