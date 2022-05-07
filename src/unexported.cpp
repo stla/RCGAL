@@ -273,8 +273,6 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
       Rcpp::IntegerVector col_i(3);
       col_i(0) = (int)s + 1;
       col_i(1) = (int)t + 1;
-      Edges(Rcpp::_, i) = col_i;
-      i++;      
       std::vector<Point3> points(4);
       points[0] = mesh.point(s);
       points[1] = mesh.point(t);
@@ -283,7 +281,9 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
       Mesh3::Halfedge_index h1 = mesh.halfedge(ed, 1);
       points[3] = mesh.point(mesh.target(mesh.next(h1)));
       bool coplanar = CGAL::coplanar(points[0], points[1], points[2], points[3]);
-      col_i(3) = (int)coplanar;
+      col_i(2) = (int)coplanar;
+      Edges(Rcpp::_, i) = col_i;
+      i++;      
     }
   }
   Rcpp::CharacterVector rowNames =
