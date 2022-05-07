@@ -284,7 +284,7 @@ Rcpp::IntegerMatrix getEdges2(EMesh3 mesh, const double epsilon) {
       if(epsilon == 0){
         exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
       }else{
-        K::FT vol = CGAL::volume(points[0], points[1], points[2], points[3]);
+        EK::FT vol = CGAL::volume(points[0], points[1], points[2], points[3]);
         exterior = CGAL::abs(vol) > epsilon;
         // K::FT svol = CGAL::square(CGAL::volume(points[0], points[1], points[2], points[3]));
         // CGAL::Triangle_3<K> tr1(points[0], points[1], points[2]);
