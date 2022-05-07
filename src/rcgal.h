@@ -195,12 +195,12 @@ void mark_domains0(CDT&, CDFace_handle, int, std::list<CDT::Edge>&);
 
 void mark_domains(CDT&);
 
-template <typename PointT>
-std::vector<PointT> matrix_to_points3(const Rcpp::NumericMatrix);
+//template <typename PointT>
+//std::vector<PointT> matrix_to_points3(const Rcpp::NumericMatrix);
 
 // std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
 
-std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List);
+//std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List);
 
 // Polyhedron makePolyMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
 
@@ -212,8 +212,8 @@ MeshT makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
 template <typename MeshT>
 Rcpp::IntegerMatrix getEdges(MeshT);
 
-template <typename KernelT, typename MeshT, typename PointT>
-Rcpp::IntegerMatrix getEdges2(MeshT, const double);
+//template <typename KernelT, typename MeshT, typename PointT>
+//Rcpp::IntegerMatrix getEdges2(MeshT, const double);
 
 template <typename KernelT, typename MeshT, typename PointT>
 Rcpp::List RSurfMesh(MeshT, const bool, const double, const bool);

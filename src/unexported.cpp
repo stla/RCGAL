@@ -104,6 +104,9 @@ std::vector<PointT> matrix_to_points3(const Rcpp::NumericMatrix M) {
   return points;
 }
 
+template std::vector<Point3> matrix_to_points3<Point3>(Rcpp::NumericMatrix);
+template std::vector<EPoint3> matrix_to_points3<EPoint3>(Rcpp::NumericMatrix);
+
 // std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I)
 // {
 //   const size_t nfaces = I.ncol();
@@ -249,6 +252,9 @@ MeshT makeSurfMesh(const Rcpp::NumericMatrix M,
   return mesh;
 }
 
+template Mesh3 makeSurfMesh<Mesh3, Point3>(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
+template EMesh3 makeSurfMesh<EMesh3, EPoint3>(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
+
 template <typename MeshT>
 Rcpp::IntegerMatrix getEdges(MeshT mesh) {
   const size_t nedges = mesh.number_of_edges();
@@ -265,6 +271,9 @@ Rcpp::IntegerMatrix getEdges(MeshT mesh) {
   }
   return Edges;
 }
+
+template Rcpp::IntegerMatrix getEdges<Mesh3>(Mesh3);
+template Rcpp::IntegerMatrix getEdges<EMesh3>(EMesh3);
 
 template <typename KernelT, typename MeshT, typename PointT>
 Rcpp::IntegerMatrix getEdges2(MeshT mesh, const double epsilon) {
@@ -326,9 +335,13 @@ Rcpp::IntegerMatrix getEdges2(MeshT mesh, const double epsilon) {
   return Edges;
 }
 
+template Rcpp::IntegerMatrix getEdges2<K, Mesh3, Point3>(Mesh3, const double);
+template Rcpp::IntegerMatrix getEdges2<EK, EMesh3, EPoint3>(EMesh3, const double);
+
+
 template <typename KernelT, typename MeshT, typename PointT>
 Rcpp::List RSurfMesh(MeshT mesh,
-                     bool isTriangle,
+                     const bool isTriangle,
                      const double epsilon,
                      const bool exact) {
   Rcpp::IntegerMatrix Edges;
@@ -381,6 +394,9 @@ Rcpp::List RSurfMesh(MeshT mesh,
                             Rcpp::Named("edges") = Edges,
                             Rcpp::Named("faces") = Faces);
 }
+
+template Rcpp::List RSurfMesh<K, Mesh3, Point3>(Mesh3, const bool, const double, const bool);
+template Rcpp::List RSurfMesh<EK, EMesh3, EPoint3>(EMesh3, const bool, const double, const bool);
 
 // Mesh3 Poly2Mesh3(Polyhedron poly) {
 //   Mesh3 mesh;
