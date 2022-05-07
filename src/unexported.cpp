@@ -255,7 +255,7 @@ Rcpp::IntegerMatrix getEdges(MeshT mesh) {
   Rcpp::IntegerMatrix Edges(2, nedges);
   {
     size_t i = 0;
-    for(MeshT::Edge_index ed : mesh.edges()) {
+    for(typename MeshT::Edge_index ed : mesh.edges()) {
       Rcpp::IntegerVector col_i(2);
       col_i(0) = source(ed, mesh) + 1;
       col_i(1) = target(ed, mesh) + 1;
@@ -272,7 +272,7 @@ Rcpp::IntegerMatrix getEdges2(MeshT mesh, const double epsilon) {
   Rcpp::IntegerMatrix Edges(3, nedges);
   {
     size_t i = 0;
-    for(MeshT::Edge_index ed : mesh.edges()) {
+    for(typename MeshT::Edge_index ed : mesh.edges()) {
       MeshT::Vertex_index s = source(ed, mesh);
       MeshT::Vertex_index t = target(ed, mesh);
       Rcpp::IntegerVector col_i(3);
@@ -367,7 +367,7 @@ Rcpp::List RSurfMesh(MeshT mesh,
   Rcpp::List Faces(nfaces);
   {
     size_t i = 0;
-    for(MeshT::Face_index fd : mesh.faces()) {
+    for(typename MeshT::Face_index fd : mesh.faces()) {
       Rcpp::IntegerVector col_i;
       for(MeshT::Vertex_index vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
