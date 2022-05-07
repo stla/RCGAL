@@ -166,7 +166,7 @@ typedef CGAL::Constrained_Delaunay_triangulation_2<K, Tds22, Itag> CDT;
 typedef CDT::Point CDPoint;
 typedef CDT::Face_handle CDFace_handle;
 
-typedef CGAL::Nef_polyhedron_3<EK> Nef;
+//typedef CGAL::Nef_polyhedron_3<EK> Nef;
 
 typedef Rcpp::NumericVector Dvector;
 
@@ -195,7 +195,8 @@ void mark_domains0(CDT&, CDFace_handle, int, std::list<CDT::Edge>&);
 
 void mark_domains(CDT&);
 
-std::vector<EPoint3> matrix_to_points3(const Rcpp::NumericMatrix);
+template <typename PointT>
+std::vector<PointT> matrix_to_points3(const Rcpp::NumericMatrix);
 
 // std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
 
@@ -205,12 +206,16 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List);
 
 // Rcpp::List RPolyMesh(Polyhedron);
 
-EMesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
+template <typename MeshT, typename PointT>
+MeshT makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
 
-Rcpp::IntegerMatrix getEdges(EMesh3);
+template <typename MeshT>
+Rcpp::IntegerMatrix getEdges(MeshT);
 
-Rcpp::IntegerMatrix getEdges2(EMesh3, const double);
+template <typename KernelT, typename MeshT, typename PointT>
+Rcpp::IntegerMatrix getEdges2(MeshT, const double);
 
-Rcpp::List RSurfMesh(EMesh3, const bool, const double);
+template <typename KernelT, typename MeshT, typename PointT>
+Rcpp::List RSurfMesh(MeshT, const bool, const double, const bool);
 
 // Mesh3 Poly2Mesh3(Polyhedron);
