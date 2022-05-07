@@ -138,6 +138,7 @@ typedef CGAL::Advancing_front_surface_reconstruction<> AFS_reconstruction;
 typedef AFS_reconstruction::Triangulation_3 AFS_triangulation3;
 typedef AFS_reconstruction::Triangulation_data_structure_2 AFS_Tds2;
 typedef K::Vector_3 Vector3;
+typedef EK::Vector_3 EVector3;
 
 typedef CGAL::Simple_cartesian<double> KSC;
 

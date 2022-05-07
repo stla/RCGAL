@@ -36,10 +36,10 @@ Rcpp::List SurfMesh(const Rcpp::NumericMatrix points,
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Normals(3, nvertices);
   if(normals) {
-    auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
+    auto vnormals = mesh.add_property_map<boost_vertex_descriptor, EVector3>(
                             "v:normals", CGAL::NULL_VECTOR)
                         .first;
-    auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
+    auto fnormals = mesh.add_property_map<boost_face_descriptor, EVector3>(
                             "f:normals", CGAL::NULL_VECTOR)
                         .first;
     CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
@@ -47,7 +47,7 @@ Rcpp::List SurfMesh(const Rcpp::NumericMatrix points,
       size_t i = 0;
       for(boost_vertex_descriptor vd : vertices(mesh)) {
         Rcpp::NumericVector col_i(3);
-        const EK::Vector_3 normal = vnormals[vd];
+        const EVector3 normal = vnormals[vd];
         col_i(0) = normal.x();
         col_i(1) = normal.y();
         col_i(2) = normal.z();
@@ -163,11 +163,11 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
   Rcpp::NumericMatrix Normals(3, nvertices);
   if(normals) {
     auto vnormals = outmesh
-                        .add_property_map<boost_vertex_descriptor, Vector3>(
+                        .add_property_map<boost_vertex_descriptor, EVector3>(
                             "v:normals", CGAL::NULL_VECTOR)
                         .first;
     auto fnormals = outmesh
-                        .add_property_map<boost_face_descriptor, Vector3>(
+                        .add_property_map<boost_face_descriptor, EVector3>(
                             "f:normals", CGAL::NULL_VECTOR)
                         .first;
     CGAL::Polygon_mesh_processing::compute_normals(outmesh, vnormals, fnormals);
@@ -175,7 +175,7 @@ Rcpp::List Intersection(const Rcpp::List rmeshes,
       size_t i = 0;
       for(boost_vertex_descriptor vd : vertices(outmesh)) {
         Rcpp::NumericVector col_i(3);
-        const EK::Vector_3 normal = vnormals[vd];
+        const EVector3 normal = vnormals[vd];
         col_i(0) = normal.x();
         col_i(1) = normal.y();
         col_i(2) = normal.z();
@@ -213,10 +213,10 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Normals(3, nvertices);
   if(normals) {
-    auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
+    auto vnormals = mesh.add_property_map<boost_vertex_descriptor, EVector3>(
                             "v:normals", CGAL::NULL_VECTOR)
                         .first;
-    auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
+    auto fnormals = mesh.add_property_map<boost_face_descriptor, EVector3>(
                             "f:normals", CGAL::NULL_VECTOR)
                         .first;
     CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
@@ -224,7 +224,7 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
       size_t i = 0;
       for(boost_vertex_descriptor vd : vertices(mesh)) {
         Rcpp::NumericVector col_i(3);
-        const EK::Vector_3 normal = vnormals[vd];
+        const EVector3 normal = vnormals[vd];
         col_i(0) = normal.x();
         col_i(1) = normal.y();
         col_i(2) = normal.z();
