@@ -98,7 +98,7 @@ std::vector<EPoint3> matrix_to_points3(const Rcpp::NumericMatrix M) {
   points.reserve(npoints);
   for(size_t i = 0; i < npoints; i++) {
     const Rcpp::NumericVector pt = M(Rcpp::_, i);
-    points.emplace_back(Point3(pt(0), pt(1), pt(2)));
+    points.emplace_back(EPoint3(pt(0), pt(1), pt(2)));
   }
   return points;
 }
