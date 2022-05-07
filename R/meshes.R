@@ -110,6 +110,7 @@ Mesh <- function(
   }
   storage.mode(vertices) <- "double"
   homogeneousFaces <- FALSE
+  isTriangle <- FALSE
   if(is.matrix(faces)){
     if(ncol(faces) < 3L){
       stop("Faces must be given by at least three indices.")
@@ -125,6 +126,7 @@ Mesh <- function(
       stop("Faces cannot contain indices higher than the number of vertices.")
     }
     homogeneousFaces <- TRUE
+    isTriangle <- ncol(faces) == 3L
     faces <- lapply(1L:nrow(faces), function(i) faces[i, ] - 1L)
   }else if(is.list(faces)){
     check <- all(vapply(faces, isAtomicVector, logical(1L)))
@@ -150,10 +152,17 @@ Mesh <- function(
       )
     }
     homogeneousFaces <- uniqueN(sizes) == 1L
+    isTriangle <- homogeneousFaces && sizes[1L] == 3L
   }else{
     stop("The `faces` argument must be a list or a matrix.")
   }
-  mesh <- SurfMesh(t(vertices), faces, triangulate, merge, normals)
+  mesh <- SurfMesh(t(vertices), faces, isTriangle, triangulate, merge, normals)
+  if(triangulate && isTriangle){
+    message(
+      "Ignored option `triangulate`, since the mesh is already triangulated."
+    )
+    triangulate <- FALSE
+  }
   # mesh <- if(normals){
   #   SurfMeshWithNormals(t(vertices), faces, merge)
   # }else{

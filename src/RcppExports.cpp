@@ -155,17 +155,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // SurfMesh
-Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool triangulate, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_SurfMesh(SEXP pointsSEXP, SEXP facesSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool isTriangle, const bool triangulate, const bool merge, const bool normals);
+RcppExport SEXP _RCGAL_SurfMesh(SEXP pointsSEXP, SEXP facesSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type faces(facesSEXP);
+    Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
     Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
     Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfMesh(points, faces, triangulate, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(SurfMesh(points, faces, isTriangle, triangulate, merge, normals));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -210,7 +211,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_PolyMesh", (DL_FUNC) &_RCGAL_PolyMesh, 2},
-    {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 5},
+    {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 6},
     {"_RCGAL_Intersection", (DL_FUNC) &_RCGAL_Intersection, 4},
     {"_RCGAL_Intersection2", (DL_FUNC) &_RCGAL_Intersection2, 3},
     {NULL, NULL, 0}

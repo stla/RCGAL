@@ -292,8 +292,13 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh) {
   return Edges;
 }
 
-Rcpp::List RSurfMesh(Mesh3 mesh) {
-  Rcpp::IntegerMatrix Edges = getEdges2(mesh);
+Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle) {
+  Rcpp::IntegerMatrix Edges;
+  if(isTriangle){
+    Edges = getEdges2(mesh);
+  }else{
+    Edges = getEdges(mesh);
+  }
   const size_t nvertices = mesh.number_of_vertices();
   Rcpp::NumericMatrix Vertices(3, nvertices);
   {
