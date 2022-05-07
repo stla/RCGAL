@@ -273,7 +273,7 @@ Rcpp::IntegerMatrix getEdges2(EMesh3 mesh, const double epsilon) {
       Rcpp::IntegerVector col_i(3);
       col_i(0) = (int)s + 1;
       col_i(1) = (int)t + 1;
-      std::vector<Point3> points(4);
+      std::vector<EPoint3> points(4);
       points[0] = mesh.point(s);
       points[1] = mesh.point(t);
       EMesh3::Halfedge_index h0 = mesh.halfedge(ed, 0);
@@ -334,9 +334,9 @@ Rcpp::List RSurfMesh(EMesh3 mesh, bool isTriangle, const double epsilon) {
     for(EMesh3::Vertex_index vd : mesh.vertices()) {
       Rcpp::NumericVector col_i(3);
       const EPoint3 vertex = mesh.point(vd);
-      col_i(0) = vertex.x();
-      col_i(1) = vertex.y();
-      col_i(2) = vertex.z();
+      col_i(0) = CGAL::to_double(vertex.x());
+      col_i(1) = CGAL::to_double(vertex.y());
+      col_i(2) = CGAL::to_double(vertex.z());
       Vertices(Rcpp::_, i) = col_i;
       i++;
     }
