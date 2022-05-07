@@ -90,10 +90,12 @@
 #include <map>
 #include <vector>
 
-typedef CGAL::Exact_predicates_exact_constructions_kernel K;
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Exact_predicates_exact_constructions_kernel EK;
 
 typedef K::Point_2 Point2;
 typedef K::Point_3 Point3;
+typedef EK::Point_3 EPoint3;
 typedef std::vector<Point2> Points2;
 typedef std::vector<Point3> Points3;
 typedef std::pair<Point3, unsigned> IPoint3;
@@ -109,6 +111,7 @@ typedef CGAL::Extreme_points_traits_adapter_3<Pmap,
 
 typedef CGAL::Surface_mesh<IPoint3> Mesh;
 typedef CGAL::Surface_mesh<Point3> Mesh3;
+typedef CGAL::Surface_mesh<EPoint3> EMesh3;
 
 typedef Mesh::Vertex_index vertex_descriptor;
 typedef Mesh::Edge_index edge_descriptor;
@@ -162,7 +165,7 @@ typedef CGAL::Constrained_Delaunay_triangulation_2<K, Tds22, Itag> CDT;
 typedef CDT::Point CDPoint;
 typedef CDT::Face_handle CDFace_handle;
 
-typedef CGAL::Nef_polyhedron_3<K> Nef;
+typedef CGAL::Nef_polyhedron_3<EK> Nef;
 
 typedef Rcpp::NumericVector Dvector;
 
@@ -193,13 +196,13 @@ void mark_domains(CDT&);
 
 Points3 matrix_to_points3(const Rcpp::NumericMatrix);
 
-std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
+// std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix);
 
 std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List);
 
-Polyhedron makePolyMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
+// Polyhedron makePolyMesh(const Rcpp::NumericMatrix, const Rcpp::IntegerMatrix);
 
-Rcpp::List RPolyMesh(Polyhedron);
+// Rcpp::List RPolyMesh(Polyhedron);
 
 Mesh3 makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
 
@@ -209,4 +212,4 @@ Rcpp::IntegerMatrix getEdges2(Mesh3, const double);
 
 Rcpp::List RSurfMesh(Mesh3, const bool, const double);
 
-Mesh3 Poly2Mesh3(Polyhedron);
+// Mesh3 Poly2Mesh3(Polyhedron);

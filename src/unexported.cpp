@@ -92,9 +92,9 @@ void mark_domains(CDT& cdt) {
   }
 }
 
-Points3 matrix_to_points3(const Rcpp::NumericMatrix M) {
+std::vector<EPoint3> matrix_to_points3(const Rcpp::NumericMatrix M) {
   const size_t npoints = M.ncol();
-  Points3 points;
+  std::vector<EPoint3> points;
   points.reserve(npoints);
   for(size_t i = 0; i < npoints; i++) {
     const Rcpp::NumericVector pt = M(Rcpp::_, i);
@@ -103,17 +103,17 @@ Points3 matrix_to_points3(const Rcpp::NumericMatrix M) {
   return points;
 }
 
-std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
-  const size_t nfaces = I.ncol();
-  std::vector<std::vector<size_t>> faces;
-  faces.reserve(nfaces);
-  for(size_t i = 0; i < nfaces; i++) {
-    const Rcpp::IntegerVector face_rcpp = I(Rcpp::_, i);
-    std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
-    faces.emplace_back(face);
-  }
-  return faces;
-}
+// std::vector<std::vector<size_t>> matrix_to_faces(const Rcpp::IntegerMatrix I) {
+//   const size_t nfaces = I.ncol();
+//   std::vector<std::vector<size_t>> faces;
+//   faces.reserve(nfaces);
+//   for(size_t i = 0; i < nfaces; i++) {
+//     const Rcpp::IntegerVector face_rcpp = I(Rcpp::_, i);
+//     std::vector<size_t> face(face_rcpp.begin(), face_rcpp.end());
+//     faces.emplace_back(face);
+//   }
+//   return faces;
+// }
 
 std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
   const size_t nfaces = L.size();
@@ -128,106 +128,106 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
   return faces;
 }
 
-Polyhedron makePolyMesh(const Rcpp::NumericMatrix M,
-                        const Rcpp::IntegerMatrix I) {
-  Points3 points = matrix_to_points3(M);
-  std::vector<std::vector<size_t>> faces = matrix_to_faces(I);
-  bool success =
-      CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
-  if(!success) {
-    Rcpp::stop("Polygon orientation failed.");
-  }
-  Polyhedron mesh;
-  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
-                                                              mesh);
-  return mesh;
-}
+// Polyhedron makePolyMesh(const Rcpp::NumericMatrix M,
+//                         const Rcpp::IntegerMatrix I) {
+//   Points3 points = matrix_to_points3(M);
+//   std::vector<std::vector<size_t>> faces = matrix_to_faces(I);
+//   bool success =
+//       CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
+//   if(!success) {
+//     Rcpp::stop("Polygon orientation failed.");
+//   }
+//   Polyhedron mesh;
+//   CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
+//                                                               mesh);
+//   return mesh;
+// }
 
-Rcpp::List RPolyMesh(Polyhedron mesh) {
-  int id = 1;
-  for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
-      vit != mesh.vertices_end(); ++vit) {
-    vit->id() = id;
-    id++;
-  }
+// Rcpp::List RPolyMesh(Polyhedron mesh) {
+//   int id = 1;
+//   for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
+//       vit != mesh.vertices_end(); ++vit) {
+//     vit->id() = id;
+//     id++;
+//   }
 
-  const size_t nfacets = mesh.size_of_facets();
-  const size_t nvertices = mesh.size_of_vertices();
+//   const size_t nfacets = mesh.size_of_facets();
+//   const size_t nvertices = mesh.size_of_vertices();
 
-  // const size_t nvertices = num_vertices(mesh);  // or number_of_vertices
-  // // const size_t nedges = num_edges(mesh);        // or number_of_edges
-  // const size_t nfaces = num_faces(mesh);
-  Rcpp::NumericMatrix vertices(3, nvertices);
-  {
-    size_t i = 0;
-    for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
-        vit != mesh.vertices_end(); vit++) {
-      Rcpp::NumericVector col_i(3);
-      col_i(0) = vit->point().x();
-      col_i(1) = vit->point().y();
-      col_i(2) = vit->point().z();
-      vertices(Rcpp::_, i) = col_i;
-      i++;
-    }
-  }
+//   // const size_t nvertices = num_vertices(mesh);  // or number_of_vertices
+//   // // const size_t nedges = num_edges(mesh);        // or number_of_edges
+//   // const size_t nfaces = num_faces(mesh);
+//   Rcpp::NumericMatrix vertices(3, nvertices);
+//   {
+//     size_t i = 0;
+//     for(Polyhedron::Vertex_iterator vit = mesh.vertices_begin();
+//         vit != mesh.vertices_end(); vit++) {
+//       Rcpp::NumericVector col_i(3);
+//       col_i(0) = vit->point().x();
+//       col_i(1) = vit->point().y();
+//       col_i(2) = vit->point().z();
+//       vertices(Rcpp::_, i) = col_i;
+//       i++;
+//     }
+//   }
 
-  // Rcpp::NumericMatrix vertices(3, nvertices);
-  // Rcpp::IntegerVector ids(nvertices);
-  // {
-  //   size_t i = 0;
-  //   for(vertex_descriptor vd : mesh.vertices()) {
-  //     const IPoint3 ivertex = mesh.point(vd);
-  //     Rcpp::NumericVector col_i(3);
-  //     col_i(0) = ivertex.first.x();
-  //     col_i(1) = ivertex.first.y();
-  //     col_i(2) = ivertex.first.z();
-  //     vertices(Rcpp::_, i) = col_i;
-  //     const unsigned id = ivertex.second;
-  //     ids(i) = id;
-  //     i++;
-  //   }
-  // }
+//   // Rcpp::NumericMatrix vertices(3, nvertices);
+//   // Rcpp::IntegerVector ids(nvertices);
+//   // {
+//   //   size_t i = 0;
+//   //   for(vertex_descriptor vd : mesh.vertices()) {
+//   //     const IPoint3 ivertex = mesh.point(vd);
+//   //     Rcpp::NumericVector col_i(3);
+//   //     col_i(0) = ivertex.first.x();
+//   //     col_i(1) = ivertex.first.y();
+//   //     col_i(2) = ivertex.first.z();
+//   //     vertices(Rcpp::_, i) = col_i;
+//   //     const unsigned id = ivertex.second;
+//   //     ids(i) = id;
+//   //     i++;
+//   //   }
+//   // }
 
-  Rcpp::IntegerMatrix facets(3, nfacets);
-  {
-    size_t i = 0;
-    for(Polyhedron::Facet_iterator fit = mesh.facets_begin();
-        fit != mesh.facets_end(); fit++) {
-      Rcpp::IntegerVector col_i(3);
-      col_i(0) = fit->halfedge()->vertex()->id();
-      col_i(1) = fit->halfedge()->next()->vertex()->id();
-      col_i(2) = fit->halfedge()->opposite()->vertex()->id();
-      facets(Rcpp::_, i) = col_i;
-      i++;
-    }
-  }
+//   Rcpp::IntegerMatrix facets(3, nfacets);
+//   {
+//     size_t i = 0;
+//     for(Polyhedron::Facet_iterator fit = mesh.facets_begin();
+//         fit != mesh.facets_end(); fit++) {
+//       Rcpp::IntegerVector col_i(3);
+//       col_i(0) = fit->halfedge()->vertex()->id();
+//       col_i(1) = fit->halfedge()->next()->vertex()->id();
+//       col_i(2) = fit->halfedge()->opposite()->vertex()->id();
+//       facets(Rcpp::_, i) = col_i;
+//       i++;
+//     }
+//   }
 
-  // Rcpp::IntegerMatrix faces(nfaces, 3);
-  // {
-  //   size_t i = 0;
-  //   for(face_descriptor fa : mesh.faces()) {
-  //     size_t j = 0;
-  //     Rcpp::IntegerVector col_i(3);
-  //     for(vertex_descriptor vd :
-  //         vertices_around_face(mesh.halfedge(fa), mesh)) {
-  //       const IPoint3 ivertex = mesh.point(vd);
-  //       col_i(j) = ivertex.second;
-  //       j++;
-  //     }
-  //     faces(Rcpp::_, i) = col_i;
-  //     i++;
-  //   }
-  // }
+//   // Rcpp::IntegerMatrix faces(nfaces, 3);
+//   // {
+//   //   size_t i = 0;
+//   //   for(face_descriptor fa : mesh.faces()) {
+//   //     size_t j = 0;
+//   //     Rcpp::IntegerVector col_i(3);
+//   //     for(vertex_descriptor vd :
+//   //         vertices_around_face(mesh.halfedge(fa), mesh)) {
+//   //       const IPoint3 ivertex = mesh.point(vd);
+//   //       col_i(j) = ivertex.second;
+//   //       j++;
+//   //     }
+//   //     faces(Rcpp::_, i) = col_i;
+//   //     i++;
+//   //   }
+//   // }
 
-  return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
-                            // Rcpp::Named("ids") = ids,
-                            Rcpp::Named("faces") = facets);
-}
+//   return Rcpp::List::create(Rcpp::Named("vertices") = vertices,
+//                             // Rcpp::Named("ids") = ids,
+//                             Rcpp::Named("faces") = facets);
+// }
 
-Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M,
+EMesh3 makeSurfMesh(const Rcpp::NumericMatrix M,
                    const Rcpp::List L,
                    const bool merge) {
-  Points3 points = matrix_to_points3(M);
+  std::vector<EPoint3> points = matrix_to_points3(M);
   std::vector<std::vector<size_t>> faces = list_to_faces(L);
   bool success =
       CGAL::Polygon_mesh_processing::orient_polygon_soup(points, faces);
@@ -240,18 +240,18 @@ Mesh3 makeSurfMesh(const Rcpp::NumericMatrix M,
             points, faces);
     Rcpp::Rcout << "Number of points removed: " << nremoved << ".\n";
   }
-  Mesh3 mesh;
+  EMesh3 mesh;
   CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
                                                               mesh);
   return mesh;
 }
 
-Rcpp::IntegerMatrix getEdges(Mesh3 mesh) {
+Rcpp::IntegerMatrix getEdges(EMesh3 mesh) {
   const size_t nedges = mesh.number_of_edges();
   Rcpp::IntegerMatrix Edges(2, nedges);
   {
     size_t i = 0;
-    for(m3_edge_descriptor ed : mesh.edges()) {
+    for(EMesh3::Edge_index ed : mesh.edges()) {
       Rcpp::IntegerVector col_i(2);
       col_i(0) = source(ed, mesh) + 1;
       col_i(1) = target(ed, mesh) + 1;
@@ -262,50 +262,52 @@ Rcpp::IntegerMatrix getEdges(Mesh3 mesh) {
   return Edges;
 }
 
-Rcpp::IntegerMatrix getEdges2(Mesh3 mesh, const double epsilon) {
+Rcpp::IntegerMatrix getEdges2(EMesh3 mesh, const double epsilon) {
   const size_t nedges = mesh.number_of_edges();
   Rcpp::IntegerMatrix Edges(3, nedges);
   {
     size_t i = 0;
-    for(m3_edge_descriptor ed : mesh.edges()) {
-      Mesh3::Vertex_index s = source(ed, mesh);
-      Mesh3::Vertex_index t = target(ed, mesh);
+    for(EMesh3::Edge_index ed : mesh.edges()) {
+      EMesh3::Vertex_index s = source(ed, mesh);
+      EMesh3::Vertex_index t = target(ed, mesh);
       Rcpp::IntegerVector col_i(3);
       col_i(0) = (int)s + 1;
       col_i(1) = (int)t + 1;
       std::vector<Point3> points(4);
       points[0] = mesh.point(s);
       points[1] = mesh.point(t);
-      Mesh3::Halfedge_index h0 = mesh.halfedge(ed, 0);
+      EMesh3::Halfedge_index h0 = mesh.halfedge(ed, 0);
       points[2] = mesh.point(mesh.target(mesh.next(h0)));
-      Mesh3::Halfedge_index h1 = mesh.halfedge(ed, 1);
+      EMesh3::Halfedge_index h1 = mesh.halfedge(ed, 1);
       points[3] = mesh.point(mesh.target(mesh.next(h1)));
       bool exterior;
       if(epsilon == 0){
         exterior = !CGAL::coplanar(points[0], points[1], points[2], points[3]);
       }else{
-        K::FT svol = CGAL::square(CGAL::volume(points[0], points[1], points[2], points[3]));
-        CGAL::Triangle_3<K> tr1(points[0], points[1], points[2]);
-        K::FT sarea1 = tr1.squared_area();
-        if(svol < epsilon*sarea1){
-          CGAL::Triangle_3<K> tr2(points[0], points[1], points[3]);
-          K::FT sarea2 = tr2.squared_area();
-          if(svol < epsilon*sarea2){
-            CGAL::Triangle_3<K> tr3(points[0], points[2], points[3]);
-            K::FT sarea3 = tr3.squared_area();
-            if(svol < epsilon*sarea3){
-              CGAL::Triangle_3<K> tr4(points[1], points[2], points[3]);
-              K::FT sarea4 = tr4.squared_area();
-              exterior = svol > epsilon*sarea4;
-            }else{
-              exterior = true;
-            } 
-          }else{
-            exterior = true;
-          } 
-        }else{
-          exterior = true;
-        } 
+        K::FT vol = CGAL::volume(points[0], points[1], points[2], points[3]);
+        exterior = CGAL::abs(vol) > epsilon;
+        // K::FT svol = CGAL::square(CGAL::volume(points[0], points[1], points[2], points[3]));
+        // CGAL::Triangle_3<K> tr1(points[0], points[1], points[2]);
+        // K::FT sarea1 = tr1.squared_area();
+        // if(svol < epsilon*sarea1){
+        //   CGAL::Triangle_3<K> tr2(points[0], points[1], points[3]);
+        //   K::FT sarea2 = tr2.squared_area();
+        //   if(svol < epsilon*sarea2){
+        //     CGAL::Triangle_3<K> tr3(points[0], points[2], points[3]);
+        //     K::FT sarea3 = tr3.squared_area();
+        //     if(svol < epsilon*sarea3){
+        //       CGAL::Triangle_3<K> tr4(points[1], points[2], points[3]);
+        //       K::FT sarea4 = tr4.squared_area();
+        //       exterior = svol > epsilon*sarea4;
+        //     }else{
+        //       exterior = true;
+        //     } 
+        //   }else{
+        //     exterior = true;
+        //   } 
+        // }else{
+        //   exterior = true;
+        // } 
       }
       col_i(2) = (int)exterior;
       Edges(Rcpp::_, i) = col_i;
@@ -318,7 +320,7 @@ Rcpp::IntegerMatrix getEdges2(Mesh3 mesh, const double epsilon) {
   return Edges;
 }
 
-Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle, const double epsilon) {
+Rcpp::List RSurfMesh(EMesh3 mesh, bool isTriangle, const double epsilon) {
   Rcpp::IntegerMatrix Edges;
   if(isTriangle){
     Edges = getEdges2(mesh, epsilon);
@@ -329,9 +331,9 @@ Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle, const double epsilon) {
   Rcpp::NumericMatrix Vertices(3, nvertices);
   {
     size_t i = 0;
-    for(m3_vertex_descriptor vd : mesh.vertices()) {
+    for(EMesh3::Vertex_index vd : mesh.vertices()) {
       Rcpp::NumericVector col_i(3);
-      const Point3 vertex = mesh.point(vd);
+      const EPoint3 vertex = mesh.point(vd);
       col_i(0) = vertex.x();
       col_i(1) = vertex.y();
       col_i(2) = vertex.z();
@@ -343,9 +345,9 @@ Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle, const double epsilon) {
   Rcpp::List Faces(nfaces);
   {
     size_t i = 0;
-    for(m3_face_descriptor fd : mesh.faces()) {
+    for(EMesh3::Facee_index fd : mesh.faces()) {
       Rcpp::IntegerVector col_i;
-      for(m3_vertex_descriptor vd :
+      for(EMesh3::Vertex_index vd :
           vertices_around_face(mesh.halfedge(fd), mesh)) {
         col_i.push_back(vd + 1);
       }
@@ -358,13 +360,13 @@ Rcpp::List RSurfMesh(Mesh3 mesh, bool isTriangle, const double epsilon) {
                             Rcpp::Named("faces") = Faces);
 }
 
-Mesh3 Poly2Mesh3(Polyhedron poly) {
-  Mesh3 mesh;
-  CGAL::copy_face_graph(poly, mesh);
-  // auto vnormals = mesh.add_property_map<boost_vertex_descriptor,
-  // Vector3>("v:normals", CGAL::NULL_VECTOR).first; auto fnormals =
-  // mesh.add_property_map<boost_face_descriptor, Vector3>("f:normals",
-  // CGAL::NULL_VECTOR).first;
-  // CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
-  return mesh;
-}
+// Mesh3 Poly2Mesh3(Polyhedron poly) {
+//   Mesh3 mesh;
+//   CGAL::copy_face_graph(poly, mesh);
+//   // auto vnormals = mesh.add_property_map<boost_vertex_descriptor,
+//   // Vector3>("v:normals", CGAL::NULL_VECTOR).first; auto fnormals =
+//   // mesh.add_property_map<boost_face_descriptor, Vector3>("f:normals",
+//   // CGAL::NULL_VECTOR).first;
+//   // CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
+//   return mesh;
+// }

@@ -45,10 +45,6 @@ Poisson_reconstruction_cpp <- function(pts, normals, spacing, sm_angle, sm_radiu
     .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals, spacing, sm_angle, sm_radius, sm_distance)
 }
 
-PolyMesh <- function(points, faces) {
-    .Call(`_RCGAL_PolyMesh`, points, faces)
-}
-
 SurfMesh <- function(points, faces, isTriangle, triangulate, merge, normals, epsilon) {
     .Call(`_RCGAL_SurfMesh`, points, faces, isTriangle, triangulate, merge, normals, epsilon)
 }
