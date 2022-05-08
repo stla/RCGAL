@@ -153,11 +153,12 @@ convexhull <- function(
   }else{
     hull <- cxhull3d_cpp(points, epsilon)
     edges <- unname(hull[["edges"]])
-    exteriorEdges <- edges[edges[, 3L]==0L, c(1L, 2L)]
     hull[["edges"]] <- edges[, c(1L, 2L)]
+    hull[["exteriorEdges"]] <- edges[edges[, 3L]==1L, c(1L, 2L)]
     if(faceFamilies){
+      interiorEdges <- edges[edges[, 3L]==0L, c(1L, 2L)]
       attr(hull[["faces"]], "families") <-
-        makeFaceFamilies(hull[["faces"]], exteriorEdges)
+        makeFaceFamilies(hull[["faces"]], interiorEdges)
     }
   }
   class(hull) <- "cxhull"
