@@ -96,104 +96,129 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts, double epsilon) {
     }
   }
 
-  Rcpp::IntegerMatrix edges(nedges, 3);
+  Rcpp::IntegerMatrix edges(3, nedges);
   {
     size_t i = 0;
     for(edge_descriptor ed : mesh.edges()) {
-      const vertex_descriptor s = source(ed, mesh);
-      const vertex_descriptor t = target(ed, mesh);
-      edges(i, 0) = ids[s];
-      edges(i, 1) = ids[t];
+      Rcpp::IntegerVector edge_i(3);
+      const vertex_descriptor v1 = source(ed, mesh);
+      const vertex_descriptor v2 = target(ed, mesh);
+      edge_i(0) = ids[v1];
+      edge_i(1) = ids[v2];
 
       const Mesh::Halfedge_index h0 = mesh.halfedge(ed, 0);
-      const Mesh::Face_index face0 = mesh.face(h0);
-      std::array<unsigned, 3> vids0;
-      std::array<Point3, 3> vpoints0;
-      unsigned counter0 = 0;
-      for(vertex_descriptor vd :
-            vertices_around_face(mesh.halfedge(face0), mesh)) {
-        const IPoint3 ivertex = mesh.point(vd);
-        vids0[counter0] = ivertex.second;
-        vpoints0[counter0] = ivertex.first;
-        counter0++;
-      }
-      const CGAL::Vector_3<K> normal0 =
-        CGAL::unit_normal(vpoints0[0], vpoints0[1], vpoints0[2]);
+      // const Mesh::Face_index face0 = mesh.face(h0);
+      // std::array<unsigned, 3> vids0;
+      // std::array<Point3, 3> vpoints0;
+      // unsigned counter0 = 0;
+      // for(vertex_descriptor vd :
+      //       vertices_around_face(mesh.halfedge(face0), mesh)) {
+      //   const IPoint3 ivertex = mesh.point(vd);
+      //   vids0[counter0] = ivertex.second;
+      //   vpoints0[counter0] = ivertex.first;
+      //   counter0++;
+      // }
+      // const CGAL::Vector_3<K> normal0 =
+      //   CGAL::unit_normal(vpoints0[0], vpoints0[1], vpoints0[2]);
 
+      // const Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
+      // const Mesh::Face_index face1 = mesh.face(h1);
+      // std::array<unsigned, 3> vids1;
+      // std::array<Point3, 3> vpoints1;
+      // unsigned counter1 = 0;
+      // for(vertex_descriptor vd :
+      //       vertices_around_face(mesh.halfedge(face1), mesh)) {
+      //   const IPoint3 ivertex = mesh.point(vd);
+      //   vids1[counter1] = ivertex.second;
+      //   vpoints1[counter1] = ivertex.first;
+      //   counter1++;
+      // }
+      // const CGAL::Vector_3<K> normal1 =
+      //   CGAL::unit_normal(vpoints1[0], vpoints1[1], vpoints1[2]);
+
+      // edges(i, 2) = approxEqualVectors(normal0, normal1, epsilon) ? 0 : 1;
       const Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
-      const Mesh::Face_index face1 = mesh.face(h1);
-      std::array<unsigned, 3> vids1;
-      std::array<Point3, 3> vpoints1;
-      unsigned counter1 = 0;
-      for(vertex_descriptor vd :
-            vertices_around_face(mesh.halfedge(face1), mesh)) {
-        const IPoint3 ivertex = mesh.point(vd);
-        vids1[counter1] = ivertex.second;
-        vpoints1[counter1] = ivertex.first;
-        counter1++;
+      const vertex_descriptor v3 = mesh.target(mesh.next(h0));
+      const vertex_descriptor v4 = mesh.target(mesh.next(h1));
+      const Point3 point1 = mesh.point(v1).second;
+      const Point3 point2 = mesh.point(v2).second;
+      const Point3 point3 = mesh.point(v3).second;
+      const Point3 point4 = mesh.point(v4).second;
+      bool exterior;
+      if(epsilon == 0) {
+        exterior = !CGAL::coplanar(point1, point2, point3, point4);
+      } else {
+        K::FT vol = CGAL::volume(point1, point2, point3, point4);
+        exterior = CGAL::abs(vol) > epsilon;
       }
-      const CGAL::Vector_3<K> normal1 =
-        CGAL::unit_normal(vpoints1[0], vpoints1[1], vpoints1[2]);
-
-      edges(i, 2) = approxEqualVectors(normal0, normal1, epsilon) ? 0 : 1;
+      edge_i(2) = (int)exterior;
+      edges(Rcpp::_, i) = edge_i;
 
       i++;
     }
-    Rcpp::CharacterVector columnNames =
-      Rcpp::CharacterVector::create("i1", "i2", "border");
-    Rcpp::colnames(edges) = columnNames;
-    edges.attr("info") = "The `border` column indicates border edges.";
+    Rcpp::CharacterVector rowNames =
+      Rcpp::CharacterVector::create("i1", "i2", "exterior");
+    Rcpp::rownames(edges) = rowNames;
+    // edges.attr("info") = "The `border` column indicates border edges.";
   }
 
-  Rcpp::NumericMatrix circumcenters(nfaces, 3);
-  Rcpp::NumericMatrix normals(nfaces, 3);
+  Rcpp::NumericMatrix circumcenters(3, nfaces);
+  Rcpp::NumericMatrix normals(3, nfaces);
   Rcpp::NumericVector areas(nfaces);
   double totalArea = 0;
   double volume = 0;
-  Rcpp::IntegerMatrix faces(nfaces, 3);
+  Rcpp::IntegerMatrix faces(3, nfaces);
   {
     size_t i = 0;
-    for(face_descriptor fa : mesh.faces()) {
+    Rcpp::IntegerVector face_i(3);
+    for(face_descriptor fd : mesh.faces()) {
       size_t j = 0;
       std::array<Point3, 3> fa_vertices;
       for(vertex_descriptor vd :
             vertices_around_face(mesh.halfedge(fa), mesh)) {
         const IPoint3 ivertex = mesh.point(vd);
-        faces(i, j) = ivertex.second;
+        face_i(j) = ivertex.second;
         fa_vertices[j] = ivertex.first;
         j++;
       }
+      faces(Rcpp::_, i) = face_i;
       const double area = sqrt(
         CGAL::squared_area(fa_vertices[0], fa_vertices[1], fa_vertices[2]));
       totalArea += area;
       areas(i) = area;
-      const CGAL::Vector_3<K> normal =
+      Rcpp::NumericVector normal_i(3);
+      const Vector3 normal =
         CGAL::unit_normal(fa_vertices[0], fa_vertices[1], fa_vertices[2]);
-      normals(i, 0) = normal.x();
-      normals(i, 1) = normal.y();
-      normals(i, 2) = normal.z();
+      normal_i(0) = normal.x();
+      normal_i(1) = normal.y();
+      normal_i(2) = normal.z();
+      normals(Rcpp::_, i) = normal_i;
+      Rcpp::NumericVector circumcenter_i(3);
       const Point3 circumcenter =
         CGAL::circumcenter(fa_vertices[0], fa_vertices[1], fa_vertices[2]);
-      circumcenters(i, 0) = circumcenter.x();
-      circumcenters(i, 1) = circumcenter.y();
-      circumcenters(i, 2) = circumcenter.z();
+      circumcenter_i(0) = circumcenter.x();
+      circumcenter_i(1) = circumcenter.y();
+      circumcenter_i(2) = circumcenter.z();
+      circumcenters(Rcpp::_, i) = circumcenter_i;
 
       i++;
     }
-    faces.attr("areas") = areas;
-    faces.attr("normals") = normals;
-    faces.attr("circumcenters") = circumcenters;
+    Rcpp::IntegerMatrix tfaces = Rcpp::transpose(faces);
+    tfaces.attr("areas") = areas;
+    tfaces.attr("normals") = Rcpp::transpose(normals);
+    tfaces.attr("circumcenters") = Rcpp::transpose(circumcenters);
     for(size_t k = 0; k < nfaces; ++k) {
-      const Rcpp::NumericVector center_k = circumcenters(k, Rcpp::_);
+      const Rcpp::NumericVector center_k = circumcenters(Rcpp::_, k);
       volume += areas(k) * std::inner_product(center_k.begin(), center_k.end(),
-                      normals(k, Rcpp::_).begin(), 0.0);
+                      normals(Rcpp::_, k).begin(), 0.0);
     }
     volume /= 3;
   }
 
   return Rcpp::List::create(
-    Rcpp::Named("vertices") = vertices, Rcpp::Named("edges") = edges,
-    Rcpp::Named("faces") = faces, Rcpp::Named("surface") = totalArea,
+    Rcpp::Named("vertices") = vertices, 
+    Rcpp::Named("edges") = Rcpp::transpose(edges),
+    Rcpp::Named("faces") = tfaces, Rcpp::Named("surface") = totalArea,
     Rcpp::Named("volume") = volume);
 }
 

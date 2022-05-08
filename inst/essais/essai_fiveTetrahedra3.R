@@ -36,7 +36,7 @@ vertices <-
     c( c,  0,  b),
     c(-a, -a, -a)
   )
-vertices <- round(vertices, 6)
+vertices <- round(vertices, 0)
 
 vs1 <- vertices[c(17, 14, 2, 11), ]
 vs2 <- vertices[c(18, 1, 4, 5), ]
@@ -98,7 +98,7 @@ iiii <- RCGAL:::Intersection_EK(
     mm,
     mmm
   ),
-  TRUE, FALSE, FALSE
+  FALSE, FALSE, FALSE
 )
 
 edg <- t(iiii$edges[1:2, iiii$edges[3,]==1])

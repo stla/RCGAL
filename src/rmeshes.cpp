@@ -258,29 +258,29 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
   }
   MeshT mesh = meshes[nmeshes - 1];
   Rcpp::List routmesh = RSurfMesh<KernelT, MeshT, PointT>(mesh, true, 0, exact);
-  const size_t nvertices = mesh.number_of_vertices();
-  Rcpp::NumericMatrix Normals(3, nvertices);
-  if(normals) {
+  // const size_t nvertices = mesh.number_of_vertices();
+  // Rcpp::NumericMatrix Normals(3, nvertices);
+  // if(normals) {
   //   if(exact) {
-      auto vnormals = mesh.add_property_map<typename MeshT::Vertex_index, typename KernelT::Vector_3>(
-                              "v:normals", CGAL::NULL_VECTOR)
-                          .first;
-      auto fnormals = mesh.add_property_map<typename MeshT::Face_index, typename KernelT::Vector_3>(
-                              "f:normals", CGAL::NULL_VECTOR)
-                          .first;
-      CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
-      {
-        size_t i = 0;
-        for(typename MeshT::Vertex_index vd : vertices(mesh)) {
-          Rcpp::NumericVector col_i(3);
-          const typename KernelT::Vector_3 normal = vnormals[vd];
-          col_i(0) = CGAL::to_double(normal.x());
-          col_i(1) = CGAL::to_double(normal.y());
-          col_i(2) = CGAL::to_double(normal.z());
-          Normals(Rcpp::_, i) = col_i;
-          i++;
-        }
-      }
+      // auto vnormals = mesh.add_property_map<typename MeshT::Vertex_index, typename KernelT::Vector_3>(
+      //                         "v:normals", CGAL::NULL_VECTOR)
+      //                     .first;
+      // auto fnormals = mesh.add_property_map<typename MeshT::Face_index, typename KernelT::Vector_3>(
+      //                         "f:normals", CGAL::NULL_VECTOR)
+      //                     .first;
+      // CGAL::Polygon_mesh_processing::compute_normals(mesh, vnormals, fnormals);
+      // {
+      //   size_t i = 0;
+      //   for(typename MeshT::Vertex_index vd : vertices(mesh)) {
+      //     Rcpp::NumericVector col_i(3);
+      //     const typename KernelT::Vector_3 normal = vnormals[vd];
+      //     col_i(0) = CGAL::to_double(normal.x());
+      //     col_i(1) = CGAL::to_double(normal.y());
+      //     col_i(2) = CGAL::to_double(normal.z());
+      //     Normals(Rcpp::_, i) = col_i;
+      //     i++;
+      //   }
+      // }
   //   } else {
   //     auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
   //                             "v:normals", CGAL::NULL_VECTOR)
@@ -302,8 +302,8 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
   //       }
   //     }
   //   }
-    routmesh["normals"] = Normals;
-  }
+  //  routmesh["normals"] = Normals;
+  //}
   return routmesh;
 }
 
