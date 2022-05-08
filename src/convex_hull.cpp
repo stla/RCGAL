@@ -168,6 +168,7 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts, double epsilon) {
   double totalArea = 0;
   double volume = 0;
   Rcpp::IntegerMatrix faces(3, nfaces);
+  Rcpp::IntegerMatrix tfaces;
   {
     size_t i = 0;
     Rcpp::IntegerVector face_i(3);
@@ -203,7 +204,7 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts, double epsilon) {
 
       i++;
     }
-    Rcpp::IntegerMatrix tfaces = Rcpp::transpose(faces);
+    tfaces = Rcpp::transpose(faces);
     tfaces.attr("areas") = areas;
     tfaces.attr("normals") = Rcpp::transpose(normals);
     tfaces.attr("circumcenters") = Rcpp::transpose(circumcenters);
