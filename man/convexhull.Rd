@@ -17,13 +17,10 @@ of the family for each face, or \code{NA} is the face is "alone" (has no
 coplanar neighbor); this is useful for plotting (see the examples in
 \code{\link{plotConvexHull3D}})}
 
-\item{epsilon}{for 3D only, a small nonnegative number; this number plays
-a role in the detection of border edges: an edge is considered as a
-non-border edge when there is approximate equality between the unit
-normals of the two adjacent faces of this edge, and \code{epsilon}
-defines the degree of the approximation (perfect equality corresponds to
-\code{epsilon=0}); the last example of \code{\link{plotConvexHull3D}}
-illustrates the usage of \code{epsilon}}
+\item{epsilon}{for 3D only, zero or a small nonnegative number; this number
+plays a role in the detection of exterior edges: a higher value of
+\code{epsilon} yields less exterior edges; the last example of
+\code{\link{plotConvexHull3D}} illustrates the usage of \code{epsilon}}
 }
 \value{
 The convex hull.
@@ -47,12 +44,13 @@ The convex hull.
         \describe{
           \item{\emph{vertices}}{A list which represents the vertices of the
                convex hull. This is a list of lists, each sublist represents
-               one vertice, by giving its index and its coordinates.}
-          \item{\emph{edges}}{An integer matrix with three columns,
+               one vertex, by giving its index and its coordinates.}
+          \item{\emph{edges}}{An integer matrix with two columns,
                representing the edges of the convex hull. So each row is
-               composed of three integers; the two first ones are the indices
-               the column named \code{border}, is a \code{0/1} indicator of
-               whether the edge is a border edge.}
+               composed of two integers: the indices
+                of the two points which form the edge.}
+          \item{\emph{exteriorEdges}}{An integer matrix with two columns,
+               representing the exterior edges of the convex hull.}
           \item{\emph{faces}}{A matrix of integers with three columns which
                represents the faces (these are triangles); each row provides
                the indices of the three points which form the face. This
