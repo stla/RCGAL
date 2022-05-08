@@ -140,10 +140,10 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts, double epsilon) {
       const Mesh::Halfedge_index h1 = mesh.halfedge(ed, 1);
       const vertex_descriptor v3 = mesh.target(mesh.next(h0));
       const vertex_descriptor v4 = mesh.target(mesh.next(h1));
-      const Point3 point1 = mesh.point(v1).second;
-      const Point3 point2 = mesh.point(v2).second;
-      const Point3 point3 = mesh.point(v3).second;
-      const Point3 point4 = mesh.point(v4).second;
+      const Point3 point1 = mesh.point(v1).first;
+      const Point3 point2 = mesh.point(v2).first;
+      const Point3 point3 = mesh.point(v3).first;
+      const Point3 point4 = mesh.point(v4).first;
       bool exterior;
       if(epsilon == 0) {
         exterior = !CGAL::coplanar(point1, point2, point3, point4);
@@ -175,7 +175,7 @@ Rcpp::List cxhull3d_cpp(Rcpp::NumericMatrix pts, double epsilon) {
       size_t j = 0;
       std::array<Point3, 3> fa_vertices;
       for(vertex_descriptor vd :
-            vertices_around_face(mesh.halfedge(fa), mesh)) {
+            vertices_around_face(mesh.halfedge(fd), mesh)) {
         const IPoint3 ivertex = mesh.point(vd);
         face_i(j) = ivertex.second;
         fa_vertices[j] = ivertex.first;
