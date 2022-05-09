@@ -312,6 +312,98 @@ MeshesIntersection <- function(
   inter
 }
 
+#' @title Meshes difference
+#' @description Computes the difference between two meshes.
+#'
+#' @param mesh1,mesh2 two \emph{triangular} meshes, each given as a list with
+#'   (at least) two fields: \code{vertices} and \code{faces}
+#' @param merge Boolean, whether to merge the duplicated vertices of the
+#'   input meshes and the output mesh
+#' @param normals Boolean, whether to return the per-vertex normals of the
+#'   output mesh
+#' @param exact Boolean, whether to use exact calculations; this is slower but
+#'   more accurate
+#'
+#' @return A triangular mesh given as a list with fields \code{vertices},
+#'   \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
+#'   if \code{normals=TRUE}.
+#'
+#' @importFrom rgl tmesh3d
+#' @importFrom Rvcg vcgUpdateNormals
+#'
+#' @export
+#'
+#' @examples
+#' library(RCGAL)
+#' library(rgl)
+#'
+#' # mesh one: a cube; one has to triangulate it
+#' cube1 <- cube3d() # (from the rgl package)
+#' vertices <- t(cube1$vb[-4L, ])
+#' faces <- t(cube1$ib)
+#' mesh1 <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
+#'
+#' # mesh two: another cube; one also has to triangulate it
+#' cube2 <- translate3d( # (from the rgl package)
+#'   cube3d(), 1, 1, 0
+#' )
+#' vertices <- t(cube2$vb[-4L, ])
+#' faces <- t(cube2$ib)
+#' mesh2 <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
+#'
+#' # compute the difference
+#' differ <- MeshesDifference(mesh1, mesh2)
+#'
+#' # plot
+#' rgldiffer <- tmesh3d(
+#'   vertices = t(differ[["vertices"]]),
+#'   indices = t(differ[["faces"]]),
+#'   homogeneous = FALSE
+#' )
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' shade3d(cube1, color = "yellow", alpha = 0.2)
+#' shade3d(cube2, color = "cyan", alpha = 0.2)
+#' shade3d(rgdiffer, color = "red")
+#' plotEdges(
+#'   vertices = differ[["vertices"]], edges = differ[["exteriorEdges"]],
+#'   edgesAsTubes = FALSE, lwd = 3, verticesAsSpheres = FALSE
+#' )
+MeshesDifference <- function(
+    mesh1, mesh2, merge = FALSE, normals = FALSE, exact = FALSE
+){
+  stopifnot(is.list(mesh1))
+  stopifnot(is.list(mesh2))
+  checkMesh1 <- checkMesh(mesh1[["vertices"]], mesh1[["faces"]])
+  if(!checkMesh1[["isTriangle"]]){
+    stop("The first mesh is not triangular.")
+  }
+  checkMesh2 <- checkMesh(mesh2[["vertices"]], mesh2[["faces"]])
+  if(!checkMesh2[["isTriangle"]]){
+    stop("The second mesh is not triangular.")
+  }
+  mesh1 <- checkMesh1[c("vertices", "faces")]
+  mesh2 <- checkMesh2[c("vertices", "faces")]
+  if(exact){
+    differ <- Difference_EK(mesh1, mesh2, merge, normals)
+  }else{
+    differ <- Difference_K(mesh1, mesh2, merge, normals)
+  }
+  differ[["vertices"]] <- t(differ[["vertices"]])
+  edges <- unname(t(differ[["edges"]]))
+  differ[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  differ[["edges"]] <- edges[, c(1L, 2L)]
+  differ[["faces"]] <- do.call(rbind, differ[["faces"]])
+  if(normals){
+    tmesh <- vcgUpdateNormals(tmesh3d(
+      vertices = t(differ[["vertices"]]),
+      indices = t(differ[["faces"]]),
+      homogeneous = FALSE
+    ))
+    differ[["normals"]] <- t(tmesh[["normals"]][-4L, ])
+  }
+  differ
+}
+
 #' @title Plot some edges
 #' @description Plot the given edges with \strong{rgl}.
 #'

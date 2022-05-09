@@ -2,6 +2,7 @@
 
 export(AFSreconstruction)
 export(Mesh)
+export(MeshesDifference)
 export(MeshesIntersection)
 export(PoissonReconstruction)
 export(convexhull)
