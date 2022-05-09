@@ -255,7 +255,7 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
     bool ok = CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(
         meshes[i - 1], mesh_i, meshes[i]);
     if(!ok){
-      Rcpp::stop("Intersection computation has failed.")
+      Rcpp::stop("Intersection computation has failed.");
     }
   }
   MeshT mesh = meshes[nmeshes - 1];
