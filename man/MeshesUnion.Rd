@@ -39,14 +39,14 @@ mesh1 <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
 
 # mesh two: another cube; one also has to triangulate it
 cube2 <- translate3d( # (from the rgl package)
-  cube3d(), 1, 1, 0
+  cube3d(), 1, 1, 1
 )
 vertices <- t(cube2$vb[-4L, ])
 faces <- t(cube2$ib)
 mesh2 <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
 
 # compute the union
-umesh <- MeshesUnion(mesh1, mesh2)
+umesh <- MeshesUnion(list(mesh1, mesh2))
 
 # plot
 rglumesh <- tmesh3d(
@@ -55,8 +55,6 @@ rglumesh <- tmesh3d(
   homogeneous = FALSE
 )
 open3d(windowRect = c(50, 50, 562, 562))
-shade3d(cube1, color = "yellow", alpha = 0.2)
-shade3d(cube2, color = "cyan", alpha = 0.2)
 shade3d(rglumesh, color = "red")
 plotEdges(
   vertices = umesh[["vertices"]], edges = umesh[["exteriorEdges"]],
