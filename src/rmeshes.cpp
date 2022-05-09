@@ -254,7 +254,9 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
     MeshT mesh_i = makeSurfMesh<MeshT, PointT>(points_i, faces_i, merge);
     bool ok = CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(
         meshes[i - 1], mesh_i, meshes[i]);
-    Rcpp::Rcout << "intersection: " << ok << "\n";
+    if(!ok){
+      Rcpp::stop("Intersection computation has failed.")
+    }
   }
   MeshT mesh = meshes[nmeshes - 1];
   Rcpp::List routmesh = RSurfMesh<KernelT, MeshT, PointT>(mesh, true, 0, exact);

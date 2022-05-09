@@ -35,7 +35,7 @@ shade3d(rglmesh1, color = "yellow", alpha = 0.2)
 shade3d(cube, color = "cyan", alpha = 0.2)
 shade3d(rglinter, color = "red")
 plotEdges(
-  vertices = inter$vertices, edges = inter$exteriorEdges,
+  vertices = inter[["vertices"]], edges = inter[["exteriorEdges"]],
   edgesAsTubes = FALSE, lwd = 3, verticesAsSpheres = FALSE
 )
 
