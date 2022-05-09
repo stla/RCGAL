@@ -6,7 +6,7 @@
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins(cpp14)]]
-//#define CGAL_EIGEN3_ENABLED
+#define CGAL_EIGEN3_ENABLED 1
 
 // #include <CGAL/assertions.h>
 // #undef CGAL_error
@@ -73,8 +73,8 @@
 
 #include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
 
-#include <CGAL/Nef_polyhedron_3.h>
-#include <CGAL/boost/graph/convert_nef_polyhedron_to_polygon_mesh.h>
+// #include <CGAL/Nef_polyhedron_3.h>
+// #include <CGAL/boost/graph/convert_nef_polyhedron_to_polygon_mesh.h>
 
 #include <CGAL/Polygon_mesh_processing/corefinement.h>
 
@@ -86,7 +86,7 @@
 #include <RcppEigen.h>
 #include <algorithm>
 #include <array>
-#include <limits>
+//#include <limits>
 #include <map>
 #include <vector>
 

@@ -159,34 +159,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Intersection_K
-Rcpp::List Intersection_K(const Rcpp::List rmeshes, const bool triangulate, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Intersection_K(SEXP rmeshesSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
-    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Intersection_K(rmeshes, triangulate, merge, normals));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Intersection_EK
-Rcpp::List Intersection_EK(const Rcpp::List rmeshes, const bool triangulate, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Intersection_EK(SEXP rmeshesSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
-    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Intersection_EK(rmeshes, triangulate, merge, normals));
-    return rcpp_result_gen;
-END_RCPP
-}
 // Intersection2_K
 Rcpp::List Intersection2_K(const Rcpp::List rmeshes, const bool merge, const bool normals);
 RcppExport SEXP _RCGAL_Intersection2_K(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
@@ -227,8 +199,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 7},
-    {"_RCGAL_Intersection_K", (DL_FUNC) &_RCGAL_Intersection_K, 4},
-    {"_RCGAL_Intersection_EK", (DL_FUNC) &_RCGAL_Intersection_EK, 4},
     {"_RCGAL_Intersection2_K", (DL_FUNC) &_RCGAL_Intersection2_K, 3},
     {"_RCGAL_Intersection2_EK", (DL_FUNC) &_RCGAL_Intersection2_EK, 3},
     {NULL, NULL, 0}
