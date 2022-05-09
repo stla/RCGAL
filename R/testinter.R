@@ -27,6 +27,7 @@ testinter <- function() {
       c( c,  0,  b),
       c(-a, -a, -a)
     )
+vertices <- round(vertices, 11)
 
   vs1 <- vertices[c(17, 14, 2, 11), ]
   vs2 <- vertices[c(18, 1, 4, 5), ]
