@@ -57,3 +57,11 @@ Intersection2_EK <- function(rmeshes, merge, normals) {
     .Call(`_RCGAL_Intersection2_EK`, rmeshes, merge, normals)
 }
 
+Difference_K <- function(rmesh1, rmesh2, merge, normals) {
+    .Call(`_RCGAL_Difference_K`, rmesh1, rmesh2, merge, normals)
+}
+
+Difference_EK <- function(rmesh1, rmesh2, merge, normals) {
+    .Call(`_RCGAL_Difference_EK`, rmesh1, rmesh2, merge, normals)
+}
+

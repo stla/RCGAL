@@ -177,6 +177,9 @@ typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign>
     Ivector;
 
 // -------------------------------------------------------------------------- //
+namespace PMP = CGAL::Polygon_mesh_processing;
+
+// -------------------------------------------------------------------------- //
 bool approxEqual(double, double, double);
 
 bool approxEqualVectors(Vector3, Vector3, double);
