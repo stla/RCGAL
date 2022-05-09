@@ -251,12 +251,36 @@ Rcpp::List Intersection2(const Rcpp::List rmeshes,  // must be triangles
   Rcpp::NumericMatrix points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
   Rcpp::List faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
   meshes[0] = makeSurfMesh<MeshT, PointT>(points, faces, merge);
+  const bool si0 = PMP::does_self_intersect(meshes[0]);
+  if(si0) {
+    std::string msg01 =
+        "Mesh n\u00b0" + std::to_string(1) + " self-intersects.";
+    Rcpp::stop(msg01);
+  }
+  const bool bv0 = PMP::does_bound_a_volume(meshes[0]);
+  if(!bv0) {
+    std::string msg02 =
+        "Mesh n\u00b0" + std::to_string(1) + " does not bound a volume.";
+    Rcpp::stop(msg02);
+  }
   for(size_t i = 1; i < nmeshes; i++) {
     Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
     Rcpp::NumericMatrix points_i =
         Rcpp::as<Rcpp::NumericMatrix>(rmesh_i["vertices"]);
     Rcpp::List faces_i = Rcpp::as<Rcpp::List>(rmesh_i["faces"]);
     MeshT mesh_i = makeSurfMesh<MeshT, PointT>(points_i, faces_i, merge);
+    const bool sii = PMP::does_self_intersect(mesh_i);
+    if(sii) {
+      std::string msgi1 =
+          "Mesh n\u00b0" + std::to_string(i + 1) + " self-intersects.";
+      Rcpp::stop(msgi1);
+    }
+    const bool bvi = PMP::does_bound_a_volume(mesh_i);
+    if(!bvi) {
+      std::string msgi2 =
+          "Mesh n\u00b0" + std::to_string(i + 1) + " does not bound a volume.";
+      Rcpp::stop(msgi2);
+    }
     bool ok = PMP::corefine_and_compute_intersection(meshes[i - 1], mesh_i,
                                                      meshes[i]);
     if(!ok) {

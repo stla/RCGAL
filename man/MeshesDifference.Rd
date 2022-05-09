@@ -60,8 +60,6 @@ shade3d(cube2, color = "cyan", alpha = 0.2)
 shade3d(rgldiffer, color = "red")
 plotEdges(
   vertices = differ[["vertices"]], edges = differ[["exteriorEdges"]],
-  edgesAsTubes = FALSE, lwd = 3, verticesAsSpheres = FALSE
+  edgesAsTubes = TRUE, verticesAsSpheres = TRUE
 )
-# one missing edge
-#   => try Mesh(differ[["vertices"]], differ[["faces"]], epsilon = ?)
 }

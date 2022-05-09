@@ -366,10 +366,8 @@ MeshesIntersection <- function(
 #' shade3d(rgldiffer, color = "red")
 #' plotEdges(
 #'   vertices = differ[["vertices"]], edges = differ[["exteriorEdges"]],
-#'   edgesAsTubes = FALSE, lwd = 3, verticesAsSpheres = FALSE
+#'   edgesAsTubes = TRUE, verticesAsSpheres = TRUE
 #' )
-#' # one missing edge
-#' #   => try Mesh(differ[["vertices"]], differ[["faces"]], epsilon = ?)
 MeshesDifference <- function(
     mesh1, mesh2, merge = FALSE, normals = FALSE, exact = FALSE
 ){
