@@ -470,3 +470,91 @@ plotEdges <- function(
   invisible(NULL)
 }
 
+#' @title Meshes union
+#' @description Computes the union of the given meshes.
+#'
+#' @param meshes a list of \emph{triangular} meshes, each given as a list with
+#'   (at least) two fields: \code{vertices} and \code{faces}
+#' @param merge Boolean, whether to merge the duplicated vertices of the
+#'   input meshes and the output mesh
+#' @param normals Boolean, whether to return the per-vertex normals of the
+#'   output mesh
+#' @param exact Boolean, whether to use exact calculations; this is slower but
+#'   more accurate
+#'
+#' @return A triangular mesh given as a list with fields \code{vertices},
+#'   \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
+#'   if \code{normals=TRUE}.
+#'
+#' @importFrom rgl tmesh3d
+#' @importFrom Rvcg vcgUpdateNormals
+#'
+#' @export
+#'
+#' @examples
+#' library(RCGAL)
+#' library(rgl)
+#'
+#' # mesh one: a cube; one has to triangulate it
+#' cube1 <- cube3d() # (from the rgl package)
+#' vertices <- t(cube1$vb[-4L, ])
+#' faces <- t(cube1$ib)
+#' mesh1 <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
+#'
+#' # mesh two: another cube; one also has to triangulate it
+#' cube2 <- translate3d( # (from the rgl package)
+#'   cube3d(), 1, 1, 0
+#' )
+#' vertices <- t(cube2$vb[-4L, ])
+#' faces <- t(cube2$ib)
+#' mesh2 <- Mesh(vertices, faces, triangulate = TRUE, normals = FALSE)
+#'
+#' # compute the union
+#' umesh <- MeshesUnion(mesh1, mesh2)
+#'
+#' # plot
+#' rglumesh <- tmesh3d(
+#'   vertices = t(umesh[["vertices"]]),
+#'   indices = t(umesh[["faces"]]),
+#'   homogeneous = FALSE
+#' )
+#' open3d(windowRect = c(50, 50, 562, 562))
+#' shade3d(cube1, color = "yellow", alpha = 0.2)
+#' shade3d(cube2, color = "cyan", alpha = 0.2)
+#' shade3d(rglumesh, color = "red")
+#' plotEdges(
+#'   vertices = umesh[["vertices"]], edges = umesh[["exteriorEdges"]],
+#'   edgesAsTubes = TRUE, verticesAsSpheres = TRUE
+#' )
+MeshesUnion <- function(
+    meshes, merge = FALSE, normals = FALSE, exact = FALSE
+){
+  stopifnot(is.list(meshes))
+  checkMeshes <- lapply(meshes, function(mesh){
+    checkMesh(mesh[["vertices"]], mesh[["faces"]])
+  })
+  areTriangle <- all(vapply(checkMeshes, `[[`, logical(1L), "isTriangle"))
+  if(!areTriangle){
+    stop("All meshes must be triangular.")
+  }
+  meshes <- lapply(checkMeshes, `[`, c("vertices", "faces"))
+  if(exact){
+    umesh <- Union_EK(meshes, merge, normals)
+  }else{
+    umesh <- Union_K(meshes, merge, normals)
+  }
+  umesh[["vertices"]] <- t(umesh[["vertices"]])
+  edges <- unname(t(umesh[["edges"]]))
+  umesh[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  umesh[["edges"]] <- edges[, c(1L, 2L)]
+  umesh[["faces"]] <- do.call(rbind, umesh[["faces"]])
+  if(normals){
+    tmesh <- vcgUpdateNormals(tmesh3d(
+      vertices = t(umesh[["vertices"]]),
+      indices = t(umesh[["faces"]]),
+      homogeneous = FALSE
+    ))
+    umesh[["normals"]] <- t(tmesh[["normals"]][-4L, ])
+  }
+  umesh
+}

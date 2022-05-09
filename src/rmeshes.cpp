@@ -411,3 +411,68 @@ Rcpp::List Difference_EK(const Rcpp::List rmesh1,
                          const bool normals) {
   return Difference<EK, EMesh3, EPoint3>(rmesh1, rmesh2, merge, normals, true);
 }
+
+template <typename KernelT, typename MeshT, typename PointT>
+Rcpp::List Union(const Rcpp::List rmeshes,  // must be triangles
+                 const bool merge,
+                 const bool normals,
+                 const bool exact) {
+  const size_t nmeshes = rmeshes.size();
+  std::vector<MeshT> meshes(nmeshes);
+  Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
+  Rcpp::NumericMatrix points = Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
+  Rcpp::List faces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
+  meshes[0] = makeSurfMesh<MeshT, PointT>(points, faces, merge);
+  const bool si0 = PMP::does_self_intersect(meshes[0]);
+  if(si0) {
+    std::string msg01 =
+        "Mesh n\u00b0" + std::to_string(1) + " self-intersects.";
+    Rcpp::stop(msg01);
+  }
+  const bool bv0 = PMP::does_bound_a_volume(meshes[0]);
+  if(!bv0) {
+    std::string msg02 =
+        "Mesh n\u00b0" + std::to_string(1) + " does not bound a volume.";
+    Rcpp::stop(msg02);
+  }
+  for(size_t i = 1; i < nmeshes; i++) {
+    Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
+    Rcpp::NumericMatrix points_i =
+        Rcpp::as<Rcpp::NumericMatrix>(rmesh_i["vertices"]);
+    Rcpp::List faces_i = Rcpp::as<Rcpp::List>(rmesh_i["faces"]);
+    MeshT mesh_i = makeSurfMesh<MeshT, PointT>(points_i, faces_i, merge);
+    const bool sii = PMP::does_self_intersect(mesh_i);
+    if(sii) {
+      std::string msgi1 =
+          "Mesh n\u00b0" + std::to_string(i + 1) + " self-intersects.";
+      Rcpp::stop(msgi1);
+    }
+    const bool bvi = PMP::does_bound_a_volume(mesh_i);
+    if(!bvi) {
+      std::string msgi2 =
+          "Mesh n\u00b0" + std::to_string(i + 1) + " does not bound a volume.";
+      Rcpp::stop(msgi2);
+    }
+    bool ok = PMP::corefine_and_compute_union(meshes[i - 1], mesh_i, meshes[i]);
+    if(!ok) {
+      Rcpp::stop("Union computation has failed.");
+    }
+  }
+  MeshT mesh = meshes[nmeshes - 1];
+  Rcpp::List routmesh = RSurfMesh<KernelT, MeshT, PointT>(mesh, true, 0, exact);
+  return routmesh;
+}
+
+// [[Rcpp::export]]
+Rcpp::List Union_K(const Rcpp::List rmeshes,
+                   const bool merge,
+                   const bool normals) {
+  return Union<K, Mesh3, Point3>(rmeshes, merge, normals, false);
+}
+
+// [[Rcpp::export]]
+Rcpp::List Union_EK(const Rcpp::List rmeshes,
+                    const bool merge,
+                    const bool normals) {
+  return Union<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
+}
