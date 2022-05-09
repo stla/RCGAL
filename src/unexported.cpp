@@ -245,7 +245,7 @@ MeshT makeSurfMesh(const Rcpp::NumericMatrix M,
         CGAL::Polygon_mesh_processing::merge_duplicate_points_in_polygon_soup(
             points, faces);
     const std::string msg = "Number of points removed: " + std::to_string(nremoved);
-    Rcpp::message(msg;
+    Rcpp::message(msg);
   }
   MeshT mesh;
   CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, faces,
