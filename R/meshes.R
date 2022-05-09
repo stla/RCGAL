@@ -53,7 +53,7 @@ checkMesh <- function(vertices, faces){
     stop("The `faces` argument must be a list or a matrix.")
   }
   list(
-    vertices = vertices,
+    vertices = t(vertices),
     faces = faces,
     homogeneousFaces = homogeneousFaces,
     isTriangle = isTriangle
@@ -182,7 +182,7 @@ Mesh <- function(
   homogeneousFaces <- checkedMesh[["homogeneousFaces"]]
   isTriangle <- checkedMesh[["isTriangle"]]
   mesh <- SurfMesh(
-    t(vertices), faces, isTriangle, triangulate, merge, normals, epsilon
+    vertices, faces, isTriangle, triangulate, merge, normals, epsilon
   )
   if(triangulate && isTriangle){
     message(
@@ -215,6 +215,62 @@ Mesh <- function(
     mesh[["faces"]] <- do.call(rbind, mesh[["faces"]])
   }
   mesh
+}
+
+#' @title Meshes intersection
+#' @description Computes the intersection of the given meshes.
+#'
+#' @param meshes a list of \emph{triangular} meshes, each given as a list with
+#'   (at least) two fields: \code{vertices} and \code{faces}
+#' @param merge Boolean, whether to merge the duplicated vertices of the
+#'   input meshes and the output mesh
+#' @param normals Boolean, whether to return the per-vertex normals of the
+#'   output mesh
+#' @param exact Boolean, whether to use exact calculations; this is slower but
+#'   more accurate
+#'
+#' @return A triangular mesh given as a list with fields \code{vertices},
+#'   \code{faces}, \code{edges} and \code{normals} if \code{normals=TRUE}.
+#'
+#' @importFrom rgl tmesh3d
+#' @importFrom Rvcg vcgUpdateNormals
+#'
+#' @export
+#'
+#' @examples
+#' library(RCGAL)
+#' library(rgl)
+MeshesIntersection <- function(
+    meshes, merge = FALSE, normals = FALSE, exact = FALSE
+){
+  stopifnot(is.list(meshes))
+  checkMeshes <- lapply(meshes, function(mesh){
+    checkMesh(mesh[["vertices"]], mesh[["faces"]])
+  })
+  areTriangle <- all(vapply(checkMeshes, `[[`, logical(1L), "isTriangle"))
+  if(!areTriangle){
+    stop("All meshes must be triangular.")
+  }
+  meshes <- lapply(checkMeshes, `[`, c("vertices", "faces"))
+  if(exact){
+    inter <- Intersection2_EK(meshes, merge, normals)
+  }else{
+    inter <- Intersection2_K(meshes, merge, normals)
+  }
+  inter[["vertices"]] <- t(inter[["vertices"]])
+  edges <- unname(t(inter[["edges"]]))
+  inter[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  inter[["edges"]] <- edges[, c(1L, 2L)]
+  inter[["faces"]] <- do.call(rbind, inter[["faces"]])
+  if(normals){
+    tmesh <- vcgUpdateNormals(tmesh3d(
+      vertices = t(inter[["vertices"]]),
+      indices = t(inter[["faces"]]),
+      homogeneous = FALSE
+    ))
+    inter[["normals"]] <- t(tmesh[["normals"]][-4L, ])
+  }
+  inter
 }
 
 #' @title Plot some edges
