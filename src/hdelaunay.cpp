@@ -19,7 +19,7 @@ size_t htest(std::vector<std::vector<double>> points){
 	}
 	HDt hdt;
 	hdt.insert(hpts.begin(), hpts.end());
-	for(HDt::Edge_iterator ed = hdt.all_edges_begin(); ed != hdt.all_edges_end(); ++ed){
+	for(HDt::All_edges_iterator ed = hdt.all_edges_begin(); ed != hdt.all_edges_end(); ++ed){
 		Rcpp::Rcout << source(ed, hdt);
 	}
 	return hdt.number_of_vertices();
