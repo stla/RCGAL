@@ -6,7 +6,7 @@
 #include <CGAL/Hyperbolic_Delaunay_triangulation_traits_2.h>
 #include <CGAL/Triangulation_vertex_base_with_id_2.h>
 
-typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<K> HDtt;
+typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<> HDtt;
 typedef HDtt::Point_2 HPoint;
 typedef CGAL::Triangulation_data_structure_2<
     CGAL::Triangulation_vertex_base_with_id_2<HDtt>,
@@ -19,7 +19,7 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
   //std::vector<std::pair<HPoint, unsigned>> hpts;
 
   std::vector<HPoint> hpts;
-  const unsigned npoints = points.size();
+  const unsigned npoints = points.ncol();
   hpts.reserve(npoints);
   for(unsigned i = 0; i != npoints; i++) {
     const Rcpp::NumericVector pt = points(Rcpp::_, i);
@@ -35,6 +35,7 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
       ed != hdt.all_edges_end(); ++ed) {
     Rcpp::IntegerVector edge_i(2);
     HDt::Vertex_handle sVertex = ed->first->vertex(HDt::cw(ed->second));
+    Rcpp::Rcout << sVertex->id();
     edge_i(0) = sVertex->id();
     HDt::Vertex_handle tVertex = ed->first->vertex(HDt::ccw(ed->second));
     edge_i(1) = tVertex->id();
