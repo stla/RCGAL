@@ -28,8 +28,9 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
   }
   HDt hdt;
   hdt.insert(hpts.begin(), hpts.end());
-  const nedges = hdt.number_of_hyperbolic_edges();
+  const size_t nedges = hdt.number_of_hyperbolic_edges();
   Rcpp::IntegerMatrix(2, nedges);
+  size_t i = 0;
   for(HDt::All_edges_iterator ed = hdt.all_edges_begin();
       ed != hdt.all_edges_end(); ++ed) {
     Rcpp::IntegerVector edge_i(2);
@@ -38,6 +39,7 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
     HDt::Vertex_handle tVertex = ed->first->vertex(HDt::ccw(ed->second));
     edge_i(1) = tVertex->id();
     Edges(Rcpp::_, i) = edge_i;
+    i++;
   }
   return Edges;
 }
