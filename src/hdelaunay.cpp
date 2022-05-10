@@ -18,7 +18,7 @@ size_t htest(std::vector<std::vector<double>> points){
 	hpts.reserve(npoints);
 	for(unsigned i=0; i != npoints; i++){
 		const std::vector<double> pt = points[i];
-		hpts.emplace_back(std::make_pair(HPoint(pt[0], pt[1]), i);
+		hpts.emplace_back(std::make_pair(HPoint(pt[0], pt[1]), i));
 	}
 	HDt hdt;
 	hdt.insert(hpts.begin(), hpts.end());
