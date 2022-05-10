@@ -29,7 +29,7 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
   HDt hdt;
   hdt.insert(hpts.begin(), hpts.end());
   const size_t nedges = hdt.number_of_hyperbolic_edges();
-  Rcpp::IntegerMatrix(2, nedges);
+  Rcpp::IntegerMatrix Edges(2, nedges);
   size_t i = 0;
   for(HDt::All_edges_iterator ed = hdt.all_edges_begin();
       ed != hdt.all_edges_end(); ++ed) {
