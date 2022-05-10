@@ -25,5 +25,5 @@ gyroABt <- function(A, B, t, s = 1){
 gyrosegment <- function(A, B, n = 50, s = 1){
   t(vapply(seq(0, 1, length.out = n), function(t){
     gyroABt(A, B, t, s = s)
-  }, numeric(3L)))
+  }, numeric(2L)))
 }

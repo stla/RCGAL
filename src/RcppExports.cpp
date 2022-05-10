@@ -80,7 +80,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // htest
-Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points);
+Rcpp::List htest(const Rcpp::NumericMatrix points);
 RcppExport SEXP _RCGAL_htest(SEXP pointsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
