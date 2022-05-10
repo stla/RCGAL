@@ -4,12 +4,12 @@
 
 #include <CGAL/Hyperbolic_Delaunay_triangulation_2.h>
 #include <CGAL/Hyperbolic_Delaunay_triangulation_traits_2.h>
-#include <CGAL/Triangulation_vertex_base_with_id_2.h>
+#include <CGAL/Triangulation_vertex_base_2.h>
 
-typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<> HDtt;
+typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<K> HDtt;
 typedef HDtt::Point_2 HPoint;
 typedef CGAL::Triangulation_data_structure_2<
-    CGAL::Triangulation_vertex_base_with_id_2<HDtt>,
+    CGAL::Triangulation_vertex_base_2<HDtt>,
     CGAL::Hyperbolic_triangulation_face_base_2<HDtt>>
     HTds;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
