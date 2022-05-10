@@ -110,13 +110,13 @@ parameter (0.05, 0.02, 0.005):
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/BooleanExamples/Intersection.png)
 
-#### Union
-
-![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/BooleanExamples/Union.png)
-
 #### Difference
 
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/BooleanExamples/Difference.png)
+
+#### Union
+
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/BooleanExamples/tetrahedraCompound.gif)
 
 
 ## License

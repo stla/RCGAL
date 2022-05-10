@@ -404,72 +404,6 @@ MeshesDifference <- function(
   differ
 }
 
-#' @title Plot some edges
-#' @description Plot the given edges with \strong{rgl}.
-#'
-#' @param vertices a three-columns matrix giving the coordinates of the vertices
-#' @param edges a two-columns integer matrix giving the edges by pairs of
-#'   vertex indices
-#' @param color a color for the edges
-#' @param lwd line width, a positive number, ignored if \code{edgesAsTubes=TRUE}
-#' @param edgesAsTubes Boolean, whether to draw the edges as tubes
-#' @param tubesRadius the radius of the tubes when \code{edgesAsTubes=TRUE}
-#' @param verticesAsSpheres Boolean, whether to draw the vertices as spheres
-#' @param spheresRadius the radius of the spheres when
-#'   \code{verticesAsSpheres=TRUE}
-#' @param spheresColor the color of the spheres when
-#'   \code{verticesAsSpheres=TRUE}
-#'
-#' @return No value.
-#'
-#' @importFrom rgl cylinder3d shade3d lines3d spheres3d
-#' @export
-#'
-#' @examples
-#' library(RCGAL)
-#' library(rgl)
-#' mesh <- Mesh(
-#'   truncatedIcosahedron[["vertices"]],
-#'   truncatedIcosahedron[["faces"]],
-#'   triangulate = TRUE, normals = FALSE
-#' )
-#' # now we can plot the truncated icosahedron
-#' tmesh <- tmesh3d(
-#'   vertices = t(mesh[["vertices"]]),
-#'   indices = t(mesh[["faces"]]),
-#'   homogeneous = FALSE
-#' )
-#' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
-#' shade3d(tmesh, color = "gold")
-#' plotEdges(mesh[["vertices"]], mesh[["edges0"]], color = "navy")
-plotEdges <- function(
-  vertices,
-  edges,
-  color = "black",
-  lwd = 2,
-  edgesAsTubes = TRUE,
-  tubesRadius = 0.03,
-  verticesAsSpheres = TRUE,
-  spheresRadius = 0.05,
-  spheresColor = color
-){
-  for(i in 1L:nrow(edges)){
-    edge <- edges[i, ]
-    if(edgesAsTubes){
-      tube <- cylinder3d(
-        vertices[edge, ], radius = tubesRadius, sides = 90
-      )
-      shade3d(tube, color = color)
-    }else{
-      lines3d(vertices[edge, ], color = color, lwd = lwd)
-    }
-  }
-  if(verticesAsSpheres){
-    spheres3d(vertices, radius = spheresRadius, color = spheresColor)
-  }
-  invisible(NULL)
-}
-
 #' @title Meshes union
 #' @description Computes the union of the given meshes.
 #'
@@ -555,4 +489,70 @@ MeshesUnion <- function(
     umesh[["normals"]] <- t(tmesh[["normals"]][-4L, ])
   }
   umesh
+}
+
+#' @title Plot some edges
+#' @description Plot the given edges with \strong{rgl}.
+#'
+#' @param vertices a three-columns matrix giving the coordinates of the vertices
+#' @param edges a two-columns integer matrix giving the edges by pairs of
+#'   vertex indices
+#' @param color a color for the edges
+#' @param lwd line width, a positive number, ignored if \code{edgesAsTubes=TRUE}
+#' @param edgesAsTubes Boolean, whether to draw the edges as tubes
+#' @param tubesRadius the radius of the tubes when \code{edgesAsTubes=TRUE}
+#' @param verticesAsSpheres Boolean, whether to draw the vertices as spheres
+#' @param spheresRadius the radius of the spheres when
+#'   \code{verticesAsSpheres=TRUE}
+#' @param spheresColor the color of the spheres when
+#'   \code{verticesAsSpheres=TRUE}
+#'
+#' @return No value.
+#'
+#' @importFrom rgl cylinder3d shade3d lines3d spheres3d
+#' @export
+#'
+#' @examples
+#' library(RCGAL)
+#' library(rgl)
+#' mesh <- Mesh(
+#'   truncatedIcosahedron[["vertices"]],
+#'   truncatedIcosahedron[["faces"]],
+#'   triangulate = TRUE, normals = FALSE
+#' )
+#' # now we can plot the truncated icosahedron
+#' tmesh <- tmesh3d(
+#'   vertices = t(mesh[["vertices"]]),
+#'   indices = t(mesh[["faces"]]),
+#'   homogeneous = FALSE
+#' )
+#' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
+#' shade3d(tmesh, color = "gold")
+#' plotEdges(mesh[["vertices"]], mesh[["edges0"]], color = "navy")
+plotEdges <- function(
+    vertices,
+    edges,
+    color = "black",
+    lwd = 2,
+    edgesAsTubes = TRUE,
+    tubesRadius = 0.03,
+    verticesAsSpheres = TRUE,
+    spheresRadius = 0.05,
+    spheresColor = color
+){
+  for(i in 1L:nrow(edges)){
+    edge <- edges[i, ]
+    if(edgesAsTubes){
+      tube <- cylinder3d(
+        vertices[edge, ], radius = tubesRadius, sides = 90
+      )
+      shade3d(tube, color = color)
+    }else{
+      lines3d(vertices[edge, ], color = color, lwd = lwd)
+    }
+  }
+  if(verticesAsSpheres){
+    spheres3d(vertices, radius = spheresRadius, color = spheresColor)
+  }
+  invisible(NULL)
 }
