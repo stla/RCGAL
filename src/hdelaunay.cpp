@@ -4,6 +4,7 @@
 
 #include <CGAL/Hyperbolic_Delaunay_triangulation_2.h>
 #include <CGAL/Hyperbolic_Delaunay_triangulation_traits_2.h>
+#include <CGAL/Triangulation_vertex_base_with_id_2.h>
 
 typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<K> HDtt;
 typedef HDtt::Point_2 HPoint;
@@ -30,6 +31,8 @@ size_t htest(std::vector<std::vector<double>> points) {
       ed != hdt.all_edges_end(); ++ed) {
     HDt::Vertex_handle sVertex = ed->first->vertex(HDt::cw(ed->second));
     Rcpp::Rcout << sVertex->id();
+    HDt::Vertex_handle tVertex = ed->first->vertex(HDt::ccw(ed->second));
+    Rcpp::Rcout << tVertex->id();
   }
   return hdt.number_of_vertices();
 }
