@@ -116,6 +116,8 @@ parameter (0.05, 0.02, 0.005):
 
 #### Union
 
+![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/BooleanExamples/Union.png)
+
 ![](https://raw.githubusercontent.com/stla/RCGAL/main/inst/BooleanExamples/tetrahedraCompound.gif)
 
 
