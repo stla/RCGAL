@@ -8,7 +8,7 @@
 typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<K> HDtt;
 typedef HDtt::Point_2 HPoint;
 typedef CGAL::Triangulation_data_structure_2<
-    CGAL::Triangulation_vertex_base_with_info_2<unsigned, HDtt>,
+    CGAL::Triangulation_vertex_base_with_info_2<unsigned, K>,
     CGAL::Hyperbolic_triangulation_face_base_2<HDtt>>
     HTds;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
