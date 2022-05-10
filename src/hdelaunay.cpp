@@ -4,8 +4,9 @@
 
 #include <CGAL/Hyperbolic_Delaunay_triangulation_2.h>
 #include <CGAL/Hyperbolic_Delaunay_triangulation_traits_2.h>
-#include <CGAL/Triangulation_face_base_with_id_2.h>
+//#include <CGAL/Triangulation_face_base_with_id_2.h>
 #include <CGAL/Triangulation_vertex_base_with_id_2.h>
+#include <CGAL/boost/graph/graph_traits_Delaunay_triangulation_2.h>
 
 typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<> HDtt;
 typedef HDtt::Point_2 HPoint;
@@ -14,6 +15,7 @@ typedef CGAL::Triangulation_data_structure_2<
     CGAL::Hyperbolic_triangulation_face_base_2<HDtt>>
     HTds;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
+typedef boost::graph_traits<HDt>::vertex_descriptor hvertex_descriptor;
 
 // [[Rcpp::export]]
 Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
@@ -28,8 +30,12 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
     hpts.emplace_back(HPoint(pt(0), pt(1)));
   }
   HDt hdt;
+  //CGAL::set_triangulation_ids(hdt);
   hdt.insert(hpts.begin(), hpts.end());
-  CGAL::set_triangulation_ids(hdt);
+  int index = 0;
+  for(hvertex_descriptor vd : vertices(hdt)){
+    vd->id() = index++;
+  }
   const size_t nedges = hdt.number_of_hyperbolic_edges();
   Rcpp::IntegerMatrix Edges(2, nedges);
   size_t i = 0;
