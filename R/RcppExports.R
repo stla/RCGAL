@@ -25,6 +25,10 @@ del2d_constrained_cpp <- function(pts, edges) {
     .Call(`_RCGAL_del2d_constrained_cpp`, pts, edges)
 }
 
+htest <- function(points) {
+    .Call(`_RCGAL_htest`, points)
+}
+
 jet_normals_cpp <- function(pts, nb_neighbors) {
     .Call(`_RCGAL_jet_normals_cpp`, pts, nb_neighbors)
 }
