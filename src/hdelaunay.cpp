@@ -8,27 +8,28 @@
 typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<K> HDtt;
 typedef HDtt::Point_2 HPoint;
 typedef CGAL::Triangulation_data_structure_2<
-    CGAL::Triangulation_vertex_base_with_info_2<unsigned, K>,
+    CGAL::Triangulation_vertex_base_with_id_2<HDtt>,
     CGAL::Hyperbolic_triangulation_face_base_2<HDtt>>
     HTds;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
 
 size_t htest(std::vector<std::vector<double>> points) {
-  std::vector<std::pair<HPoint, unsigned>> hpts;
+  //std::vector<std::pair<HPoint, unsigned>> hpts;
 
-  // std::vector<HPoint> hpts;
+  std::vector<HPoint> hpts;
   const unsigned npoints = points.size();
   hpts.reserve(npoints);
   for(unsigned i = 0; i != npoints; i++) {
     const std::vector<double> pt = points[i];
-    hpts.emplace_back(std::make_pair(HPoint(pt[0], pt[1]), i));
+    //hpts.emplace_back(std::make_pair(HPoint(pt[0], pt[1]), i));
+    hpts.emplace_back(HPoint(pt[0], pt[1]));
   }
   HDt hdt;
   hdt.insert(hpts.begin(), hpts.end());
   for(HDt::All_edges_iterator ed = hdt.all_edges_begin();
       ed != hdt.all_edges_end(); ++ed) {
     HDt::Vertex_handle sVertex = ed->first->vertex(HDt::cw(ed->second));
-    Rcpp::Rcout << sVertex->info();
+    Rcpp::Rcout << sVertex->id();
   }
   return hdt.number_of_vertices();
 }
