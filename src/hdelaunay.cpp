@@ -29,7 +29,7 @@ Rcpp::IntegerMatrix htest(const Rcpp::NumericMatrix points) {
   }
   HDt hdt;
   hdt.insert(hpts.begin(), hpts.end());
-  CGAL::set_triangulation_ids(hdt&);
+  CGAL::set_triangulation_ids(hdt);
   const size_t nedges = hdt.number_of_hyperbolic_edges();
   Rcpp::IntegerMatrix Edges(2, nedges);
   size_t i = 0;
