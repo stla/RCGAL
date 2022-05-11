@@ -15,8 +15,8 @@ typedef CGAL::Triangulation_data_structure_2<
     CGAL::Hyperbolic_triangulation_face_base_2<HDtt>>
     HTds;
 typedef CGAL::Triangulation_data_structure_2<
-  CGAL::Triangulation_vertex_base_with_id_2<EHDtt>,
-  CGAL::Hyperbolic_triangulation_face_base_2<EHDtt>>
+    CGAL::Triangulation_vertex_base_with_id_2<EHDtt>,
+    CGAL::Hyperbolic_triangulation_face_base_2<EHDtt>>
     EHTds;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<EHDtt, EHTds> EHDt;
@@ -51,9 +51,11 @@ Rcpp::List hdelaunay(const Rcpp::NumericMatrix points) {
     for(typename HDtT::All_edges_iterator ed = hdt.all_edges_begin();
         ed != hdt.all_edges_end(); ++ed) {
       Rcpp::IntegerVector edge_i(2);
-      HDtT::Vertex_handle sVertex = ed->first->vertex(HDtT::cw(ed->second));
+      typename HDtT::Vertex_handle sVertex =
+          ed->first->vertex(HDtT::cw(ed->second));
       edge_i(0) = sVertex->id();
-      HDtT::Vertex_handle tVertex = ed->first->vertex(HDtT::ccw(ed->second));
+      typename HDtT::Vertex_handle tVertex =
+          ed->first->vertex(HDtT::ccw(ed->second));
       edge_i(1) = tVertex->id();
       Edges(Rcpp::_, i) = edge_i;
       i++;
