@@ -21,34 +21,34 @@ typedef CGAL::Triangulation_data_structure_2<
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<EHDtt, EHTds> EHDt;
 
-// [[Rcpp::export]]
-Rcpp::List htest(const Rcpp::NumericMatrix points) {
-  std::vector<HPoint> hpts;
+template <typename HDtT, typename HPointT>
+Rcpp::List hdelaunay(const Rcpp::NumericMatrix points) {
+  std::vector<HPointT> hpts;
   const unsigned npoints = points.ncol();
   hpts.reserve(npoints);
   for(unsigned i = 0; i != npoints; i++) {
     const Rcpp::NumericVector pt = points(Rcpp::_, i);
-    hpts.emplace_back(HPoint(pt(0), pt(1)));
+    hpts.emplace_back(HPointT(pt(0), pt(1)));
   }
-  HDt hdt;
+  HDtT hdt;
   hdt.insert(hpts.begin(), hpts.end());
   Rcpp::NumericMatrix Vertices(2, hdt.number_of_vertices());
   {
-    int index = 1;
-    for(HDt::All_vertices_iterator vd = hdt.all_vertices_begin();
+    int index = 0;
+    for(typename HDtT::All_vertices_iterator vd = hdt.all_vertices_begin();
         vd != hdt.all_vertices_end(); ++vd) {
-      vd->id() = index;
-      HPoint pt = vd->point();
+      HPointT pt = vd->point();
       Vertices(0, index) = pt.x();
       Vertices(1, index) = pt.y();
       index++;
+      vd->id() = index;
     }
   }
   const size_t nedges = hdt.number_of_hyperbolic_edges();
   Rcpp::IntegerMatrix Edges(2, nedges);
   {
     size_t i = 0;
-    for(HDt::All_edges_iterator ed = hdt.all_edges_begin();
+    for(typename HDtT::All_edges_iterator ed = hdt.all_edges_begin();
         ed != hdt.all_edges_end(); ++ed) {
       Rcpp::IntegerVector edge_i(2);
       HDt::Vertex_handle sVertex = ed->first->vertex(HDt::cw(ed->second));
@@ -63,15 +63,12 @@ Rcpp::List htest(const Rcpp::NumericMatrix points) {
   Rcpp::IntegerMatrix Faces(3, nfaces);
   {
     size_t i = 0;
-    for(HDt::All_faces_iterator fd = hdt.all_faces_begin();
+    for(typename HDtT::All_faces_iterator fd = hdt.all_faces_begin();
         fd != hdt.all_faces_end(); ++fd) {
       Rcpp::IntegerVector face_i(3);
       face_i(0) = fd->vertex(0)->id();
       face_i(1) = fd->vertex(1)->id();
       face_i(2) = fd->vertex(2)->id();
-      // for(HDt::Vertex_index vd : vertices_around_face(hdt.halfedge(fd), hdt)) {
-      //   face_i.push_back(vd + 1);
-      // }
       Faces(Rcpp::_, i) = face_i;
       i++;
     }
@@ -79,4 +76,14 @@ Rcpp::List htest(const Rcpp::NumericMatrix points) {
   return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,
                             Rcpp::Named("faces") = Faces);
+}
+
+// [[Rcpp::export]]
+Rcpp::List hdelaunay_K(const Rcpp::NumericMatrix points) {
+  return hdelaunay<HDt, HPoint>(points);
+}
+
+// [[Rcpp::export]]
+Rcpp::List hdelaunay_EK(const Rcpp::NumericMatrix points) {
+  return hdelaunay<EHDt, EHPoint>(points);
 }

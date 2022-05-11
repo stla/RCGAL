@@ -79,14 +79,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// htest
-Rcpp::List htest(const Rcpp::NumericMatrix points);
-RcppExport SEXP _RCGAL_htest(SEXP pointsSEXP) {
+// hdelaunay_K
+Rcpp::List hdelaunay_K(const Rcpp::NumericMatrix points);
+RcppExport SEXP _RCGAL_hdelaunay_K(SEXP pointsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
-    rcpp_result_gen = Rcpp::wrap(htest(points));
+    rcpp_result_gen = Rcpp::wrap(hdelaunay_K(points));
+    return rcpp_result_gen;
+END_RCPP
+}
+// hdelaunay_EK
+Rcpp::List hdelaunay_EK(const Rcpp::NumericMatrix points);
+RcppExport SEXP _RCGAL_hdelaunay_EK(SEXP pointsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
+    rcpp_result_gen = Rcpp::wrap(hdelaunay_EK(points));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -258,7 +269,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_del3d_cpp", (DL_FUNC) &_RCGAL_del3d_cpp, 1},
     {"_RCGAL_del2d_xy_cpp", (DL_FUNC) &_RCGAL_del2d_xy_cpp, 1},
     {"_RCGAL_del2d_constrained_cpp", (DL_FUNC) &_RCGAL_del2d_constrained_cpp, 2},
-    {"_RCGAL_htest", (DL_FUNC) &_RCGAL_htest, 1},
+    {"_RCGAL_hdelaunay_K", (DL_FUNC) &_RCGAL_hdelaunay_K, 1},
+    {"_RCGAL_hdelaunay_EK", (DL_FUNC) &_RCGAL_hdelaunay_EK, 1},
     {"_RCGAL_jet_normals_cpp", (DL_FUNC) &_RCGAL_jet_normals_cpp, 2},
     {"_RCGAL_pca_normals_cpp", (DL_FUNC) &_RCGAL_pca_normals_cpp, 2},
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
