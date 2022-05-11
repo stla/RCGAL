@@ -7,5 +7,5 @@
 CXX_STD = CXX14
 PKG_LIBS = -lmpfr -lgmp 
 #-Wl,--whole-archive -lpthread -Wl,--no-whole-archive
-PKG_CPPFLAGS=-UNDEBUG
+#PKG_CPPFLAGS=-UNDEBUG
 
