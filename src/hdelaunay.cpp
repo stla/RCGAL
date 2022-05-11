@@ -51,9 +51,9 @@ Rcpp::List hdelaunay(const Rcpp::NumericMatrix points) {
     for(typename HDtT::All_edges_iterator ed = hdt.all_edges_begin();
         ed != hdt.all_edges_end(); ++ed) {
       Rcpp::IntegerVector edge_i(2);
-      HDt::Vertex_handle sVertex = ed->first->vertex(HDt::cw(ed->second));
+      HDtT::Vertex_handle sVertex = ed->first->vertex(HDtT::cw(ed->second));
       edge_i(0) = sVertex->id();
-      HDt::Vertex_handle tVertex = ed->first->vertex(HDt::ccw(ed->second));
+      HDtT::Vertex_handle tVertex = ed->first->vertex(HDtT::ccw(ed->second));
       edge_i(1) = tVertex->id();
       Edges(Rcpp::_, i) = edge_i;
       i++;
