@@ -7,12 +7,19 @@
 #include <CGAL/Triangulation_vertex_base_with_id_2.h>
 
 typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<K> HDtt;
+typedef CGAL::Hyperbolic_Delaunay_triangulation_traits_2<EK> EHDtt;
 typedef HDtt::Point_2 HPoint;
+typedef EHDtt::Point_2 EHPoint;
 typedef CGAL::Triangulation_data_structure_2<
     CGAL::Triangulation_vertex_base_with_id_2<HDtt>,
     CGAL::Hyperbolic_triangulation_face_base_2<HDtt>>
     HTds;
+typedef CGAL::Triangulation_data_structure_2<
+  CGAL::Triangulation_vertex_base_with_id_2<EHDtt>,
+  CGAL::Hyperbolic_triangulation_face_base_2<EHDtt>>
+    EHTds;
 typedef CGAL::Hyperbolic_Delaunay_triangulation_2<HDtt, HTds> HDt;
+typedef CGAL::Hyperbolic_Delaunay_triangulation_2<EHDtt, EHTds> EHDt;
 
 // [[Rcpp::export]]
 Rcpp::List htest(const Rcpp::NumericMatrix points) {
@@ -55,13 +62,13 @@ Rcpp::List htest(const Rcpp::NumericMatrix points) {
   const size_t nfaces = hdt.number_of_hyperbolic_faces();
   Rcpp::IntegerMatrix Faces(3, nfaces);
   {
-    // size_t i = 0;
+    size_t i = 0;
     for(HDt::All_faces_iterator fd = hdt.all_faces_begin();
         fd != hdt.all_faces_end(); ++fd) {
       Rcpp::IntegerVector face_i(3);
-      face_i(0) = fd->vertex(0) + 1;
-      face_i(1) = fd->vertex(1) + 1;
-      face_i(2) = fd->vertex(2) + 1;
+      face_i(0) = fd->vertex(0)->id();
+      face_i(1) = fd->vertex(1)->id();
+      face_i(2) = fd->vertex(2)->id();
       // for(HDt::Vertex_index vd : vertices_around_face(hdt.halfedge(fd), hdt)) {
       //   face_i.push_back(vd + 1);
       // }

@@ -20,7 +20,7 @@ plot(
 plotrix::draw.circle(0, 0, radius = 1, border = "black")
 points(points, pch = 19, cex = 0.9)
 for(i in 1L:nrow(hedges)){
-  hedge <- hedges[i, ] + 1L
+  hedge <- hedges[i, ]
   hsegment <- RCGAL:::gyrosegment(points[hedge[1L], ], points[hedge[2L], ])
   lines(hsegment, lty = "solid", col = "red", lwd = 2)
 }
