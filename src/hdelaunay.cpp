@@ -38,8 +38,8 @@ Rcpp::List hdelaunay(const Rcpp::NumericMatrix points) {
     for(typename HDtT::All_vertices_iterator vd = hdt.all_vertices_begin();
         vd != hdt.all_vertices_end(); ++vd) {
       HPointT pt = vd->point();
-      Vertices(0, index) = pt.x();
-      Vertices(1, index) = pt.y();
+      Vertices(0, index) = CGAL::to_double(pt.x());
+      Vertices(1, index) = CGAL::to_double(pt.y());
       index++;
       vd->id() = index;
     }
