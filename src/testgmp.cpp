@@ -100,8 +100,8 @@ int testgmp() {
         if(PMP::corefine_and_compute_intersection(inter1234, mesh5,
                                                   inter12345)) {
           std::cout << "Final intersection successfully computed.\n";
-          CGAL::IO::write_polygon_mesh("inter_tetrahedra.off", inter12345,
-                                       CGAL::parameters::stream_precision(17));
+          // CGAL::IO::write_polygon_mesh("inter_tetrahedra.off", inter12345,
+          //                              CGAL::parameters::stream_precision(17));
           return 0;
         } else {
           std::cout << "Final intersection failed.\n";
