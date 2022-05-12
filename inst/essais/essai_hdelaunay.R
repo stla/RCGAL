@@ -5,7 +5,7 @@ library(rsvg)
 path <- "C:/SL/MyPackages/RCGAL/inst/trash/"
 
 points <- runif_in_sphere(11L, d = 2)
-hh <- RCGAL:::htest(t(points))
+hh <- RCGAL:::hdelaunay_EK(t(points))
 hedges <- t(hh$edges)
 hfaces <- t(hh$faces)
 points <- t(hh$vertices)
