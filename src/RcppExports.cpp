@@ -261,6 +261,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// testgmp
+int testgmp();
+RcppExport SEXP _RCGAL_testgmp() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(testgmp());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
@@ -283,6 +293,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_Difference_EK", (DL_FUNC) &_RCGAL_Difference_EK, 4},
     {"_RCGAL_Union_K", (DL_FUNC) &_RCGAL_Union_K, 3},
     {"_RCGAL_Union_EK", (DL_FUNC) &_RCGAL_Union_EK, 3},
+    {"_RCGAL_testgmp", (DL_FUNC) &_RCGAL_testgmp, 0},
     {NULL, NULL, 0}
 };
 
