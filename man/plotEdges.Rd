@@ -12,6 +12,7 @@ plotEdges(
   edgesAsTubes = TRUE,
   tubesRadius = 0.03,
   verticesAsSpheres = TRUE,
+  only = NULL,
   spheresRadius = 0.05,
   spheresColor = color
 )
@@ -31,6 +32,9 @@ vertex indices}
 \item{tubesRadius}{the radius of the tubes when \code{edgesAsTubes=TRUE}}
 
 \item{verticesAsSpheres}{Boolean, whether to draw the vertices as spheres}
+
+\item{only}{integer vector made of the indices of the vertices you want
+to plot (as spheres), or \code{NULL} to plot all vertices}
 
 \item{spheresRadius}{the radius of the spheres when
 \code{verticesAsSpheres=TRUE}}

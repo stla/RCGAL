@@ -6,18 +6,25 @@
 #' @param n a positive integer, the higher the better approximation
 #' @param ... ignored
 #'
-#' @return A \strong{gmp} rational number (class \code{\link[gmp]{bigq}})
-#'   approximating the square root of \code{x}.
+#' @return The \code{qsqrt} function returns a \strong{gmp} rational number
+#'   (class \code{\link[gmp]{bigq}}) approximating the square root of
+#'   \code{x}. The \code{qsqrt2}, \code{qsqrt3}, and \code{qsqrtPhi} functions
+#'   return a \strong{gmp} rational number approximating the square root of
+#'   \code{2}, \code{3}, and \code{phi} (the golden number) respectively.
+#'   Their value converge more fastly than the value obtained with \code{qsqrt}.
 #'
 #' @importFrom gmp as.bigz as.bigq asNumeric matrix.bigq `%*%`
 #'
-#' @aliases qsqrt print.qsqrt
+#' @aliases qsqrt qsqrt2 qsqrt3 qsqrtPhi print.qsqrt
 #' @rdname qsqrt
 #' @export
 #'
 #' @examples
 #' library(RCGAL)
 #' qsqrt(2, 7)
+#' qsqrt2(7)
+#' qsqrt3(22)
+#' qsqrtPhi(17)
 qsqrt <- function(x, n){
   stopifnot(isPositiveInteger(x))
   stopifnot(isStrictPositiveInteger(n))
@@ -27,6 +34,50 @@ qsqrt <- function(x, n){
   zs <- c(gmp::`%*%`(A %^% n, c(zero, one)))
   out <- as.bigq(zs[2L], zs[1L]) - 1L
   attr(out, "error") <- abs(asNumeric(out) - sqrt(x))
+  class(out) <- c("qsqrt", class(out))
+  out
+}
+
+#' @rdname qsqrt
+#' @export
+qsqrt2 <- function(n){
+  stopifnot(isStrictPositiveInteger(n) && n >= 2)
+  out <- as.bigq(99L, 70L) + Reduce(add.bigq, sapply(2L:n, function(i){
+    numer <- 10L * prod(1L - 2L*(0L:(i-1L)))
+    denom <- 7L * factorialZ(i) * as.bigz(-100L)^i
+    as.bigq(numer, denom)
+  }))
+  attr(out, "error") <- abs(asNumeric(out) - sqrt(2))
+  class(out) <- c("qsqrt", class(out))
+  out
+}
+
+#' @rdname qsqrt
+#' @export
+qsqrt3 <- function(n){
+  stopifnot(isStrictPositiveInteger(n) && n >= 2)
+  out <- as.bigq(7L, 4L) + Reduce(add.bigq, sapply(2L:n, function(i){
+    as.bigq(
+      2L * prod(1L - 2L*(0L:(i-1L))),
+      factorialZ(i) * as.bigz(-8L)^i
+    )
+  }))
+  attr(out, "error") <- abs(asNumeric(out) - sqrt(3))
+  class(out) <- c("qsqrt", class(out))
+  out
+}
+
+#' @rdname qsqrt
+#' @export
+qsqrtPhi <- function(n){
+  stopifnot(isStrictPositiveInteger(n) && n >= 2)
+  out <- as.bigq(13L, 8L) + Reduce(add.bigq, sapply(2L:n, function(i){
+    as.bigq(
+      10L * prod(1L - 2L*(0L:(i-1L))),
+      as.bigz(8L) * factorialZ(i) * as.bigz(-10L)^(i)
+    )
+  }))
+  attr(out, "error") <- abs(asNumeric(out) - (1+sqrt(5))/2)
   class(out) <- c("qsqrt", class(out))
   out
 }
@@ -371,7 +422,9 @@ MeshesIntersection <- function(
   }
   inter[["vertices"]] <- vertices
   edges <- unname(t(inter[["edges"]]))
-  inter[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  exteriorEdges <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  inter[["exteriorEdges"]] <- exteriorEdges
+  inter[["exteriorVertices"]] <- which(table(exteriorEdges) != 2L)
   inter[["edges"]] <- edges[, c(1L, 2L)]
   inter[["faces"]] <- do.call(rbind, inter[["faces"]])
   if(normals){
@@ -605,6 +658,8 @@ MeshesUnion <- function(
 #' @param edgesAsTubes Boolean, whether to draw the edges as tubes
 #' @param tubesRadius the radius of the tubes when \code{edgesAsTubes=TRUE}
 #' @param verticesAsSpheres Boolean, whether to draw the vertices as spheres
+#' @param only integer vector made of the indices of the vertices you want
+#'   to plot (as spheres), or \code{NULL} to plot all vertices
 #' @param spheresRadius the radius of the spheres when
 #'   \code{verticesAsSpheres=TRUE}
 #' @param spheresColor the color of the spheres when
@@ -640,6 +695,7 @@ plotEdges <- function(
     edgesAsTubes = TRUE,
     tubesRadius = 0.03,
     verticesAsSpheres = TRUE,
+    only = NULL,
     spheresRadius = 0.05,
     spheresColor = color
 ){
@@ -655,6 +711,9 @@ plotEdges <- function(
     }
   }
   if(verticesAsSpheres){
+    if(!is.null(only)){
+      vertices <- vertices[only, ]
+    }
     spheres3d(vertices, radius = spheresRadius, color = spheresColor)
   }
   invisible(NULL)

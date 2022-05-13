@@ -2,10 +2,19 @@
 % Please edit documentation in R/meshes.R
 \name{qsqrt}
 \alias{qsqrt}
+\alias{qsqrt2}
+\alias{qsqrt3}
+\alias{qsqrtPhi}
 \alias{print.qsqrt}
 \title{Rational approximation of square roots}
 \usage{
 qsqrt(x, n)
+
+qsqrt2(n)
+
+qsqrt3(n)
+
+qsqrtPhi(n)
 
 \method{print}{qsqrt}(x, ...)
 }
@@ -17,8 +26,12 @@ qsqrt(x, n)
 \item{...}{ignored}
 }
 \value{
-A \strong{gmp} rational number (class \code{\link[gmp]{bigq}})
-  approximating the square root of \code{x}.
+The \code{qsqrt} function returns a \strong{gmp} rational number
+  (class \code{\link[gmp]{bigq}}) approximating the square root of
+  \code{x}. The \code{qsqrt2}, \code{qsqrt3}, and \code{qsqrtPhi} functions
+  return a \strong{gmp} rational number approximating the square root of
+  \code{2}, \code{3}, and \code{phi} (the golden number) respectively.
+  Their value converge more fastly than the value obtained with \code{qsqrt}.
 }
 \description{
 Returns a rational approximation of the square root of
@@ -27,4 +40,7 @@ Returns a rational approximation of the square root of
 \examples{
 library(RCGAL)
 qsqrt(2, 7)
+qsqrt2(7)
+qsqrt3(22)
+qsqrtPhi(17)
 }
