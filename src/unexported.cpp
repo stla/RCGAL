@@ -529,7 +529,7 @@ Rcpp::List getFaces(MeshT mesh) {
 Rcpp::List RSurfKMesh(Mesh3 mesh, const bool isTriangle, const double epsilon) {
   Rcpp::IntegerMatrix Edges =
       getEdges<K, Mesh3, Point3>(mesh, isTriangle, epsilon);
-  Rcpp::NumericMatrix Vertices = getVerticesK(mesh);
+  Rcpp::NumericMatrix Vertices = getVertices_K(mesh);
   Rcpp::List Faces = getFaces<Mesh3>(mesh);
   return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,
@@ -541,7 +541,7 @@ Rcpp::List RSurfEKMesh(EMesh3 mesh,
                        const double epsilon) {
   Rcpp::IntegerMatrix Edges =
       getEdges<EK, EMesh3, EPoint3>(mesh, isTriangle, epsilon);
-  Rcpp::NumericMatrix Vertices = getVerticesEK(mesh);
+  Rcpp::NumericMatrix Vertices = getVertices_EK(mesh);
   Rcpp::List Faces = getFaces<EMesh3>(mesh);
   return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,
@@ -553,7 +553,7 @@ Rcpp::List RSurfQMesh(QMesh3 mesh,
                       const double epsilon) {
   Rcpp::IntegerMatrix Edges =
       getEdges<QK, QMesh3, QPoint3>(mesh, isTriangle, epsilon);
-  Rcpp::CharacterMatrix Vertices = getVerticesQK(mesh);
+  Rcpp::CharacterMatrix Vertices = getVertices_QK(mesh);
   Rcpp::List Faces = getFaces<QMesh3>(mesh);
   return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,

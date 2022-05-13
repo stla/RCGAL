@@ -51,11 +51,15 @@ as.bigq(1L, 4L) * (as.bigq(7L)  + Reduce("+", sapply(2:11, u), 0L))
 library(gmp)
 
 qsqrt <- function(x, n){
+  # stopifnot(isPositiveInteger(x) || x == 0)
+  # stopifnot(isPositiveInteger(n))
   zero <- as.bigz(0L)
   one <- as.bigz(1L)
-  P <- as.bigz(2L)
-  zX <- as.bigz(x)
-  A <- matrix(c(zero, zX-1L, one, P), nrow = 2L, ncol = 2L)
+  A <- matrix(c(zero, as.bigz(x)-1L, one, as.bigz(2L)), nrow = 2L, ncol = 2L)
   zs <- c((A %^% n) %*% c(zero, one))
-  as.bigq(zs[2L], zs[1L]) - 1L
+  out <- as.bigq(zs[2L], zs[1L]) - 1L
+  attr(out, "error") <- abs(asNumeric(out) - sqrt(x))
+  out
 }
+
+qsqrt(3, 7)
