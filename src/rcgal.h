@@ -174,7 +174,8 @@ typedef CDT::Face_handle CDFace_handle;
 //typedef CGAL::Nef_polyhedron_3<EK> Nef;
 
 typedef CGAL::Cartesian<boost::multiprecision::mpq_rational> QK;
-typedef CGAL::Surface_mesh<QK::Point_3> QMesh;
+typedef CGAL::Surface_mesh<QK::Point_3> QMesh3;
+typedef QK::Point_3 QPoint3;
 
 typedef Rcpp::NumericVector Dvector;
 
@@ -219,15 +220,21 @@ void mark_domains(CDT&);
 // Rcpp::List RPolyMesh(Polyhedron);
 
 template <typename MeshT, typename PointT>
-MeshT makeSurfMesh(const Rcpp::NumericMatrix, const Rcpp::List, const bool);
+MeshT makeSurfMesh(const Rcpp::List, const bool);
+
+QMesh3 makeSurfQMesh(const Rcpp::List, const bool);
 
 template <typename MeshT>
-Rcpp::IntegerMatrix getEdges(MeshT);
+Rcpp::IntegerMatrix getEdges1(MeshT);
+
+Rcpp::List RSurfKMesh(Mesh3, const bool, const double);
+Rcpp::List RSurfEKMesh(EMesh3, const bool, const double);
+Rcpp::List RSurfQMesh(QMesh3, const bool, const double);
 
 //template <typename KernelT, typename MeshT, typename PointT>
 //Rcpp::IntegerMatrix getEdges2(MeshT, const double);
 
-template <typename KernelT, typename MeshT, typename PointT>
-Rcpp::List RSurfMesh(MeshT, const bool, const double, const bool);
+// template <typename KernelT, typename MeshT, typename PointT>
+// Rcpp::List RSurfMesh(MeshT, const bool, const double, const bool);
 
 // Mesh3 Poly2Mesh3(Polyhedron);

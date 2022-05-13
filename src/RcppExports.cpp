@@ -11,6 +11,27 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// rgmp
+Rcpp::StringVector rgmp(Rcpp::StringVector vin);
+RcppExport SEXP _RCGAL_rgmp(SEXP vinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type vin(vinSEXP);
+    rcpp_result_gen = Rcpp::wrap(rgmp(vin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// testgmp
+int testgmp();
+RcppExport SEXP _RCGAL_testgmp() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(testgmp());
+    return rcpp_result_gen;
+END_RCPP
+}
 // cxhull2d_cpp
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts);
 RcppExport SEXP _RCGAL_cxhull2d_cpp(SEXP ptsSEXP) {
@@ -165,19 +186,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // SurfMesh
-Rcpp::List SurfMesh(const Rcpp::NumericMatrix points, const Rcpp::List faces, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
-RcppExport SEXP _RCGAL_SurfMesh(SEXP pointsSEXP, SEXP facesSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
+Rcpp::List SurfMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
+RcppExport SEXP _RCGAL_SurfMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type points(pointsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List >::type faces(facesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh(rmeshSEXP);
     Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
     Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
     Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfMesh(points, faces, isTriangle, triangulate, merge, normals, epsilon));
+    rcpp_result_gen = Rcpp::wrap(SurfMesh(rmesh, isTriangle, triangulate, merge, normals, epsilon));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -204,6 +224,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
     rcpp_result_gen = Rcpp::wrap(Intersection2_EK(rmeshes, merge, normals));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Intersection_Q
+Rcpp::List Intersection_Q(const Rcpp::List rmeshes, const bool merge, const bool normals);
+RcppExport SEXP _RCGAL_Intersection_Q(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Intersection_Q(rmeshes, merge, normals));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -261,29 +294,10 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rgmp
-Rcpp::CharacterVector rgmp(Rcpp::CharacterVector in);
-RcppExport SEXP _RCGAL_rgmp(SEXP inSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type in(inSEXP);
-    rcpp_result_gen = Rcpp::wrap(rgmp(in));
-    return rcpp_result_gen;
-END_RCPP
-}
-// testgmp
-int testgmp();
-RcppExport SEXP _RCGAL_testgmp() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(testgmp());
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_RCGAL_rgmp", (DL_FUNC) &_RCGAL_rgmp, 1},
+    {"_RCGAL_testgmp", (DL_FUNC) &_RCGAL_testgmp, 0},
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
     {"_RCGAL_cxhull3d_cpp", (DL_FUNC) &_RCGAL_cxhull3d_cpp, 2},
     {"_RCGAL_del2d_cpp", (DL_FUNC) &_RCGAL_del2d_cpp, 1},
@@ -297,15 +311,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_cpp, 1},
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
-    {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 7},
+    {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 6},
     {"_RCGAL_Intersection2_K", (DL_FUNC) &_RCGAL_Intersection2_K, 3},
     {"_RCGAL_Intersection2_EK", (DL_FUNC) &_RCGAL_Intersection2_EK, 3},
+    {"_RCGAL_Intersection_Q", (DL_FUNC) &_RCGAL_Intersection_Q, 3},
     {"_RCGAL_Difference_K", (DL_FUNC) &_RCGAL_Difference_K, 4},
     {"_RCGAL_Difference_EK", (DL_FUNC) &_RCGAL_Difference_EK, 4},
     {"_RCGAL_Union_K", (DL_FUNC) &_RCGAL_Union_K, 3},
     {"_RCGAL_Union_EK", (DL_FUNC) &_RCGAL_Union_EK, 3},
-    {"_RCGAL_rgmp", (DL_FUNC) &_RCGAL_rgmp, 1},
-    {"_RCGAL_testgmp", (DL_FUNC) &_RCGAL_testgmp, 0},
     {NULL, NULL, 0}
 };
 
