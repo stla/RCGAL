@@ -3,12 +3,12 @@
 #endif
 
 // [[Rcpp::export]]
-Rcpp::CharacterVector rgmp(Rcpp::CharacterVector in){
+Rcpp::StringVector rgmp(Rcpp::StringVector in){
 	std::string xs = in(0);
 	mp::mpq_rational xq(xs);
 	mp::mpq_rational doublex = 2 * xq;
 	std::string sres = doublex.convert_to<std::string>();
-	Rcpp::CharacterVector out(1);
+	Rcpp::StringVector out(1);
 	out(0) = sres;
 	return out;
 }
