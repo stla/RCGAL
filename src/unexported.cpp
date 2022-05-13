@@ -245,19 +245,6 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
 // }
 
 template <typename MeshT, typename PointT>
-MeshT makeSurfMesh(const Rcpp::List rmesh, const bool merge) {
-  const Rcpp::NumericMatrix vertices =
-      Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
-  const Rcpp::List rfaces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
-  std::vector<PointT> points = matrix_to_points3<PointT>(vertices);
-  std::vector<std::vector<size_t>> faces = list_to_faces(rfaces);
-  return soup2mesh<MeshT, PointT>(points, faces, merge);
-}
-
-template Mesh3 makeSurfMesh<Mesh3, Point3>(const Rcpp::List, const bool);
-template EMesh3 makeSurfMesh<EMesh3, EPoint3>(const Rcpp::List, const bool);
-
-template <typename MeshT, typename PointT>
 MeshT soup2mesh(std::vector<PointT> points,
                 std::vector<std::vector<size_t>> faces,
                 const bool merge) {
@@ -276,6 +263,19 @@ MeshT soup2mesh(std::vector<PointT> points,
   PMP::polygon_soup_to_polygon_mesh(points, faces, mesh);
   return mesh;
 }
+
+template <typename MeshT, typename PointT>
+MeshT makeSurfMesh(const Rcpp::List rmesh, const bool merge) {
+  const Rcpp::NumericMatrix vertices =
+      Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
+  const Rcpp::List rfaces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
+  std::vector<PointT> points = matrix_to_points3<PointT>(vertices);
+  std::vector<std::vector<size_t>> faces = list_to_faces(rfaces);
+  return soup2mesh<MeshT, PointT>(points, faces, merge);
+}
+
+template Mesh3 makeSurfMesh<Mesh3, Point3>(const Rcpp::List, const bool);
+template EMesh3 makeSurfMesh<EMesh3, EPoint3>(const Rcpp::List, const bool);
 
 QMesh3 makeSurfQMesh(const Rcpp::List rmesh, const bool merge) {
   const Rcpp::CharacterMatrix vertices =
