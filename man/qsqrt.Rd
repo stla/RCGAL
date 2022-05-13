@@ -3,7 +3,7 @@
 \name{qsqrt}
 \alias{qsqrt}
 \alias{print.qsqrt}
-\title{Title}
+\title{Rational approximation of square roots}
 \usage{
 qsqrt(x, n)
 
@@ -21,7 +21,8 @@ A \strong{gmp} rational number (class \code{\link[gmp]{bigq}})
   approximating the square root of \code{x}.
 }
 \description{
-Title
+Returns a rational approximation of the square root of
+  an integer.
 }
 \examples{
 library(RCGAL)

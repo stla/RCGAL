@@ -40,17 +40,21 @@ print.qsqrt <- function(x, ...){
   invisible(NULL)
 }
 
-#' @importFrom gmp is.bigq
+#' @importFrom gmp is.bigq is.matrixZQ
 #' @importFrom data.table uniqueN
 #' @noRd
 checkMesh <- function(vertices, faces, gmp){
-  if(!is.matrix(vertices) || ncol(vertices) != 3L){
-    stop("The `vertices` argument must be a matrix with three columns.")
-  }
   if(gmp){
+    if(!is.matrixZQ(vertices) || ncol(vertices) != 3L){
+      stop("The `vertices` argument must be a matrix with three columns.")
+    }
     stopifnot(is.bigq(vertices))
     vertices <- as.character(vertices)
   }else{
+    if(!is.matrix(vertices) || ncol(vertices) != 3L){
+      stop("The `vertices` argument must be a matrix with three columns.")
+    }
+    stopifnot(is.numeric(vertices))
     storage.mode(vertices) <- "double"
   }
   if(anyNA(vertices)){
@@ -227,7 +231,7 @@ Mesh <- function(
   epsilon = 0
 ){
   stopifnot(epsilon >= 0)
-  checkedMesh <- checkMesh(vertices, faces)
+  checkedMesh <- checkMesh(vertices, faces, gmp = FALSE)
   vertices <- checkedMesh[["vertices"]]
   faces <- checkedMesh[["faces"]]
   homogeneousFaces <- checkedMesh[["homogeneousFaces"]]
@@ -358,10 +362,12 @@ MeshesIntersection <- function(
   }else{
     inter <- Intersection_Q(meshes, merge, normals)
   }
-  vertices <- t(inter[["vertices"]])
   if(gmp){
-    inter[["gmpVertices"]] <- as.bigq(vertices)
+    vertices <- as.bigq(t(inter[["vertices"]]))
+    inter[["gmpVertices"]] <- vertices
     vertices <- asNumeric(vertices)
+  }else{
+    vertices <- t(inter[["vertices"]])
   }
   inter[["vertices"]] <- vertices
   edges <- unname(t(inter[["edges"]]))

@@ -367,7 +367,7 @@ Rcpp::List Intersection_Q(const Rcpp::List rmeshes,  // must be triangles
       Rcpp::stop("Intersection computation has failed.");
     }
   }
-  return RSurfQMesh(meshes[nmeshes - 1], merge, 0);
+  return RSurfQMesh(meshes[nmeshes - 1], true, 0);
 }
 
 template <typename KernelT, typename MeshT, typename PointT>
@@ -484,5 +484,5 @@ Rcpp::List Union_Q(const Rcpp::List rmeshes,  // must be triangles
       Rcpp::stop("Union computation has failed.");
     }
   }
-  return RSurfQMesh(meshes[nmeshes - 1], merge, 0);
+  return RSurfQMesh(meshes[nmeshes - 1], true, 0);
 }
