@@ -9,7 +9,6 @@
 //   return RPolyMesh(mesh);
 // }
 
-
 // [[Rcpp::export]]
 Rcpp::List SurfMesh(const Rcpp::List rmesh,
                     const bool isTriangle,
@@ -29,8 +28,7 @@ Rcpp::List SurfMesh(const Rcpp::List rmesh,
       Rcpp::stop("Triangulation has failed.");
     }
   }
-  Rcpp::List routmesh = RSurfKMesh(
-      mesh, isTriangle || triangulate, epsilon);
+  Rcpp::List routmesh = RSurfKMesh(mesh, isTriangle || triangulate, epsilon);
   if(really_triangulate) {
     routmesh["edges0"] = Edges0;
   }
@@ -241,11 +239,10 @@ success = CGAL::Polygon_mesh_processing::triangulate_faces(mesh); if(!success){
 // }
 
 template <typename MeshT>
-void checkMesh(MeshT mesh, size_t i){
+void checkMesh(MeshT mesh, size_t i) {
   const bool si = PMP::does_self_intersect(mesh);
   if(si) {
-    std::string msg =
-        "Mesh n\u00b0" + std::to_string(i) + " self-intersects.";
+    std::string msg = "Mesh n\u00b0" + std::to_string(i) + " self-intersects.";
     Rcpp::stop(msg);
   }
   const bool bv = PMP::does_bound_a_volume(mesh);
@@ -258,17 +255,23 @@ void checkMesh(MeshT mesh, size_t i){
 
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Intersection2(const Rcpp::List rmeshes,  // must be triangles
-                         const bool merge,
-                         const bool normals) {
+                    const bool merge,
+                    const bool normals,
+                    const bool exact) {
   const size_t nmeshes = rmeshes.size();
   std::vector<MeshT> meshes(nmeshes);
   Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
   meshes[0] = makeSurfMesh<MeshT, PointT>(rmesh, merge);
-  checkMesh<MeshT>(meshes[0], 1);
+  if(exact) {
+    checkMesh<MeshT>(meshes[0], 1);
+  }
   for(size_t i = 1; i < nmeshes; i++) {
+    if(!exact) {
+      checkMesh<MeshT>(meshes[i - 1], i);
+    }
     Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
     MeshT mesh_i = makeSurfMesh<MeshT, PointT>(rmesh_i, merge);
-    checkMesh<MeshT>(mesh_i, i+1);
+    checkMesh<MeshT>(mesh_i, i + 1);
     bool ok = PMP::corefine_and_compute_intersection(meshes[i - 1], mesh_i,
                                                      meshes[i]);
     if(!ok) {
@@ -333,7 +336,7 @@ MeshT Intersection2(const Rcpp::List rmeshes,  // must be triangles
 Rcpp::List Intersection2_K(const Rcpp::List rmeshes,
                            const bool merge,
                            const bool normals) {
-  Mesh3 mesh = Intersection2<K, Mesh3, Point3>(rmeshes, merge, normals);
+  Mesh3 mesh = Intersection2<K, Mesh3, Point3>(rmeshes, merge, normals, false);
   return RSurfKMesh(mesh, true, 0);
 }
 
@@ -341,14 +344,14 @@ Rcpp::List Intersection2_K(const Rcpp::List rmeshes,
 Rcpp::List Intersection2_EK(const Rcpp::List rmeshes,
                             const bool merge,
                             const bool normals) {
-  EMesh3 = Intersection2<EK, EMesh3, EPoint3>(rmeshes, merge, normals);
+  EMesh3 = Intersection2<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
   return RSurfEKMesh(mesh, true, 0);
 }
 
 // [[Rcpp::export]]
 Rcpp::List Intersection_Q(const Rcpp::List rmeshes,  // must be triangles
-                         const bool merge,
-                         const bool normals) {
+                          const bool merge,
+                          const bool normals) {
   const size_t nmeshes = rmeshes.size();
   std::vector<QMesh3> meshes(nmeshes);
   Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
@@ -367,16 +370,15 @@ Rcpp::List Intersection_Q(const Rcpp::List rmeshes,  // must be triangles
   return RSurfQMesh(meshes[nmeshes - 1], merge, 0);
 }
 
-
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Difference(const Rcpp::List rmesh1,  // must be triangles
-                      const Rcpp::List rmesh2,
-                      const bool merge,
-                      const bool normals) {
+                 const Rcpp::List rmesh2,
+                 const bool merge,
+                 const bool normals) {
   MeshT smesh1 = makeSurfMesh<MeshT, PointT>(rmesh1, merge);
-  checkMesh<MeshT>(smesh1, 1); 
+  checkMesh<MeshT>(smesh1, 1);
   MeshT smesh2 = makeSurfMesh<MeshT, PointT>(rmesh2, merge);
-  checkMesh<MeshT>(smesh2, 2); 
+  checkMesh<MeshT>(smesh2, 2);
   MeshT outmesh;
   bool ok = PMP::corefine_and_compute_difference(smesh1, smesh2, outmesh);
   if(!ok) {
@@ -405,8 +407,8 @@ Rcpp::List Difference_EK(const Rcpp::List rmesh1,
 
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Union(const Rcpp::List rmeshes,  // must be triangles
-                 const bool merge,
-                 const bool normals) {
+            const bool merge,
+            const bool normals) {
   const size_t nmeshes = rmeshes.size();
   std::vector<MeshT> meshes(nmeshes);
   Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
@@ -415,7 +417,7 @@ MeshT Union(const Rcpp::List rmeshes,  // must be triangles
   for(size_t i = 1; i < nmeshes; i++) {
     Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
     MeshT mesh_i = makeSurfMesh<MeshT, PointT>(rmesh_i, merge);
-    checkMesh<MeshT>(mesh_i, i+1);
+    checkMesh<MeshT>(mesh_i, i + 1);
     bool ok = PMP::corefine_and_compute_union(meshes[i - 1], mesh_i, meshes[i]);
     if(!ok) {
       Rcpp::stop("Union computation has failed.");

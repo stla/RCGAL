@@ -20,28 +20,28 @@ int testgmp() {
   mp::mpq_rational b = a / phi;
   mp::mpq_rational c = a * phi;
 
-  QMesh mesh1, mesh2, mesh3, mesh4, mesh5;
+  QMesh3 mesh1, mesh2, mesh3, mesh4, mesh5;
 
-  QMesh::Vertex_index v0 = mesh1.add_vertex(QK::Point_3(0, b, c));
-  QMesh::Vertex_index v1 = mesh1.add_vertex(QK::Point_3(b, -c, 0));
-  QMesh::Vertex_index v2 = mesh1.add_vertex(QK::Point_3(a, a, -a));
-  QMesh::Vertex_index v3 = mesh1.add_vertex(QK::Point_3(-c, 0, b));
-  QMesh::Vertex_index v4 = mesh2.add_vertex(QK::Point_3(a, -a, -a));
-  QMesh::Vertex_index v5 = mesh2.add_vertex(QK::Point_3(a, a, a));
-  QMesh::Vertex_index v6 = mesh2.add_vertex(QK::Point_3(-a, -a, a));
-  QMesh::Vertex_index v7 = mesh2.add_vertex(QK::Point_3(-a, a, -a));
-  QMesh::Vertex_index v8 = mesh3.add_vertex(QK::Point_3(c, 0, b));
-  QMesh::Vertex_index v9 = mesh3.add_vertex(QK::Point_3(-a, a, a));
-  QMesh::Vertex_index v10 = mesh3.add_vertex(QK::Point_3(-b, -c, 0));
-  QMesh::Vertex_index v11 = mesh3.add_vertex(QK::Point_3(0, b, -c));
-  QMesh::Vertex_index v12 = mesh4.add_vertex(QK::Point_3(a, -a, a));
-  QMesh::Vertex_index v13 = mesh4.add_vertex(QK::Point_3(b, c, 0));
-  QMesh::Vertex_index v14 = mesh4.add_vertex(QK::Point_3(-c, 0, b));
-  QMesh::Vertex_index v15 = mesh4.add_vertex(QK::Point_3(0, -b, -c));
-  QMesh::Vertex_index v16 = mesh5.add_vertex(QK::Point_3(-a, -a, -a));
-  QMesh::Vertex_index v17 = mesh5.add_vertex(QK::Point_3(-b, c, 0));
-  QMesh::Vertex_index v18 = mesh5.add_vertex(QK::Point_3(c, 0, -b));
-  QMesh::Vertex_index v19 = mesh5.add_vertex(QK::Point_3(0, -b, c));
+  QMesh3::Vertex_index v0 = mesh1.add_vertex(QK::Point_3(0, b, c));
+  QMesh3::Vertex_index v1 = mesh1.add_vertex(QK::Point_3(b, -c, 0));
+  QMesh3::Vertex_index v2 = mesh1.add_vertex(QK::Point_3(a, a, -a));
+  QMesh3::Vertex_index v3 = mesh1.add_vertex(QK::Point_3(-c, 0, b));
+  QMesh3::Vertex_index v4 = mesh2.add_vertex(QK::Point_3(a, -a, -a));
+  QMesh3::Vertex_index v5 = mesh2.add_vertex(QK::Point_3(a, a, a));
+  QMesh3::Vertex_index v6 = mesh2.add_vertex(QK::Point_3(-a, -a, a));
+  QMesh3::Vertex_index v7 = mesh2.add_vertex(QK::Point_3(-a, a, -a));
+  QMesh3::Vertex_index v8 = mesh3.add_vertex(QK::Point_3(c, 0, b));
+  QMesh3::Vertex_index v9 = mesh3.add_vertex(QK::Point_3(-a, a, a));
+  QMesh3::Vertex_index v10 = mesh3.add_vertex(QK::Point_3(-b, -c, 0));
+  QMesh3::Vertex_index v11 = mesh3.add_vertex(QK::Point_3(0, b, -c));
+  QMesh3::Vertex_index v12 = mesh4.add_vertex(QK::Point_3(a, -a, a));
+  QMesh3::Vertex_index v13 = mesh4.add_vertex(QK::Point_3(b, c, 0));
+  QMesh3::Vertex_index v14 = mesh4.add_vertex(QK::Point_3(-c, 0, b));
+  QMesh3::Vertex_index v15 = mesh4.add_vertex(QK::Point_3(0, -b, -c));
+  QMesh3::Vertex_index v16 = mesh5.add_vertex(QK::Point_3(-a, -a, -a));
+  QMesh3::Vertex_index v17 = mesh5.add_vertex(QK::Point_3(-b, c, 0));
+  QMesh3::Vertex_index v18 = mesh5.add_vertex(QK::Point_3(c, 0, -b));
+  QMesh3::Vertex_index v19 = mesh5.add_vertex(QK::Point_3(0, -b, c));
 
   mesh1.add_face(v0, v1, v2);
   mesh1.add_face(v2, v1, v3);
@@ -64,7 +64,7 @@ int testgmp() {
   mesh5.add_face(v19, v17, v16);
   mesh5.add_face(v16, v18, v19);
 
-  QMesh inter12;
+  QMesh3 inter12;
   if(PMP::corefine_and_compute_intersection(mesh1, mesh2, inter12)) {
     std::cout << "Intersection th1-th2 successfully computed.\n";
     if(PMP::does_self_intersect(inter12)) {
@@ -75,7 +75,7 @@ int testgmp() {
       std::cout << "Intersection th1-th2 does not bound a volume.\n";
       return 0;
     }
-    QMesh inter34;
+    QMesh3 inter34;
     if(PMP::corefine_and_compute_intersection(mesh3, mesh4, inter34)) {
       std::cout << "Intersection th3-th4 successfully computed.\n";
       if(PMP::does_self_intersect(inter34)) {
@@ -86,7 +86,7 @@ int testgmp() {
         std::cout << "Intersection th3-th4 does not bound a volume.\n";
         return 0;
       }
-      QMesh inter1234;
+      QMesh3 inter1234;
       if(PMP::corefine_and_compute_intersection(inter12, inter34, inter1234)) {
         std::cout << "Intersection th1-th2-th3-th4 successfully computed.\n";
         if(PMP::does_self_intersect(inter1234)) {
@@ -98,7 +98,7 @@ int testgmp() {
               << "Intersection th1-th2-th3-th4 does not bound a volume.\n";
           return 0;
         }
-        QMesh inter12345;
+        QMesh3 inter12345;
         if(PMP::corefine_and_compute_intersection(inter1234, mesh5,
                                                   inter12345)) {
           std::cout << "Final intersection successfully computed.\n";

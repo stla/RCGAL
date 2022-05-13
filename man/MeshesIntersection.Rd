@@ -4,7 +4,7 @@
 \alias{MeshesIntersection}
 \title{Meshes intersection}
 \usage{
-MeshesIntersection(meshes, merge = FALSE, normals = FALSE, exact = FALSE)
+MeshesIntersection(meshes, merge = FALSE, normals = FALSE, numbersType = "double")
 }
 \arguments{
 \item{meshes}{a list of \emph{triangular} meshes, each given as a list with
@@ -16,7 +16,7 @@ input meshes and the output mesh}
 \item{normals}{Boolean, whether to return the per-vertex normals of the
 output mesh}
 
-\item{exact}{Boolean, whether to use exact calculations; this is slower but
+\item{numbersType}{Boolean, whether to use exact calculations; this is slower but
 more accurate}
 }
 \value{

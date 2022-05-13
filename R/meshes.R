@@ -226,13 +226,14 @@ Mesh <- function(
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param exact Boolean, whether to use exact calculations; this is slower but
+#' @param numbersType Boolean, whether to use exact calculations; this is slower but
 #'   more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
 #'   \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
 #'   if \code{normals=TRUE}.
 #'
+#' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
 #' @importFrom Rvcg vcgUpdateNormals
 #'
@@ -280,8 +281,9 @@ Mesh <- function(
 #'   edgesAsTubes = FALSE, lwd = 3, verticesAsSpheres = FALSE
 #' )
 MeshesIntersection <- function(
-    meshes, merge = FALSE, normals = FALSE, exact = FALSE
+    meshes, merge = FALSE, normals = FALSE, numbersType = "double"
 ){
+  numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
   stopifnot(is.list(meshes))
   checkMeshes <- lapply(meshes, function(mesh){
     checkMesh(mesh[["vertices"]], mesh[["faces"]])
@@ -291,19 +293,26 @@ MeshesIntersection <- function(
     stop("All meshes must be triangular.")
   }
   meshes <- lapply(checkMeshes, `[`, c("vertices", "faces"))
-  if(exact){
+  if(numbersType == "double"){
+    inter <- Intersection2_K(meshes, merge, normals)
+  }else if(numbersType == "lazyExact"){
     inter <- Intersection2_EK(meshes, merge, normals)
   }else{
-    inter <- Intersection2_K(meshes, merge, normals)
+    inter <- Intersection_Q(meshes, merge, normals)
   }
-  inter[["vertices"]] <- t(inter[["vertices"]])
+  vertices <- t(inter[["vertices"]])
+  if(numbersType == "gmp"){
+    inter[["gmpVertices"]] <- as.bigq(vertices)
+    vertices <- asNumeric(vertices)
+  }
+  inter[["vertices"]] <- vertices
   edges <- unname(t(inter[["edges"]]))
   inter[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
   inter[["edges"]] <- edges[, c(1L, 2L)]
   inter[["faces"]] <- do.call(rbind, inter[["faces"]])
   if(normals){
     tmesh <- vcgUpdateNormals(tmesh3d(
-      vertices = t(inter[["vertices"]]),
+      vertices = vertices,
       indices = t(inter[["faces"]]),
       homogeneous = FALSE
     ))
