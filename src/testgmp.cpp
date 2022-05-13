@@ -2,14 +2,16 @@
 #include "rcgal.h"
 #endif
 
-#include <boost/multiprecision/gmp.hpp>
-namespace mp = boost::multiprecision;
-#include <CGAL/Cartesian.h>
-#include <CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h>
-
-
-typedef CGAL::Cartesian<mp::mpq_rational> QK;
-typedef CGAL::Surface_mesh<QK::Point_3> QMesh;
+// [[Rcpp::export]]
+Rcpp::CharacterVector rgmp(Rcpp::CharacterVector in){
+	std::string xs = in(0);
+	mp::mpq_rational xq(xs);
+	mp::mpq_rational doublex = 2 * xq;
+	std::string sres = doublex.convert_to<std::string>();
+	Rcpp::CharacterVector out(1);
+	out(0) = sres;
+	return out;
+}
 
 // [[Rcpp::export]]
 int testgmp() {

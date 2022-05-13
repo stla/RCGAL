@@ -81,6 +81,10 @@ Union_EK <- function(rmeshes, merge, normals) {
     .Call(`_RCGAL_Union_EK`, rmeshes, merge, normals)
 }
 
+rgmp <- function(in) {
+    .Call(`_RCGAL_rgmp`, in)
+}
+
 testgmp <- function() {
     .Call(`_RCGAL_testgmp`)
 }

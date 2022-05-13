@@ -80,7 +80,12 @@
 
 #include <CGAL/number_utils.h>
 
-#include <CGAL/Triangle_3.h>
+// #include <CGAL/Triangle_3.h>
+
+#include <boost/multiprecision/gmp.hpp>
+#include <CGAL/Cartesian.h>
+#include <CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h>
+
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -168,6 +173,9 @@ typedef CDT::Face_handle CDFace_handle;
 
 //typedef CGAL::Nef_polyhedron_3<EK> Nef;
 
+typedef CGAL::Cartesian<boost::multiprecision::mpq_rational> QK;
+typedef CGAL::Surface_mesh<QK::Point_3> QMesh;
+
 typedef Rcpp::NumericVector Dvector;
 
 typedef Eigen::
@@ -178,6 +186,7 @@ typedef Eigen::Matrix<unsigned, 1, 3, Eigen::RowMajor | Eigen::AutoAlign>
 
 // -------------------------------------------------------------------------- //
 namespace PMP = CGAL::Polygon_mesh_processing;
+namespace mp = boost::multiprecision;
 
 // -------------------------------------------------------------------------- //
 bool approxEqual(double, double, double);
