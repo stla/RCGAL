@@ -405,16 +405,39 @@ Rcpp::List Difference_EK(const Rcpp::List rmesh1,
   return RSurfEKMesh(mesh, true, 0);
 }
 
+// [[Rcpp::export]]
+Rcpp::List Difference_Q(const Rcpp::List rmesh1,  // must be triangles
+                 const Rcpp::List rmesh2,
+                 const bool merge,
+                 const bool normals) {
+  QMesh3 smesh1 = makeSurfQMesh(rmesh1, merge);
+  checkMesh<QMesh3>(smesh1, 1);
+  QMesh3 smesh2 = makeSurfQMesh(rmesh2, merge);
+  checkMesh<QMesh3>(smesh2, 2);
+  QMesh3 outmesh;
+  bool ok = PMP::corefine_and_compute_difference(smesh1, smesh2, outmesh);
+  if(!ok) {
+    Rcpp::stop("Difference computation has failed.");
+  }
+  return RSurfQMesh(outmesh, true, 0);
+}
+
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Union(const Rcpp::List rmeshes,  // must be triangles
             const bool merge,
-            const bool normals) {
+            const bool normals,
+            const bool exact) {
   const size_t nmeshes = rmeshes.size();
   std::vector<MeshT> meshes(nmeshes);
   Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
   meshes[0] = makeSurfMesh<MeshT, PointT>(rmesh, merge);
-  checkMesh<MeshT>(meshes[0], 1);
+  if(exact) {
+    checkMesh<MeshT>(meshes[0], 1);
+  }
   for(size_t i = 1; i < nmeshes; i++) {
+    if(!exact) {
+      checkMesh<MeshT>(meshes[i - 1], i);
+    }
     Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
     MeshT mesh_i = makeSurfMesh<MeshT, PointT>(rmesh_i, merge);
     checkMesh<MeshT>(mesh_i, i + 1);
@@ -430,7 +453,7 @@ MeshT Union(const Rcpp::List rmeshes,  // must be triangles
 Rcpp::List Union_K(const Rcpp::List rmeshes,
                    const bool merge,
                    const bool normals) {
-  Mesh3 mesh = Union<K, Mesh3, Point3>(rmeshes, merge, normals);
+  Mesh3 mesh = Union<K, Mesh3, Point3>(rmeshes, merge, normals, false);
   return RSurfKMesh(mesh, true, 0);
 }
 
@@ -438,6 +461,28 @@ Rcpp::List Union_K(const Rcpp::List rmeshes,
 Rcpp::List Union_EK(const Rcpp::List rmeshes,
                     const bool merge,
                     const bool normals) {
-  EMesh3 mesh = Union<EK, EMesh3, EPoint3>(rmeshes, merge, normals);
+  EMesh3 mesh = Union<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
   return RSurfEKMesh(mesh, true, 0);
+}
+
+// [[Rcpp::export]]
+Rcpp::List Union_Q(const Rcpp::List rmeshes,  // must be triangles
+                          const bool merge,
+                          const bool normals) {
+  const size_t nmeshes = rmeshes.size();
+  std::vector<QMesh3> meshes(nmeshes);
+  Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
+  meshes[0] = makeSurfQMesh(rmesh, merge);
+  checkMesh<QMesh3>(meshes[0], 0);
+  for(size_t i = 1; i < nmeshes; i++) {
+    Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
+    QMesh3 mesh_i = makeSurfQMesh(rmesh_i, merge);
+    checkMesh<QMesh3>(mesh_i, i);
+    bool ok = PMP::corefine_and_compute_union(meshes[i - 1], mesh_i,
+                                                     meshes[i]);
+    if(!ok) {
+      Rcpp::stop("Union computation has failed.");
+    }
+  }
+  return RSurfQMesh(meshes[nmeshes - 1], merge, 0);
 }

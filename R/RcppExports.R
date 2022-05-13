@@ -85,11 +85,19 @@ Difference_EK <- function(rmesh1, rmesh2, merge, normals) {
     .Call(`_RCGAL_Difference_EK`, rmesh1, rmesh2, merge, normals)
 }
 
+Difference_Q <- function(rmesh1, rmesh2, merge, normals) {
+    .Call(`_RCGAL_Difference_Q`, rmesh1, rmesh2, merge, normals)
+}
+
 Union_K <- function(rmeshes, merge, normals) {
     .Call(`_RCGAL_Union_K`, rmeshes, merge, normals)
 }
 
 Union_EK <- function(rmeshes, merge, normals) {
     .Call(`_RCGAL_Union_EK`, rmeshes, merge, normals)
+}
+
+Union_Q <- function(rmeshes, merge, normals) {
+    .Call(`_RCGAL_Union_Q`, rmeshes, merge, normals)
 }
 
