@@ -281,7 +281,7 @@ checkMesh <- function(vertices, faces, gmp){
 #' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
 #' shade3d(tmesh, color = "orange")
 Mesh <- function(
-  vertices, faces, triangulate = FALSE, merge = FALSE, normals = TRUE,
+  vertices, faces, triangulate = FALSE, merge = FALSE, normals = FALSE,
   epsilon = 0
 ){
   stopifnot(epsilon >= 0)
@@ -317,6 +317,9 @@ Mesh <- function(
   }
   if(triangulate){
     mesh[["edges0"]] <- t(mesh[["edges0"]])
+    if(normals){
+      mesh[["normals0"]] <- t(mesh[["normals0"]])
+    }
   }
   if(normals){
     mesh[["normals"]] <- t(mesh[["normals"]])
@@ -473,14 +476,14 @@ MeshesIntersection <- function(
   inter[["exteriorVertices"]] <- which(table(exteriorEdges) != 2L)
   inter[["edges"]] <- edges[, c(1L, 2L)]
   inter[["faces"]] <- do.call(rbind, inter[["faces"]])
-  if(normals){
-    tmesh <- vcgUpdateNormals(tmesh3d(
-      vertices = vertices,
-      indices = t(inter[["faces"]]),
-      homogeneous = FALSE
-    ))
-    inter[["normals"]] <- t(tmesh[["normals"]][-4L, ])
-  }
+  # if(normals){
+  #   tmesh <- vcgUpdateNormals(tmesh3d(
+  #     vertices = vertices,
+  #     indices = t(inter[["faces"]]),
+  #     homogeneous = FALSE
+  #   ))
+  #   inter[["normals"]] <- t(tmesh[["normals"]][-4L, ])
+  # }
   inter
 }
 
@@ -580,14 +583,14 @@ MeshesDifference <- function(
   differ[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
   differ[["edges"]] <- edges[, c(1L, 2L)]
   differ[["faces"]] <- do.call(rbind, differ[["faces"]])
-  if(normals){
-    tmesh <- vcgUpdateNormals(tmesh3d(
-      vertices = t(vertices),
-      indices = t(differ[["faces"]]),
-      homogeneous = FALSE
-    ))
-    differ[["normals"]] <- t(tmesh[["normals"]][-4L, ])
-  }
+  # if(normals){
+  #   tmesh <- vcgUpdateNormals(tmesh3d(
+  #     vertices = t(vertices),
+  #     indices = t(differ[["faces"]]),
+  #     homogeneous = FALSE
+  #   ))
+  #   differ[["normals"]] <- t(tmesh[["normals"]][-4L, ])
+  # }
   differ
 }
 
@@ -682,14 +685,14 @@ MeshesUnion <- function(
   umesh[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
   umesh[["edges"]] <- edges[, c(1L, 2L)]
   umesh[["faces"]] <- do.call(rbind, umesh[["faces"]])
-  if(normals){
-    tmesh <- vcgUpdateNormals(tmesh3d(
-      vertices = t(umesh[["vertices"]]),
-      indices = t(umesh[["faces"]]),
-      homogeneous = FALSE
-    ))
-    umesh[["normals"]] <- t(tmesh[["normals"]][-4L, ])
-  }
+  # if(normals){
+  #   tmesh <- vcgUpdateNormals(tmesh3d(
+  #     vertices = t(umesh[["vertices"]]),
+  #     indices = t(umesh[["faces"]]),
+  #     homogeneous = FALSE
+  #   ))
+  #   umesh[["normals"]] <- t(tmesh[["normals"]][-4L, ])
+  # }
   umesh
 }
 
