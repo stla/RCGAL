@@ -526,6 +526,81 @@ Rcpp::List getFaces(MeshT mesh) {
 // double, const bool); template Rcpp::List RSurfMesh<EK, EMesh3,
 // EPoint3>(EMesh3, const bool, const double, const bool);
 
+Rcpp::NumericMatrix getKNormals(Mesh3 mesh) {
+  const size_t nvertices = mesh.number_of_vertices();
+  Rcpp::NumericMatrix Normals(3, nvertices);
+  auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
+                          "v:normals", CGAL::NULL_VECTOR)
+                      .first;
+  auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
+                          "f:normals", CGAL::NULL_VECTOR)
+                      .first;
+  PMP::compute_normals(mesh, vnormals, fnormals);
+  {
+    size_t i = 0;
+    for(boost_vertex_descriptor vd : vertices(mesh)) {
+      Rcpp::NumericVector col_i(3);
+      const Vector3 normal = vnormals[vd];
+      col_i(0) = normal.x();
+      col_i(1) = normal.y();
+      col_i(2) = normal.z();
+      Normals(Rcpp::_, i) = col_i;
+      i++;
+    }
+  }
+  return Normals;
+}
+
+Rcpp::NumericMatrix getEKNormals(EMesh3 mesh) {
+  const size_t nvertices = mesh.number_of_vertices();
+  Rcpp::NumericMatrix Normals(3, nvertices);
+  auto vnormals = mesh.add_property_map<boost_vertex_descriptor, EVector3>(
+                          "v:normals", CGAL::NULL_VECTOR)
+                      .first;
+  auto fnormals = mesh.add_property_map<boost_face_descriptor, EVector3>(
+                          "f:normals", CGAL::NULL_VECTOR)
+                      .first;
+  PMP::compute_normals(mesh, vnormals, fnormals);
+  {
+    size_t i = 0;
+    for(boost_vertex_descriptor vd : vertices(mesh)) {
+      Rcpp::NumericVector col_i(3);
+      const EVector3 normal = vnormals[vd];
+      col_i(0) = CGAL::to_double(normal.x());
+      col_i(1) = CGAL::to_double(normal.y());
+      col_i(2) = CGAL::to_double(normal.z());
+      Normals(Rcpp::_, i) = col_i;
+      i++;
+    }
+  }
+  return Normals;
+}
+
+Rcpp::NumericMatrix getQNormals(QMesh3 mesh) {
+  const size_t nvertices = mesh.number_of_vertices();
+  Rcpp::NumericMatrix Normals(3, nvertices);
+  auto vnormals = mesh.add_property_map<boost_vertex_descriptor, QVector3>(
+                          "v:normals", CGAL::NULL_VECTOR)
+                      .first;
+  auto fnormals = mesh.add_property_map<boost_face_descriptor, QVector3>(
+                          "f:normals", CGAL::NULL_VECTOR)
+                      .first;
+  PMP::compute_normals(mesh, vnormals, fnormals);
+  {
+    size_t i = 0;
+    for(boost_vertex_descriptor vd : vertices(mesh)) {
+      Rcpp::NumericVector col_i(3);
+      const QVector3 normal = vnormals[vd];
+      col_i(0) = normal.x().convert_to<double>();
+      col_i(1) = normal.y().convert_to<double>();
+      col_i(2) = normal.z().convert_to<double>();
+      Normals(Rcpp::_, i) = col_i;
+      i++;
+    }
+  }
+  return Normals;
+}
+
 Rcpp::List RSurfKMesh(Mesh3 mesh, const bool isTriangle, const double epsilon) {
   Rcpp::IntegerMatrix Edges =
       getEdges<K, Mesh3, Point3>(mesh, isTriangle, epsilon);

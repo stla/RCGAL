@@ -176,6 +176,7 @@ typedef CDT::Face_handle CDFace_handle;
 typedef CGAL::Cartesian<boost::multiprecision::mpq_rational> QK;
 typedef CGAL::Surface_mesh<QK::Point_3> QMesh3;
 typedef QK::Point_3 QPoint3;
+typedef QK::Vector_3 QVector3;
 
 typedef Rcpp::NumericVector Dvector;
 

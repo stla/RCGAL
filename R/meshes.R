@@ -30,7 +30,10 @@ qsqrt <- function(x, n){
   stopifnot(isStrictPositiveInteger(n))
   zero <- as.bigz(0L)
   one <- as.bigz(1L)
-  A <- matrix.bigq(c(zero, as.bigz(x)-1L, one, as.bigz(2L)), nrow = 2L, ncol = 2L)
+  A <- matrix.bigq(
+    c(zero, as.bigz(x)-1L, one, as.bigz(2L)),
+    nrow = 2L, ncol = 2L
+  )
   zs <- c(gmp::`%*%`(A %^% n, c(zero, one)))
   out <- as.bigq(zs[2L], zs[1L]) - 1L
   attr(out, "error") <- abs(asNumeric(out) - sqrt(x))
