@@ -225,15 +225,19 @@ MeshT makeSurfMesh(const Rcpp::List, const bool);
 
 QMesh3 makeSurfQMesh(const Rcpp::List, const bool);
 
-template <typename MeshT>
-Rcpp::IntegerMatrix getEdges1(MeshT);
+// template <typename MeshT>
+// Rcpp::IntegerMatrix getEdges1(MeshT);
+template <typename KernelT, typename MeshT, typename PointT>
+Rcpp::IntegerMatrix getEdges2(MeshT, const double);
+
+Rcpp::NumericMatrix getKNormals(Mesh3);
+Rcpp::NumericMatrix getEKNormals(EMesh3);
+Rcpp::NumericMatrix getQNormals(QMesh3);
 
 Rcpp::List RSurfKMesh(Mesh3, const bool, const double);
 Rcpp::List RSurfEKMesh(EMesh3, const bool, const double);
 Rcpp::List RSurfQMesh(QMesh3, const bool, const double);
 
-//template <typename KernelT, typename MeshT, typename PointT>
-//Rcpp::IntegerMatrix getEdges2(MeshT, const double);
 
 // template <typename KernelT, typename MeshT, typename PointT>
 // Rcpp::List RSurfMesh(MeshT, const bool, const double, const bool);

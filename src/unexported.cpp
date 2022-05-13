@@ -340,26 +340,26 @@ Rcpp::CharacterMatrix getVertices_QK(QMesh3 mesh) {
   return Vertices;
 }
 
-template <typename MeshT>
-Rcpp::IntegerMatrix getEdges1(MeshT mesh) {
-  const size_t nedges = mesh.number_of_edges();
-  Rcpp::IntegerMatrix Edges(2, nedges);
-  {
-    size_t i = 0;
-    for(typename MeshT::Edge_index ed : mesh.edges()) {
-      Rcpp::IntegerVector col_i(2);
-      col_i(0) = source(ed, mesh) + 1;
-      col_i(1) = target(ed, mesh) + 1;
-      Edges(Rcpp::_, i) = col_i;
-      i++;
-    }
-  }
-  return Edges;
-}
+// template <typename MeshT>
+// Rcpp::IntegerMatrix getEdges1(MeshT mesh) {
+//   const size_t nedges = mesh.number_of_edges();
+//   Rcpp::IntegerMatrix Edges(2, nedges);
+//   {
+//     size_t i = 0;
+//     for(typename MeshT::Edge_index ed : mesh.edges()) {
+//       Rcpp::IntegerVector col_i(2);
+//       col_i(0) = source(ed, mesh) + 1;
+//       col_i(1) = target(ed, mesh) + 1;
+//       Edges(Rcpp::_, i) = col_i;
+//       i++;
+//     }
+//   }
+//   return Edges;
+// }
 
-template Rcpp::IntegerMatrix getEdges1<Mesh3>(Mesh3);
-template Rcpp::IntegerMatrix getEdges1<EMesh3>(EMesh3);
-template Rcpp::IntegerMatrix getEdges1<QMesh3>(QMesh3);
+// template Rcpp::IntegerMatrix getEdges1<Mesh3>(Mesh3);
+// template Rcpp::IntegerMatrix getEdges1<EMesh3>(EMesh3);
+// template Rcpp::IntegerMatrix getEdges1<QMesh3>(QMesh3);
 
 template <typename KernelT, typename MeshT, typename PointT>
 Rcpp::IntegerMatrix getEdges2(MeshT mesh, const double epsilon) {
@@ -421,20 +421,19 @@ Rcpp::IntegerMatrix getEdges2(MeshT mesh, const double epsilon) {
   return Edges;
 }
 
-// template Rcpp::IntegerMatrix getEdges2<K, Mesh3, Point3>(Mesh3, const
-// double); template Rcpp::IntegerMatrix getEdges2<EK, EMesh3, EPoint3>(EMesh3,
-// const double); template Rcpp::IntegerMatrix getEdges2<QK, QMesh3,
-// QPoint3>(QMesh3, const double);
+template Rcpp::IntegerMatrix getEdges2<K, Mesh3, Point3>(Mesh3, const double); 
+template Rcpp::IntegerMatrix getEdges2<EK, EMesh3, EPoint3>(EMesh3, const double); 
+template Rcpp::IntegerMatrix getEdges2<QK, QMesh3, QPoint3>(QMesh3, const double);
 
-template <typename KernelT, typename MeshT, typename PointT>
-Rcpp::IntegerMatrix getEdges(MeshT mesh,
-                             const bool isTriangle,
-                             const double epsilon) {
-  if(isTriangle) {
-    return getEdges2<KernelT, MeshT, PointT>(mesh, epsilon);
-  }
-  return getEdges1<MeshT>(mesh);
-}
+// template <typename KernelT, typename MeshT, typename PointT>
+// Rcpp::IntegerMatrix getEdges(MeshT mesh,
+//                              const bool isTriangle,
+//                              const double epsilon) {
+//   if(isTriangle) {
+//     return getEdges2<KernelT, MeshT, PointT>(mesh, epsilon);
+//   }
+//   return getEdges1<MeshT>(mesh);
+// }
 
 // template Rcpp::IntegerMatrix getEdges<K, Mesh3, Point3>(Mesh3, const bool,
 // const double); template Rcpp::IntegerMatrix getEdges<EK, EMesh3,
@@ -601,38 +600,53 @@ Rcpp::NumericMatrix getQNormals(QMesh3 mesh) {
   return Normals;
 }
 
-Rcpp::List RSurfKMesh(Mesh3 mesh, const bool isTriangle, const double epsilon) {
+Rcpp::List RSurfKMesh(Mesh3 mesh, const bool normals, const double epsilon) {
   Rcpp::IntegerMatrix Edges =
-      getEdges<K, Mesh3, Point3>(mesh, isTriangle, epsilon);
+      getEdges2<K, Mesh3, Point3>(mesh, epsilon);
   Rcpp::NumericMatrix Vertices = getVertices_K(mesh);
   Rcpp::List Faces = getFaces<Mesh3>(mesh);
-  return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,
                             Rcpp::Named("faces") = Faces);
+  if(normals){
+    Rcpp::NumericMatrix Normals = getKNormals(mesh);
+    out["normals"] = Normals;
+  }
+  return out;
 }
 
 Rcpp::List RSurfEKMesh(EMesh3 mesh,
-                       const bool isTriangle,
+                       const bool normals,
                        const double epsilon) {
   Rcpp::IntegerMatrix Edges =
-      getEdges<EK, EMesh3, EPoint3>(mesh, isTriangle, epsilon);
+      getEdges2<EK, EMesh3, EPoint3>(mesh, epsilon);
   Rcpp::NumericMatrix Vertices = getVertices_EK(mesh);
   Rcpp::List Faces = getFaces<EMesh3>(mesh);
-  return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,
                             Rcpp::Named("faces") = Faces);
+  if(normals){
+    Rcpp::NumericMatrix Normals = getEKNormals(mesh);
+    out["normals"] = Normals;
+  }
+  return out;
 }
 
 Rcpp::List RSurfQMesh(QMesh3 mesh,
-                      const bool isTriangle,
+                      const bool normals,
                       const double epsilon) {
   Rcpp::IntegerMatrix Edges =
-      getEdges<QK, QMesh3, QPoint3>(mesh, isTriangle, epsilon);
+      getEdges2<QK, QMesh3, QPoint3>(mesh, epsilon);
   Rcpp::CharacterMatrix Vertices = getVertices_QK(mesh);
   Rcpp::List Faces = getFaces<QMesh3>(mesh);
-  return Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("vertices") = Vertices,
                             Rcpp::Named("edges") = Edges,
                             Rcpp::Named("faces") = Faces);
+  if(normals){
+    Rcpp::NumericMatrix Normals = getQNormals(mesh);
+    out["normals"] = Normals;
+  }
+  return out;
 }
 
 // Mesh3 Poly2Mesh3(Polyhedron poly) {

@@ -180,6 +180,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SurfEMesh
+Rcpp::List SurfEMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
+RcppExport SEXP _RCGAL_SurfEMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh(rmeshSEXP);
+    Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
+    Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
+    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
+    rcpp_result_gen = Rcpp::wrap(SurfEMesh(rmesh, isTriangle, triangulate, merge, normals, epsilon));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SurfQMesh
+Rcpp::List SurfQMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
+RcppExport SEXP _RCGAL_SurfQMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh(rmeshSEXP);
+    Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
+    Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
+    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
+    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
+    rcpp_result_gen = Rcpp::wrap(SurfQMesh(rmesh, isTriangle, triangulate, merge, normals, epsilon));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Intersection2_K
 Rcpp::List Intersection2_K(const Rcpp::List rmeshes, const bool merge, const bool normals);
 RcppExport SEXP _RCGAL_Intersection2_K(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
@@ -316,6 +348,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCGAL_AFSreconstruction_perimeter_cpp", (DL_FUNC) &_RCGAL_AFSreconstruction_perimeter_cpp, 2},
     {"_RCGAL_Poisson_reconstruction_cpp", (DL_FUNC) &_RCGAL_Poisson_reconstruction_cpp, 6},
     {"_RCGAL_SurfMesh", (DL_FUNC) &_RCGAL_SurfMesh, 6},
+    {"_RCGAL_SurfEMesh", (DL_FUNC) &_RCGAL_SurfEMesh, 6},
+    {"_RCGAL_SurfQMesh", (DL_FUNC) &_RCGAL_SurfQMesh, 6},
     {"_RCGAL_Intersection2_K", (DL_FUNC) &_RCGAL_Intersection2_K, 3},
     {"_RCGAL_Intersection2_EK", (DL_FUNC) &_RCGAL_Intersection2_EK, 3},
     {"_RCGAL_Intersection_Q", (DL_FUNC) &_RCGAL_Intersection_Q, 3},

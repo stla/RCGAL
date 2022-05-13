@@ -21,40 +21,109 @@ Rcpp::List SurfMesh(const Rcpp::List rmesh,
   Mesh3 mesh = makeSurfMesh<Mesh3, Point3>(rmesh, merge);
   const bool really_triangulate = !isTriangle && triangulate;
   Rcpp::IntegerMatrix Edges0;
+  Rcpp::NumericMatrix Normals0;
   if(really_triangulate) {
-    Edges0 = getEdges1<Mesh3>(mesh);
+    Edges0 = getEdges2<K, Mesh3, Point3>(mesh, epsilon);
+    if(normals) {
+      Normals0 = getKNormals(mesh);
+    }
     bool success = CGAL::Polygon_mesh_processing::triangulate_faces(mesh);
     if(!success) {
       Rcpp::stop("Triangulation has failed.");
     }
   }
-  Rcpp::List routmesh = RSurfKMesh(mesh, isTriangle || triangulate, epsilon);
+  Rcpp::List routmesh = RSurfKMesh(mesh, normals, epsilon);
   if(really_triangulate) {
     routmesh["edges0"] = Edges0;
-  }
-  const size_t nvertices = mesh.number_of_vertices();
-  Rcpp::NumericMatrix Normals(3, nvertices);
-  if(normals) {
-    auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
-                            "v:normals", CGAL::NULL_VECTOR)
-                        .first;
-    auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
-                            "f:normals", CGAL::NULL_VECTOR)
-                        .first;
-    PMP::compute_normals(mesh, vnormals, fnormals);
-    {
-      size_t i = 0;
-      for(boost_vertex_descriptor vd : vertices(mesh)) {
-        Rcpp::NumericVector col_i(3);
-        const Vector3 normal = vnormals[vd];
-        col_i(0) = normal.x();
-        col_i(1) = normal.y();
-        col_i(2) = normal.z();
-        Normals(Rcpp::_, i) = col_i;
-        i++;
-      }
+    if(normals) {
+      routmesh["normals0"] = Normals0;
     }
-    routmesh["normals"] = Normals;
+  }
+  // const size_t nvertices = mesh.number_of_vertices();
+  // Rcpp::NumericMatrix Normals(3, nvertices);
+  // if(normals) {
+  //   auto vnormals = mesh.add_property_map<boost_vertex_descriptor, Vector3>(
+  //                           "v:normals", CGAL::NULL_VECTOR)
+  //                       .first;
+  //   auto fnormals = mesh.add_property_map<boost_face_descriptor, Vector3>(
+  //                           "f:normals", CGAL::NULL_VECTOR)
+  //                       .first;
+  //   PMP::compute_normals(mesh, vnormals, fnormals);
+  //   {
+  //     size_t i = 0;
+  //     for(boost_vertex_descriptor vd : vertices(mesh)) {
+  //       Rcpp::NumericVector col_i(3);
+  //       const Vector3 normal = vnormals[vd];
+  //       col_i(0) = normal.x();
+  //       col_i(1) = normal.y();
+  //       col_i(2) = normal.z();
+  //       Normals(Rcpp::_, i) = col_i;
+  //       i++;
+  //     }
+  //   }
+  //   routmesh["normals"] = Normals;
+  // }
+  return routmesh;
+}
+
+// [[Rcpp::export]]
+Rcpp::List SurfEMesh(const Rcpp::List rmesh,
+                    const bool isTriangle,
+                    const bool triangulate,
+                    const bool merge,
+                    const bool normals,
+                    const double epsilon) {
+  EMesh3 mesh = makeSurfMesh<EMesh3, EPoint3>(rmesh, merge);
+  const bool really_triangulate = !isTriangle && triangulate;
+  Rcpp::IntegerMatrix Edges0;
+  Rcpp::NumericMatrix Normals0;
+  if(really_triangulate) {
+    Edges0 = getEdges2<EK, EMesh3, EPoint3>(mesh, epsilon);
+    if(normals) {
+      Normals0 = getEKNormals(mesh);
+    }
+    bool success = CGAL::Polygon_mesh_processing::triangulate_faces(mesh);
+    if(!success) {
+      Rcpp::stop("Triangulation has failed.");
+    }
+  }
+  Rcpp::List routmesh = RSurfEKMesh(mesh, normals, epsilon);
+  if(really_triangulate) {
+    routmesh["edges0"] = Edges0;
+    if(normals) {
+      routmesh["normals0"] = Normals0;
+    }
+  }
+  return routmesh;
+}
+
+// [[Rcpp::export]]
+Rcpp::List SurfQMesh(const Rcpp::List rmesh,
+                    const bool isTriangle,
+                    const bool triangulate,
+                    const bool merge,
+                    const bool normals,
+                    const double epsilon) {
+  QMesh3 mesh = makeSurfQMesh(rmesh, merge);
+  const bool really_triangulate = !isTriangle && triangulate;
+  Rcpp::IntegerMatrix Edges0;
+  Rcpp::NumericMatrix Normals0;
+  if(really_triangulate) {
+    Edges0 = getEdges2<QK, QMesh3, QPoint3>(mesh, epsilon);
+    if(normals) {
+      Normals0 = getQNormals(mesh);
+    }
+    bool success = CGAL::Polygon_mesh_processing::triangulate_faces(mesh);
+    if(!success) {
+      Rcpp::stop("Triangulation has failed.");
+    }
+  }
+  Rcpp::List routmesh = RSurfQMesh(mesh, normals, epsilon);
+  if(really_triangulate) {
+    routmesh["edges0"] = Edges0;
+    if(normals) {
+      routmesh["normals0"] = Normals0;
+    }
   }
   return routmesh;
 }
@@ -256,7 +325,6 @@ void checkMesh(MeshT mesh, size_t i) {
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Intersection2(const Rcpp::List rmeshes,  // must be triangles
                     const bool merge,
-                    const bool normals,
                     const bool exact) {
   const size_t nmeshes = rmeshes.size();
   std::vector<MeshT> meshes(nmeshes);
@@ -336,16 +404,16 @@ MeshT Intersection2(const Rcpp::List rmeshes,  // must be triangles
 Rcpp::List Intersection2_K(const Rcpp::List rmeshes,
                            const bool merge,
                            const bool normals) {
-  Mesh3 mesh = Intersection2<K, Mesh3, Point3>(rmeshes, merge, normals, false);
-  return RSurfKMesh(mesh, true, 0);
+  Mesh3 mesh = Intersection2<K, Mesh3, Point3>(rmeshes, merge, false);
+  return RSurfKMesh(mesh, normals, 0);
 }
 
 // [[Rcpp::export]]
 Rcpp::List Intersection2_EK(const Rcpp::List rmeshes,
                             const bool merge,
                             const bool normals) {
-  EMesh3 mesh = Intersection2<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
-  return RSurfEKMesh(mesh, true, 0);
+  EMesh3 mesh = Intersection2<EK, EMesh3, EPoint3>(rmeshes, merge, true);
+  return RSurfEKMesh(mesh, normals, 0);
 }
 
 // [[Rcpp::export]]
@@ -367,14 +435,13 @@ Rcpp::List Intersection_Q(const Rcpp::List rmeshes,  // must be triangles
       Rcpp::stop("Intersection computation has failed.");
     }
   }
-  return RSurfQMesh(meshes[nmeshes - 1], true, 0);
+  return RSurfQMesh(meshes[nmeshes - 1], normals, 0);
 }
 
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Difference(const Rcpp::List rmesh1,  // must be triangles
                  const Rcpp::List rmesh2,
-                 const bool merge,
-                 const bool normals) {
+                 const bool merge) {
   MeshT smesh1 = makeSurfMesh<MeshT, PointT>(rmesh1, merge);
   checkMesh<MeshT>(smesh1, 1);
   MeshT smesh2 = makeSurfMesh<MeshT, PointT>(rmesh2, merge);
@@ -392,8 +459,8 @@ Rcpp::List Difference_K(const Rcpp::List rmesh1,
                         const Rcpp::List rmesh2,
                         const bool merge,
                         const bool normals) {
-  Mesh3 mesh = Difference<K, Mesh3, Point3>(rmesh1, rmesh2, merge, normals);
-  return RSurfKMesh(mesh, true, 0);
+  Mesh3 mesh = Difference<K, Mesh3, Point3>(rmesh1, rmesh2, merge);
+  return RSurfKMesh(mesh, normals, 0);
 }
 
 // [[Rcpp::export]]
@@ -401,8 +468,8 @@ Rcpp::List Difference_EK(const Rcpp::List rmesh1,
                          const Rcpp::List rmesh2,
                          const bool merge,
                          const bool normals) {
-  EMesh3 mesh = Difference<EK, EMesh3, EPoint3>(rmesh1, rmesh2, merge, normals);
-  return RSurfEKMesh(mesh, true, 0);
+  EMesh3 mesh = Difference<EK, EMesh3, EPoint3>(rmesh1, rmesh2, merge);
+  return RSurfEKMesh(mesh, normals, 0);
 }
 
 // [[Rcpp::export]]
@@ -419,13 +486,12 @@ Rcpp::List Difference_Q(const Rcpp::List rmesh1,  // must be triangles
   if(!ok) {
     Rcpp::stop("Difference computation has failed.");
   }
-  return RSurfQMesh(outmesh, true, 0);
+  return RSurfQMesh(outmesh, normals, 0);
 }
 
 template <typename KernelT, typename MeshT, typename PointT>
 MeshT Union(const Rcpp::List rmeshes,  // must be triangles
             const bool merge,
-            const bool normals,
             const bool exact) {
   const size_t nmeshes = rmeshes.size();
   std::vector<MeshT> meshes(nmeshes);
@@ -453,16 +519,16 @@ MeshT Union(const Rcpp::List rmeshes,  // must be triangles
 Rcpp::List Union_K(const Rcpp::List rmeshes,
                    const bool merge,
                    const bool normals) {
-  Mesh3 mesh = Union<K, Mesh3, Point3>(rmeshes, merge, normals, false);
-  return RSurfKMesh(mesh, true, 0);
+  Mesh3 mesh = Union<K, Mesh3, Point3>(rmeshes, merge, false);
+  return RSurfKMesh(mesh, normals, 0);
 }
 
 // [[Rcpp::export]]
 Rcpp::List Union_EK(const Rcpp::List rmeshes,
                     const bool merge,
                     const bool normals) {
-  EMesh3 mesh = Union<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
-  return RSurfEKMesh(mesh, true, 0);
+  EMesh3 mesh = Union<EK, EMesh3, EPoint3>(rmeshes, merge, true);
+  return RSurfEKMesh(mesh, normals, 0);
 }
 
 // [[Rcpp::export]]
@@ -484,5 +550,5 @@ Rcpp::List Union_Q(const Rcpp::List rmeshes,  // must be triangles
       Rcpp::stop("Union computation has failed.");
     }
   }
-  return RSurfQMesh(meshes[nmeshes - 1], true, 0);
+  return RSurfQMesh(meshes[nmeshes - 1], normals, 0);
 }
