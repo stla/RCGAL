@@ -4,8 +4,8 @@
 
 // [[Rcpp::export]]
 Rcpp::StringVector rgmp(Rcpp::StringVector in){
-	std::string xs = in(0);
-	mp::mpq_rational xq(xs);
+	//std::string xs = in(0);
+	mp::mpq_rational xq(in(0));
 	mp::mpq_rational doublex = 2 * xq;
 	std::string sres = doublex.convert_to<std::string>();
 	Rcpp::StringVector out(1);
