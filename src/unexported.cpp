@@ -442,21 +442,22 @@ Rcpp::IntegerMatrix getEdges(MeshT mesh,
 // getEdges<QK, QMesh3, QPoint3>(QMesh3, const bool, const double);
 
 template <typename MeshT>
-Rcpp::List getFaces(MeshT mesh) const size_t nfaces = mesh.number_of_faces();
-Rcpp::List Faces(nfaces);
-{
-  size_t i = 0;
-  for(typename MeshT::Face_index fd : mesh.faces()) {
-    Rcpp::IntegerVector col_i;
-    for(typename MeshT::Vertex_index vd :
-        vertices_around_face(mesh.halfedge(fd), mesh)) {
-      col_i.push_back(vd + 1);
+Rcpp::List getFaces(MeshT mesh) {
+  const size_t nfaces = mesh.number_of_faces();
+  Rcpp::List Faces(nfaces);
+  {
+    size_t i = 0;
+    for(typename MeshT::Face_index fd : mesh.faces()) {
+      Rcpp::IntegerVector col_i;
+      for(typename MeshT::Vertex_index vd :
+          vertices_around_face(mesh.halfedge(fd), mesh)) {
+        col_i.push_back(vd + 1);
+      }
+      Faces(i) = col_i;
+      i++;
     }
-    Faces(i) = col_i;
-    i++;
   }
-}
-return Faces;
+  return Faces;
 }
 
 // template Rcpp::List getFaces<Mesh3>(Mesh3);
