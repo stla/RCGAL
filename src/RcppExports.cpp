@@ -11,27 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// rgmp
-Rcpp::StringVector rgmp(Rcpp::StringVector vin);
-RcppExport SEXP _RCGAL_rgmp(SEXP vinSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::StringVector >::type vin(vinSEXP);
-    rcpp_result_gen = Rcpp::wrap(rgmp(vin));
-    return rcpp_result_gen;
-END_RCPP
-}
-// testgmp
-int testgmp();
-RcppExport SEXP _RCGAL_testgmp() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(testgmp());
-    return rcpp_result_gen;
-END_RCPP
-}
 // cxhull2d_cpp
 Rcpp::List cxhull2d_cpp(Rcpp::NumericMatrix pts);
 RcppExport SEXP _RCGAL_cxhull2d_cpp(SEXP ptsSEXP) {
@@ -323,8 +302,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RCGAL_rgmp", (DL_FUNC) &_RCGAL_rgmp, 1},
-    {"_RCGAL_testgmp", (DL_FUNC) &_RCGAL_testgmp, 0},
     {"_RCGAL_cxhull2d_cpp", (DL_FUNC) &_RCGAL_cxhull2d_cpp, 1},
     {"_RCGAL_cxhull3d_cpp", (DL_FUNC) &_RCGAL_cxhull3d_cpp, 2},
     {"_RCGAL_del2d_cpp", (DL_FUNC) &_RCGAL_del2d_cpp, 1},

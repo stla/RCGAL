@@ -37,7 +37,7 @@ u <- function(n){
   dbls <- 2*(0L:(n-1L))
   as.bigq(8*prod(1L - dbls), factorialZ(n) * (as.bigz(-8))^(n))
 }
-as.bigq(1L, 4L) * (as.bigq(7L)  + Reduce("+", sapply(2:11, u), 0L))
+asNumeric(as.bigq(1L, 4L) * (as.bigq(7L)  + Reduce("+", sapply(2:11, u), 0L)))
 
 
 # u(1L) + u(2L) + u(3L) + u(4L) + u(5L) + u(6L) + u(7L)
