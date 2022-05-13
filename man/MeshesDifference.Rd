@@ -8,7 +8,9 @@ MeshesDifference(mesh1, mesh2, merge = FALSE, normals = FALSE, exact = FALSE)
 }
 \arguments{
 \item{mesh1, mesh2}{two \emph{triangular} meshes, each given as a list with
-(at least) two fields: \code{vertices} and \code{faces}}
+(at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
+otherwise it must be numeric}
 
 \item{merge}{Boolean, whether to merge the duplicated vertices of the
 input meshes and the output mesh}
@@ -16,13 +18,16 @@ input meshes and the output mesh}
 \item{normals}{Boolean, whether to return the per-vertex normals of the
 output mesh}
 
-\item{exact}{Boolean, whether to use exact calculations; this is slower but
-more accurate}
+\item{numbersType}{the type of the numbers used in C++ for the 
+computations; must be one of \code{"double"}, \code{"lazyExact"} 
+(a type provided by CGAL for exact computations), or \code{"gmp"}
+(exact computations with rational numbers); of course using 
+exact computations is slower but more accurate}
 }
 \value{
 A triangular mesh given as a list with fields \code{vertices},
-  \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
-  if \code{normals=TRUE}.
+  \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+  if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 }
 \description{
 Computes the difference between two meshes.

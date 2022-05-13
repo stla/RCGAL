@@ -344,7 +344,7 @@ Rcpp::List Intersection2_K(const Rcpp::List rmeshes,
 Rcpp::List Intersection2_EK(const Rcpp::List rmeshes,
                             const bool merge,
                             const bool normals) {
-  EMesh3 = Intersection2<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
+  EMesh3 mesh = Intersection2<EK, EMesh3, EPoint3>(rmeshes, merge, normals, true);
   return RSurfEKMesh(mesh, true, 0);
 }
 
@@ -413,7 +413,7 @@ MeshT Union(const Rcpp::List rmeshes,  // must be triangles
   std::vector<MeshT> meshes(nmeshes);
   Rcpp::List rmesh = Rcpp::as<Rcpp::List>(rmeshes(0));
   meshes[0] = makeSurfMesh<MeshT, PointT>(rmesh, merge);
-  checkMesh<MeshT>(meshes0, 1);
+  checkMesh<MeshT>(meshes[0], 1);
   for(size_t i = 1; i < nmeshes; i++) {
     Rcpp::List rmesh_i = Rcpp::as<Rcpp::List>(rmeshes(i));
     MeshT mesh_i = makeSurfMesh<MeshT, PointT>(rmesh_i, merge);

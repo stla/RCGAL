@@ -1,10 +1,19 @@
+#' @importFrom gmp is.bigq
 #' @importFrom data.table uniqueN
 #' @noRd
-checkMesh <- function(vertices, faces){
+checkMesh <- function(vertices, faces, gmp){
   if(!is.matrix(vertices) || ncol(vertices) != 3L){
     stop("The `vertices` argument must be a matrix with three columns.")
   }
-  storage.mode(vertices) <- "double"
+  if(gmp){
+    stopifnot(is.bigq(vertices))
+    vertices <- as.character(vertices)
+  }else{
+    storage.mode(vertices) <- "double"
+  }
+  if(anyNA(vertices)){
+    stop("Found missing values in `vertices`.")
+  }
   homogeneousFaces <- FALSE
   isTriangle <- FALSE
   if(is.matrix(faces)){
@@ -221,17 +230,22 @@ Mesh <- function(
 #' @description Computes the intersection of the given meshes.
 #'
 #' @param meshes a list of \emph{triangular} meshes, each given as a list with
-#'   (at least) two fields: \code{vertices} and \code{faces}
+#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+#'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
+#'   otherwise it must be numeric
 #' @param merge Boolean, whether to merge the duplicated vertices of the
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param numbersType Boolean, whether to use exact calculations; this is slower but
-#'   more accurate
+#' @param numbersType the type of the numbers used in C++ for the 
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"} 
+#'   (a type provided by CGAL for exact computations), or \code{"gmp"}
+#'   (exact computations with rational numbers); of course using 
+#'   exact computations is slower but more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
-#'   \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
-#'   if \code{normals=TRUE}.
+#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+#'   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 #'
 #' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
@@ -284,9 +298,10 @@ MeshesIntersection <- function(
     meshes, merge = FALSE, normals = FALSE, numbersType = "double"
 ){
   numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
+  gmp <- numbersType == "gmp"
   stopifnot(is.list(meshes))
   checkMeshes <- lapply(meshes, function(mesh){
-    checkMesh(mesh[["vertices"]], mesh[["faces"]])
+    checkMesh(mesh[["vertices"]], mesh[["faces"]], gmp)
   })
   areTriangle <- all(vapply(checkMeshes, `[[`, logical(1L), "isTriangle"))
   if(!areTriangle){
@@ -301,7 +316,7 @@ MeshesIntersection <- function(
     inter <- Intersection_Q(meshes, merge, normals)
   }
   vertices <- t(inter[["vertices"]])
-  if(numbersType == "gmp"){
+  if(gmp){
     inter[["gmpVertices"]] <- as.bigq(vertices)
     vertices <- asNumeric(vertices)
   }
@@ -325,18 +340,24 @@ MeshesIntersection <- function(
 #' @description Computes the difference between two meshes.
 #'
 #' @param mesh1,mesh2 two \emph{triangular} meshes, each given as a list with
-#'   (at least) two fields: \code{vertices} and \code{faces}
+#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+#'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
+#'   otherwise it must be numeric
 #' @param merge Boolean, whether to merge the duplicated vertices of the
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param exact Boolean, whether to use exact calculations; this is slower but
-#'   more accurate
+#' @param numbersType the type of the numbers used in C++ for the 
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"} 
+#'   (a type provided by CGAL for exact computations), or \code{"gmp"}
+#'   (exact computations with rational numbers); of course using 
+#'   exact computations is slower but more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
-#'   \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
-#'   if \code{normals=TRUE}.
+#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+#'   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 #'
+#' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
 #' @importFrom Rvcg vcgUpdateNormals
 #'
@@ -378,33 +399,42 @@ MeshesIntersection <- function(
 #'   edgesAsTubes = TRUE, verticesAsSpheres = TRUE
 #' )
 MeshesDifference <- function(
-    mesh1, mesh2, merge = FALSE, normals = FALSE, exact = FALSE
+    mesh1, mesh2, merge = FALSE, normals = FALSE, numbersType = "double"
 ){
   stopifnot(is.list(mesh1))
   stopifnot(is.list(mesh2))
-  checkMesh1 <- checkMesh(mesh1[["vertices"]], mesh1[["faces"]])
+  numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
+  gmp <- numbersType == "gmp"
+  checkMesh1 <- checkMesh(mesh1[["vertices"]], mesh1[["faces"]], gmp)
   if(!checkMesh1[["isTriangle"]]){
     stop("The first mesh is not triangular.")
   }
-  checkMesh2 <- checkMesh(mesh2[["vertices"]], mesh2[["faces"]])
+  checkMesh2 <- checkMesh(mesh2[["vertices"]], mesh2[["faces"]], gmp)
   if(!checkMesh2[["isTriangle"]]){
     stop("The second mesh is not triangular.")
   }
   mesh1 <- checkMesh1[c("vertices", "faces")]
   mesh2 <- checkMesh2[c("vertices", "faces")]
-  if(exact){
+  if(numbersType == "double"){
+    differ <- Difference_K(mesh1, mesh2, merge, normals)
+  }else if(numbersType == "lazyExact"){
     differ <- Difference_EK(mesh1, mesh2, merge, normals)
   }else{
     differ <- Difference_K(mesh1, mesh2, merge, normals)
   }
-  differ[["vertices"]] <- t(differ[["vertices"]])
+  vertices <- t(differ[["vertices"]])
+  if(gmp){
+    differ[["gmpVertices"]] <- as.bigq(vertices)
+    vertices <- asNumeric(vertices)
+  }
+  differ[["vertices"]] <- vertices
   edges <- unname(t(differ[["edges"]]))
   differ[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
   differ[["edges"]] <- edges[, c(1L, 2L)]
   differ[["faces"]] <- do.call(rbind, differ[["faces"]])
   if(normals){
     tmesh <- vcgUpdateNormals(tmesh3d(
-      vertices = t(differ[["vertices"]]),
+      vertices = t(vertices),
       indices = t(differ[["faces"]]),
       homogeneous = FALSE
     ))
@@ -417,18 +447,24 @@ MeshesDifference <- function(
 #' @description Computes the union of the given meshes.
 #'
 #' @param meshes a list of \emph{triangular} meshes, each given as a list with
-#'   (at least) two fields: \code{vertices} and \code{faces}
+#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+#'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
+#'   otherwise it must be numeric
 #' @param merge Boolean, whether to merge the duplicated vertices of the
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param exact Boolean, whether to use exact calculations; this is slower but
-#'   more accurate
+#' @param numbersType the type of the numbers used in C++ for the 
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"} 
+#'   (a type provided by CGAL for exact computations), or \code{"gmp"}
+#'   (exact computations with rational numbers); of course using 
+#'   exact computations is slower but more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
-#'   \code{faces}, \code{edges}, \code{exteriorEdges} and \code{normals}
-#'   if \code{normals=TRUE}.
+#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+#'   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 #'
+#' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
 #' @importFrom Rvcg vcgUpdateNormals
 #'
@@ -468,23 +504,32 @@ MeshesDifference <- function(
 #'   edgesAsTubes = TRUE, verticesAsSpheres = TRUE
 #' )
 MeshesUnion <- function(
-    meshes, merge = FALSE, normals = FALSE, exact = FALSE
+    meshes, merge = FALSE, normals = FALSE, numbersType = "double"
 ){
   stopifnot(is.list(meshes))
+  numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
+  gmp <- numbersType == "gmp"
   checkMeshes <- lapply(meshes, function(mesh){
-    checkMesh(mesh[["vertices"]], mesh[["faces"]])
+    checkMesh(mesh[["vertices"]], mesh[["faces"]], gmp)
   })
   areTriangle <- all(vapply(checkMeshes, `[[`, logical(1L), "isTriangle"))
   if(!areTriangle){
     stop("All meshes must be triangular.")
   }
   meshes <- lapply(checkMeshes, `[`, c("vertices", "faces"))
-  if(exact){
+  if(numbersType == "double"){
+    umesh <- Union_K(meshes, merge, normals)
+  }else if(numbersType == "lazyExact"){
     umesh <- Union_EK(meshes, merge, normals)
   }else{
-    umesh <- Union_K(meshes, merge, normals)
+    umesh <- Intersection_Q(meshes, merge, normals)
   }
-  umesh[["vertices"]] <- t(umesh[["vertices"]])
+  vertices <- t(umesh[["vertices"]])
+  if(gmp){
+    umesh[["gmpVertices"]] <- as.bigq(vertices)
+    vertices <- asNumeric(vertices)
+  }
+  umesh[["vertices"]] <- vertices
   edges <- unname(t(umesh[["edges"]]))
   umesh[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
   umesh[["edges"]] <- edges[, c(1L, 2L)]
