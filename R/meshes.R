@@ -13,7 +13,7 @@
 #'   \code{2}, \code{3}, and \code{phi} (the golden number) respectively.
 #'   Their value converge more fastly than the value obtained with \code{qsqrt}.
 #'
-#' @importFrom gmp as.bigz as.bigq asNumeric matrix.bigq `%*%`
+#' @importFrom gmp as.bigz as.bigq asNumeric matrix.bigq add.bigq factorialZ `%*%`
 #'
 #' @aliases qsqrt qsqrt2 qsqrt3 qsqrtPhi print.qsqrt
 #' @rdname qsqrt
