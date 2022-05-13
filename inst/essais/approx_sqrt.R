@@ -58,8 +58,16 @@ qsqrt <- function(x, n){
   A <- matrix(c(zero, as.bigz(x)-1L, one, as.bigz(2L)), nrow = 2L, ncol = 2L)
   zs <- c((A %^% n) %*% c(zero, one))
   out <- as.bigq(zs[2L], zs[1L]) - 1L
+  class(out) <- c("qsqrt", class(out))
   attr(out, "error") <- abs(asNumeric(out) - sqrt(x))
   out
 }
 
 qsqrt(3, 7)
+
+print.qsqrt <- function(x, ...){
+  print(x)
+  cat(attr(x, "error"))
+}
+
+print.qsqrt(qsqrt(3, 7))

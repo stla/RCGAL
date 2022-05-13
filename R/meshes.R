@@ -1,3 +1,45 @@
+#' @title Rational approximation of square roots
+#' @description Returns a rational approximation of the square root of
+#'   an integer.
+#'
+#' @param x the positive integer whose square root is desired
+#' @param n a positive integer, the higher the better approximation
+#' @param ... ignored
+#'
+#' @return A \strong{gmp} rational number (class \code{\link[gmp]{bigq}})
+#'   approximating the square root of \code{x}.
+#'
+#' @importFrom gmp as.bigz as.bigq asNumeric matrix.bigq `%*%`
+#'
+#' @aliases qsqrt print.qsqrt
+#' @rdname qsqrt
+#' @export
+#'
+#' @examples
+#' library(RCGAL)
+#' qsqrt(2, 7)
+qsqrt <- function(x, n){
+  stopifnot(isPositiveInteger(x))
+  stopifnot(isStrictPositiveInteger(n))
+  zero <- as.bigz(0L)
+  one <- as.bigz(1L)
+  A <- matrix.bigq(c(zero, as.bigz(x)-1L, one, as.bigz(2L)), nrow = 2L, ncol = 2L)
+  zs <- c(gmp::`%*%`(A %^% n, c(zero, one)))
+  out <- as.bigq(zs[2L], zs[1L]) - 1L
+  attr(out, "error") <- abs(asNumeric(out) - sqrt(x))
+  class(out) <- c("qsqrt", class(out))
+  out
+}
+
+#' @rdname qsqrt
+#' @exportS3Method print qsqrt
+print.qsqrt <- function(x, ...){
+  print(as.bigq(x))
+  cat('attr("error")')
+  print(attr(x, "error"))
+  invisible(NULL)
+}
+
 #' @importFrom gmp is.bigq
 #' @importFrom data.table uniqueN
 #' @noRd
@@ -190,8 +232,9 @@ Mesh <- function(
   faces <- checkedMesh[["faces"]]
   homogeneousFaces <- checkedMesh[["homogeneousFaces"]]
   isTriangle <- checkedMesh[["isTriangle"]]
+  rmesh <- list("vertices" = vertices, "faces" = faces)
   mesh <- SurfMesh(
-    vertices, faces, isTriangle, triangulate, merge, normals, epsilon
+    rmesh, isTriangle, triangulate, merge, normals, epsilon
   )
   if(triangulate && isTriangle){
     message(
@@ -230,21 +273,21 @@ Mesh <- function(
 #' @description Computes the intersection of the given meshes.
 #'
 #' @param meshes a list of \emph{triangular} meshes, each given as a list with
-#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
 #' @param merge Boolean, whether to merge the duplicated vertices of the
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param numbersType the type of the numbers used in C++ for the 
-#'   computations; must be one of \code{"double"}, \code{"lazyExact"} 
+#' @param numbersType the type of the numbers used in C++ for the
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"}
 #'   (a type provided by CGAL for exact computations), or \code{"gmp"}
-#'   (exact computations with rational numbers); of course using 
+#'   (exact computations with rational numbers); of course using
 #'   exact computations is slower but more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
-#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices}
 #'   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 #'
 #' @importFrom gmp as.bigq asNumeric
@@ -340,21 +383,21 @@ MeshesIntersection <- function(
 #' @description Computes the difference between two meshes.
 #'
 #' @param mesh1,mesh2 two \emph{triangular} meshes, each given as a list with
-#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
 #' @param merge Boolean, whether to merge the duplicated vertices of the
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param numbersType the type of the numbers used in C++ for the 
-#'   computations; must be one of \code{"double"}, \code{"lazyExact"} 
+#' @param numbersType the type of the numbers used in C++ for the
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"}
 #'   (a type provided by CGAL for exact computations), or \code{"gmp"}
-#'   (exact computations with rational numbers); of course using 
+#'   (exact computations with rational numbers); of course using
 #'   exact computations is slower but more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
-#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices}
 #'   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 #'
 #' @importFrom gmp as.bigq asNumeric
@@ -447,21 +490,21 @@ MeshesDifference <- function(
 #' @description Computes the union of the given meshes.
 #'
 #' @param meshes a list of \emph{triangular} meshes, each given as a list with
-#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+#'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
 #' @param merge Boolean, whether to merge the duplicated vertices of the
 #'   input meshes and the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
-#' @param numbersType the type of the numbers used in C++ for the 
-#'   computations; must be one of \code{"double"}, \code{"lazyExact"} 
+#' @param numbersType the type of the numbers used in C++ for the
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"}
 #'   (a type provided by CGAL for exact computations), or \code{"gmp"}
-#'   (exact computations with rational numbers); of course using 
+#'   (exact computations with rational numbers); of course using
 #'   exact computations is slower but more accurate
 #'
 #' @return A triangular mesh given as a list with fields \code{vertices},
-#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+#'   \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices}
 #'   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 #'
 #' @importFrom gmp as.bigq asNumeric

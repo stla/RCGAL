@@ -4,11 +4,17 @@
 \alias{MeshesDifference}
 \title{Meshes difference}
 \usage{
-MeshesDifference(mesh1, mesh2, merge = FALSE, normals = FALSE, exact = FALSE)
+MeshesDifference(
+  mesh1,
+  mesh2,
+  merge = FALSE,
+  normals = FALSE,
+  numbersType = "double"
+)
 }
 \arguments{
 \item{mesh1, mesh2}{two \emph{triangular} meshes, each given as a list with
-(at least) two fields: \code{vertices} and \code{faces}; the `vertices` 
+(at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 otherwise it must be numeric}
 
@@ -18,15 +24,15 @@ input meshes and the output mesh}
 \item{normals}{Boolean, whether to return the per-vertex normals of the
 output mesh}
 
-\item{numbersType}{the type of the numbers used in C++ for the 
-computations; must be one of \code{"double"}, \code{"lazyExact"} 
+\item{numbersType}{the type of the numbers used in C++ for the
+computations; must be one of \code{"double"}, \code{"lazyExact"}
 (a type provided by CGAL for exact computations), or \code{"gmp"}
-(exact computations with rational numbers); of course using 
+(exact computations with rational numbers); of course using
 exact computations is slower but more accurate}
 }
 \value{
 A triangular mesh given as a list with fields \code{vertices},
-  \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices} 
+  \code{faces}, \code{edges}, \code{exteriorEdges}, \code{gmpvertices}
   if \code{numberTypes="gmp"}, and \code{normals} if \code{normals=TRUE}.
 }
 \description{
