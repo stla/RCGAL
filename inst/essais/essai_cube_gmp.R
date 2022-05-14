@@ -29,7 +29,7 @@ rglinter <- tmesh3d(
   homogeneous = FALSE
 )
 
-open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
+open3d(windowRect = c(50, 50, 562, 562), zoom = 0.7)
 bg3d("#363940")
 shade3d(rglmesh1, color = "yellow", alpha = 0.2)
 shade3d(rglmesh2, color = "orange", alpha = 0.2)
@@ -44,6 +44,20 @@ plotEdges(
 
 stop()
 
+# animation ####
+movie3d(spin3d(axis = c(0, 1, 1), rpm = 10),
+        duration = 6, fps = 10,
+        movie = "zzpic", dir = ".",
+        convert = FALSE,
+        startTime = 1/10,
+        webshot = FALSE)
+
+
+command <- "gifski --fps=10 --frames=zzpic*.png -o interCubeRotatedCube.gif"
+system(command)
+
+pngfiles <- list.files(pattern = "^zzpic?.*png$")
+file.remove(pngfiles)
 
 
 

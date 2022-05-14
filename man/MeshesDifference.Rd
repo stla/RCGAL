@@ -7,7 +7,7 @@
 MeshesDifference(
   mesh1,
   mesh2,
-  merge = FALSE,
+  clean = FALSE,
   normals = FALSE,
   numbersType = "double"
 )
@@ -18,6 +18,9 @@ MeshesDifference(
 matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 otherwise it must be numeric}
 
+\item{clean}{Boolean, whether to clean the mesh (merging duplicated
+vertices, duplicated faces, removed isolated vertices)}
+
 \item{normals}{Boolean, whether to return the per-vertex normals of the
 output mesh}
 
@@ -26,9 +29,6 @@ computations; must be one of \code{"double"}, \code{"lazyExact"}
 (a type provided by CGAL for exact computations), or \code{"gmp"}
 (exact computations with rational numbers); of course using
 exact computations is slower but more accurate}
-
-\item{clean}{Boolean, whether to clean the mesh (merging duplicated
-vertices, duplicated faces, removed isolated vertices)}
 }
 \value{
 A triangular mesh given as a list with fields \code{vertices},

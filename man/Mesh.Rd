@@ -8,7 +8,7 @@ Mesh(
   vertices,
   faces,
   triangulate = FALSE,
-  merge = FALSE,
+  clean = FALSE,
   normals = FALSE,
   epsilon = 0
 )
@@ -22,15 +22,15 @@ providing the vertex indices of the corresponding face}
 
 \item{triangulate}{Boolean, whether to triangulate the faces}
 
+\item{clean}{Boolean, whether to clean the mesh (merging duplicated
+vertices, duplicated faces, removed isolated vertices)}
+
 \item{normals}{Boolean, whether to compute the normals}
 
 \item{epsilon}{if the mesh is triangulated or if \code{triangulate=TRUE},
 then \code{epsilon} is used in the detection of exterior edges (see the
 \strong{Value} section); the higher value of \code{epsilon}, the lower
 number of exterior edges}
-
-\item{clean}{Boolean, whether to clean the mesh (merging duplicated
-vertices, duplicated faces, removed isolated vertices)}
 }
 \value{
 A list giving the vertices, the edges, the faces of the mesh, and

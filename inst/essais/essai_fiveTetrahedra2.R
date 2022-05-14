@@ -1,20 +1,12 @@
 library(rgl)
 
-plotEdges <- function(vertices, edges, ...){
-  for(i in 1L:nrow(edges)){
-    edge <- edges[i, ]
-    lines3d(rbind(vertices[edge[1L], ], vertices[edge[2L], ]), ...)
-  }
-  invisible(NULL)
-}
-
 phi <- (1+sqrt(5))/2
 a <- 1/sqrt(3)
 b <- a/phi
 c <- a*phi
 
 vertices <-
-  1000 * rbind(
+  rbind(
     c( a,  a,  a),
     c( a,  a, -a),
     c( a, -a,  a),
