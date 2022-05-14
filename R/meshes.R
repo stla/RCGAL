@@ -178,7 +178,8 @@ checkMesh <- function(vertices, faces, gmp){
 #'   of the corresponding face) or a list of integer vectors, each one
 #'   providing the vertex indices of the corresponding face
 #' @param triangulate Boolean, whether to triangulate the faces
-#' @param merge Boolean, whether to merge duplicated vertices
+#' @param clean Boolean, whether to clean the mesh (merging duplicated
+#'   vertices, duplicated faces, removed isolated vertices)
 #' @param normals Boolean, whether to compute the normals
 #' @param epsilon if the mesh is triangulated or if \code{triangulate=TRUE},
 #'   then \code{epsilon} is used in the detection of exterior edges (see the
@@ -236,7 +237,7 @@ checkMesh <- function(vertices, faces, gmp){
 #' open3d(windowRect = c(50, 50, 562, 562))
 #' shade3d(tmesh2, color = "blue", back = "cull")
 #'
-#' # illustration of the `merge` option ####
+#' # illustration of the `clean` option ####
 #' # we construct a mesh with a lot of duplicated vertices
 #' library(misc3d) # to compute a mesh of an isosurface
 #' a <- 0.94; mu <- 0.56; c <- 0.34 # cyclide parameters
@@ -251,8 +252,8 @@ checkMesh <- function(vertices, faces, gmp){
 #' voxel <- array(with(g, f(x, y, z, a, c, mu)), c(45, 45, 30))
 #' cont <- computeContour3d(voxel, level = 0, x = x, y = y, z = z)
 #' ids <- matrix(1:nrow(cont), ncol = 3, byrow = TRUE)
-#' # run the `Mesh` function with `merge=TRUE`
-#' mesh <- Mesh(cont, ids, merge = TRUE)
+#' # run the `Mesh` function with `clean=TRUE`
+#' mesh <- Mesh(cont, ids, clean = TRUE)
 #' # plot the cyclide
 #' tmesh <- tmesh3d(
 #'   vertices = t(mesh[["vertices"]]),
@@ -281,7 +282,7 @@ checkMesh <- function(vertices, faces, gmp){
 #' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
 #' shade3d(tmesh, color = "orange")
 Mesh <- function(
-  vertices, faces, triangulate = FALSE, merge = FALSE, normals = FALSE,
+  vertices, faces, triangulate = FALSE, clean = FALSE, normals = FALSE,
   epsilon = 0
 ){
   stopifnot(epsilon >= 0)
@@ -292,7 +293,7 @@ Mesh <- function(
   isTriangle <- checkedMesh[["isTriangle"]]
   rmesh <- list("vertices" = vertices, "faces" = faces)
   mesh <- SurfMesh(
-    rmesh, isTriangle, triangulate, merge, normals, epsilon
+    rmesh, isTriangle, triangulate, clean, normals, epsilon
   )
   if(triangulate && isTriangle){
     message(
@@ -337,8 +338,9 @@ Mesh <- function(
 #'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
-#' @param merge Boolean, whether to merge the duplicated vertices of the
-#'   input meshes and the output mesh
+#' @param clean Boolean, whether to clean the input meshes (merging
+#'   duplicated vertices, duplicated faces, removed isolated vertices)
+#'   as well as the output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
 #' @param numbersType the type of the numbers used in C++ for the
@@ -442,7 +444,7 @@ Mesh <- function(
 #'   tubesRadius = 0.05, spheresRadius = 0.07
 #' )
 MeshesIntersection <- function(
-    meshes, merge = FALSE, normals = FALSE, numbersType = "double"
+    meshes, clean = FALSE, normals = FALSE, numbersType = "double"
 ){
   numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
   gmp <- numbersType == "gmp"
@@ -456,11 +458,11 @@ MeshesIntersection <- function(
   }
   meshes <- lapply(checkMeshes, `[`, c("vertices", "faces"))
   if(numbersType == "double"){
-    inter <- Intersection2_K(meshes, merge, normals)
+    inter <- Intersection2_K(meshes, clean, normals)
   }else if(numbersType == "lazyExact"){
-    inter <- Intersection2_EK(meshes, merge, normals)
+    inter <- Intersection2_EK(meshes, clean, normals)
   }else{
-    inter <- Intersection_Q(meshes, merge, normals)
+    inter <- Intersection_Q(meshes, clean, normals)
   }
   if(gmp){
     vertices <- as.bigq(t(inter[["vertices"]]))
@@ -494,8 +496,8 @@ MeshesIntersection <- function(
 #'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
-#' @param merge Boolean, whether to merge the duplicated vertices of the
-#'   input meshes and the output mesh
+#' @param clean Boolean, whether to clean the mesh (merging duplicated
+#'   vertices, duplicated faces, removed isolated vertices)
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
 #' @param numbersType the type of the numbers used in C++ for the
@@ -550,7 +552,7 @@ MeshesIntersection <- function(
 #'   edgesAsTubes = TRUE, verticesAsSpheres = TRUE
 #' )
 MeshesDifference <- function(
-    mesh1, mesh2, merge = FALSE, normals = FALSE, numbersType = "double"
+    mesh1, mesh2, clean = FALSE, normals = FALSE, numbersType = "double"
 ){
   stopifnot(is.list(mesh1))
   stopifnot(is.list(mesh2))
@@ -567,11 +569,11 @@ MeshesDifference <- function(
   mesh1 <- checkMesh1[c("vertices", "faces")]
   mesh2 <- checkMesh2[c("vertices", "faces")]
   if(numbersType == "double"){
-    differ <- Difference_K(mesh1, mesh2, merge, normals)
+    differ <- Difference_K(mesh1, mesh2, clean, normals)
   }else if(numbersType == "lazyExact"){
-    differ <- Difference_EK(mesh1, mesh2, merge, normals)
+    differ <- Difference_EK(mesh1, mesh2, clean, normals)
   }else{
-    differ <- Difference_K(mesh1, mesh2, merge, normals)
+    differ <- Difference_K(mesh1, mesh2, clean, normals)
   }
   vertices <- t(differ[["vertices"]])
   if(gmp){
@@ -601,8 +603,8 @@ MeshesDifference <- function(
 #'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
-#' @param merge Boolean, whether to merge the duplicated vertices of the
-#'   input meshes and the output mesh
+#' @param clean Boolean, whether to clean the mesh (merging duplicated
+#'   vertices, duplicated faces, removed isolated vertices)
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
 #' @param numbersType the type of the numbers used in C++ for the
@@ -655,7 +657,7 @@ MeshesDifference <- function(
 #'   edgesAsTubes = TRUE, verticesAsSpheres = TRUE
 #' )
 MeshesUnion <- function(
-    meshes, merge = FALSE, normals = FALSE, numbersType = "double"
+    meshes, clean = FALSE, normals = FALSE, numbersType = "double"
 ){
   stopifnot(is.list(meshes))
   numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
@@ -669,11 +671,11 @@ MeshesUnion <- function(
   }
   meshes <- lapply(checkMeshes, `[`, c("vertices", "faces"))
   if(numbersType == "double"){
-    umesh <- Union_K(meshes, merge, normals)
+    umesh <- Union_K(meshes, clean, normals)
   }else if(numbersType == "lazyExact"){
-    umesh <- Union_EK(meshes, merge, normals)
+    umesh <- Union_EK(meshes, clean, normals)
   }else{
-    umesh <- Intersection_Q(meshes, merge, normals)
+    umesh <- Intersection_Q(meshes, clean, normals)
   }
   vertices <- t(umesh[["vertices"]])
   if(gmp){

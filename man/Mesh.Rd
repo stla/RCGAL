@@ -22,14 +22,15 @@ providing the vertex indices of the corresponding face}
 
 \item{triangulate}{Boolean, whether to triangulate the faces}
 
-\item{merge}{Boolean, whether to merge duplicated vertices}
-
 \item{normals}{Boolean, whether to compute the normals}
 
 \item{epsilon}{if the mesh is triangulated or if \code{triangulate=TRUE},
 then \code{epsilon} is used in the detection of exterior edges (see the
 \strong{Value} section); the higher value of \code{epsilon}, the lower
 number of exterior edges}
+
+\item{clean}{Boolean, whether to clean the mesh (merging duplicated
+vertices, duplicated faces, removed isolated vertices)}
 }
 \value{
 A list giving the vertices, the edges, the faces of the mesh, and
@@ -85,7 +86,7 @@ tmesh2 <- tmesh3d(
 open3d(windowRect = c(50, 50, 562, 562))
 shade3d(tmesh2, color = "blue", back = "cull")
 
-# illustration of the `merge` option ####
+# illustration of the `clean` option ####
 # we construct a mesh with a lot of duplicated vertices
 library(misc3d) # to compute a mesh of an isosurface
 a <- 0.94; mu <- 0.56; c <- 0.34 # cyclide parameters
@@ -100,8 +101,8 @@ g <- expand.grid(x = x, y = y, z = z)
 voxel <- array(with(g, f(x, y, z, a, c, mu)), c(45, 45, 30))
 cont <- computeContour3d(voxel, level = 0, x = x, y = y, z = z)
 ids <- matrix(1:nrow(cont), ncol = 3, byrow = TRUE)
-# run the `Mesh` function with `merge=TRUE`
-mesh <- Mesh(cont, ids, merge = TRUE)
+# run the `Mesh` function with `clean=TRUE`
+mesh <- Mesh(cont, ids, clean = TRUE)
 # plot the cyclide
 tmesh <- tmesh3d(
   vertices = t(mesh[["vertices"]]),
