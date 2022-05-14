@@ -266,7 +266,7 @@ MeshT soup2mesh(std::vector<PointT> points,
     // Rcpp::message(rmsg2);
   }
   MeshT mesh;
-  polygon_soup_to_polygon_mesh(points, faces, mesh);
+  PMP::polygon_soup_to_polygon_mesh(points, faces, mesh);
   // const size_t nivremoved = PMP::remove_isolated_vertices(mesh);
   // std::string msg3 = "Number of isolated points removed: " + std::to_string(nivremoved);
   // SEXP rmsg3 = Rcpp::wrap(msg3);
