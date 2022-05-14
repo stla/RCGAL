@@ -11,3 +11,4 @@
 ^\.Rprofile$
 ^inst/ConvexHullExamples$
 ^inst/AFSexamples$
+^inst/BooleanExamples$

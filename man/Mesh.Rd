@@ -9,7 +9,7 @@ Mesh(
   faces,
   triangulate = FALSE,
   merge = FALSE,
-  normals = TRUE,
+  normals = FALSE,
   epsilon = 0
 )
 }
