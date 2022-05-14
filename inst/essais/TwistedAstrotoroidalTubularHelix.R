@@ -37,7 +37,7 @@ bnrml <- function(t, R, r, w){
 # mesh: astrotoroidal twisted tubular helix
 scos <- function(x,alpha) sign(cos(x)) * abs(cos(x))^alpha
 ssin <- function(x,alpha) sign(sin(x)) * abs(sin(x))^alpha
-TubularHelixMesh <- function(R, r, w, a, nu, nv, alpha=1, twists=2){
+TubularHelixMesh <- function(R, r, w, a, nu, nv, alpha=0.5, twists=2){
   vs <- matrix(NA_real_, nrow=3, ncol=nu*nv)
   colors <- matrix(NA_character_, nrow = 3L, ncol = nu*nv)
   u_ <- seq(0, w*2*pi, length.out = nu+1)[-1]
@@ -81,7 +81,7 @@ TubularHelixMesh <- function(R, r, w, a, nu, nv, alpha=1, twists=2){
 }
 
 # draw ####
-m <- TubularHelixMesh(R=5, r=1.35, w=10, a=0.7, 10*20, 30, alpha=1, twists=1)
+m <- TubularHelixMesh(R=5, r=1.35, w=10, a=0.7, 10*20, 30, alpha=2, twists=1)
 open3d(windowRect = c(50,50,550,550))
 bg3d(rgb(54,57,64, maxColorValue = 255))
 view3d(0,-55)
@@ -93,6 +93,16 @@ open3d(windowRect = c(50,50,562,562))
 view3d(0,-55)
 shade3d(mesh, color = "yellow")
 wire3d(mesh, color="black")
+
+library(Rvcg)
+vcgmesh <- vcgUpdateNormals(mesh)
+open3d(windowRect = c(50,50,562,562))
+view3d(0,-55)
+shade3d(vcgmesh, color = "orange")
+wire3d(vcgmesh, color="black")
+AFSreconstruction(pts)
+
+
 
 mesh <- PoissonReconstruction(pts, getSomeNormals(pts, 10))
 open3d(windowRect = c(50,50,562,562))

@@ -247,43 +247,53 @@ std::vector<std::vector<size_t>> list_to_faces(const Rcpp::List L) {
 template <typename MeshT, typename PointT>
 MeshT soup2mesh(std::vector<PointT> points,
                 std::vector<std::vector<size_t>> faces,
-                const bool merge) {
+                const bool clean) {
   bool success = PMP::orient_polygon_soup(points, faces);
   if(!success) {
     Rcpp::stop("Polygon orientation failed.");
   }
-  if(merge) {
-    const unsigned nremoved =
-        PMP::merge_duplicate_points_in_polygon_soup(points, faces);
-    std::string msg = "Number of points removed: " + std::to_string(nremoved);
-    SEXP rmsg = Rcpp::wrap(msg);
-    Rcpp::message(rmsg);
+  if(clean) {
+    PMP::repair_polygon_soup(points, faces);
+    // const unsigned nvremoved =
+    //     PMP::merge_duplicate_points_in_polygon_soup(points, faces);
+    // std::string msg1 = "Number of duplicated points removed: " + std::to_string(nvremoved);
+    // SEXP rmsg1 = Rcpp::wrap(msg1);
+    // Rcpp::message(rmsg1);
+    // const unsigned nfremoved = 
+    //   PMP::merge_duplicate_polygons_in_polygon_soup(points, faces);
+    // std::string msg2 = "Number of duplicated faces removed: " + std::to_string(nfremoved);
+    // SEXP rmsg2 = Rcpp::wrap(msg2);
+    // Rcpp::message(rmsg2);
   }
   MeshT mesh;
-  PMP::polygon_soup_to_polygon_mesh(points, faces, mesh);
+  soup_to_polygon_mesh(points, faces, mesh);
+  // const size_t nivremoved = PMP::remove_isolated_vertices(mesh);
+  // std::string msg3 = "Number of isolated points removed: " + std::to_string(nivremoved);
+  // SEXP rmsg3 = Rcpp::wrap(msg3);
+  // Rcpp::message(rmsg3);
   return mesh;
 }
 
 template <typename MeshT, typename PointT>
-MeshT makeSurfMesh(const Rcpp::List rmesh, const bool merge) {
+MeshT makeSurfMesh(const Rcpp::List rmesh, const bool clean) {
   const Rcpp::NumericMatrix vertices =
       Rcpp::as<Rcpp::NumericMatrix>(rmesh["vertices"]);
   const Rcpp::List rfaces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
   std::vector<PointT> points = matrix_to_points3<PointT>(vertices);
   std::vector<std::vector<size_t>> faces = list_to_faces(rfaces);
-  return soup2mesh<MeshT, PointT>(points, faces, merge);
+  return soup2mesh<MeshT, PointT>(points, faces, clean);
 }
 
 template Mesh3 makeSurfMesh<Mesh3, Point3>(const Rcpp::List, const bool);
 template EMesh3 makeSurfMesh<EMesh3, EPoint3>(const Rcpp::List, const bool);
 
-QMesh3 makeSurfQMesh(const Rcpp::List rmesh, const bool merge) {
+QMesh3 makeSurfQMesh(const Rcpp::List rmesh, const bool clean) {
   const Rcpp::CharacterMatrix vertices =
       Rcpp::as<Rcpp::CharacterMatrix>(rmesh["vertices"]);
   const Rcpp::List rfaces = Rcpp::as<Rcpp::List>(rmesh["faces"]);
   std::vector<QPoint3> points = matrix_to_qpoints3(vertices);
   std::vector<std::vector<size_t>> faces = list_to_faces(rfaces);
-  return soup2mesh<QMesh3, QPoint3>(points, faces, merge);
+  return soup2mesh<QMesh3, QPoint3>(points, faces, clean);
 }
 
 Rcpp::NumericMatrix getVertices_K(Mesh3 mesh) {
