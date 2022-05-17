@@ -288,7 +288,7 @@ checkMesh <- function(vertices, faces, gmp){
 #' shade3d(tmesh, color = "orange")
 Mesh <- function(
     vertices, faces, triangulate = FALSE, clean = FALSE, normals = FALSE,
-    numberTypes = "double", epsilon = 0
+    numbersType = "double", epsilon = 0
 ){
   numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
   gmp <- numbersType == "gmp"
