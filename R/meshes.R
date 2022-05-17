@@ -200,6 +200,8 @@ checkMesh <- function(vertices, faces, gmp){
 #'
 #' @export
 #'
+#' @importFrom gmp as.bigq asNumeric
+#'
 #' @examples
 #' library(RCGAL)
 #' library(rgl)
@@ -285,19 +287,31 @@ checkMesh <- function(vertices, faces, gmp){
 #' open3d(windowRect = c(50, 50, 562, 562), zoom = 0.9)
 #' shade3d(tmesh, color = "orange")
 Mesh <- function(
-  vertices, faces, triangulate = FALSE, clean = FALSE, normals = FALSE,
-  epsilon = 0
+    vertices, faces, triangulate = FALSE, clean = FALSE, normals = FALSE,
+    numberTypes = "double", epsilon = 0
 ){
+  numbersType <- match.arg(numbersType, c("double", "lazyExact", "gmp"))
+  gmp <- numbersType == "gmp"
   stopifnot(epsilon >= 0)
-  checkedMesh <- checkMesh(vertices, faces, gmp = FALSE)
+  checkedMesh <- checkMesh(vertices, faces, gmp = gmp)
   vertices <- checkedMesh[["vertices"]]
   faces <- checkedMesh[["faces"]]
   homogeneousFaces <- checkedMesh[["homogeneousFaces"]]
   isTriangle <- checkedMesh[["isTriangle"]]
   rmesh <- list("vertices" = vertices, "faces" = faces)
-  mesh <- SurfMesh(
-    rmesh, isTriangle, triangulate, clean, normals, epsilon
-  )
+  if(numbersType == "double"){
+    mesh <- SurfMesh(
+      rmesh, isTriangle, triangulate, clean, normals, epsilon
+    )
+  }else if(numbersType == "lazyExact"){
+    mesh <- SurfEMesh(
+      rmesh, isTriangle, triangulate, clean, normals, epsilon
+    )
+  }else{
+    mesh <- SurfQMesh(
+      rmesh, isTriangle, triangulate, clean, normals, epsilon
+    )
+  }
   if(triangulate && isTriangle){
     message(
       "Ignored option `triangulate`, since the mesh is already triangulated."
@@ -313,20 +327,27 @@ Mesh <- function(
   #     SurfMesh(t(vertices), faces, merge)
   #   }
   # }
-  mesh[["vertices"]] <- t(mesh[["vertices"]])
+  if(gmp){
+    vertices <- as.bigq(t(mesh[["vertices"]]))
+    mesh[["gmpVertices"]] <- vertices
+    vertices <- asNumeric(vertices)
+  }else{
+    vertices <- t(mesh[["vertices"]])
+  }
+  mesh[["vertices"]] <- vertices
   edges <- unname(t(mesh[["edges"]]))
-  if(triangulate || isTriangle){
-    mesh[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
-    mesh[["edges"]] <- edges[, c(1L, 2L)]
+  exteriorEdges <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  mesh[["exteriorEdges"]] <- exteriorEdges
+  mesh[["exteriorVertices"]] <- which(table(exteriorEdges) != 2L)
+  mesh[["edges"]] <- edges[, c(1L, 2L)]
+  if(normals){
+    mesh[["normals"]] <- t(tmesh[["normals"]])
   }
   if(triangulate){
     mesh[["edges0"]] <- t(mesh[["edges0"]])
     if(normals){
       mesh[["normals0"]] <- t(mesh[["normals0"]])
     }
-  }
-  if(normals){
-    mesh[["normals"]] <- t(mesh[["normals"]])
   }
   if(triangulate || homogeneousFaces){
     mesh[["faces"]] <- do.call(rbind, mesh[["faces"]])
@@ -358,7 +379,6 @@ Mesh <- function(
 #'
 #' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
-#' @importFrom Rvcg vcgUpdateNormals
 #'
 #' @export
 #'
@@ -481,6 +501,9 @@ MeshesIntersection <- function(
   inter[["exteriorVertices"]] <- which(table(exteriorEdges) != 2L)
   inter[["edges"]] <- edges[, c(1L, 2L)]
   inter[["faces"]] <- do.call(rbind, inter[["faces"]])
+  if(normals){
+    inter[["normals"]] <- t(tmesh[["normals"]])
+  }
   # if(normals){
   #   tmesh <- vcgUpdateNormals(tmesh3d(
   #     vertices = vertices,
@@ -516,7 +539,6 @@ MeshesIntersection <- function(
 #'
 #' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
-#' @importFrom Rvcg vcgUpdateNormals
 #'
 #' @export
 #'
@@ -579,24 +601,23 @@ MeshesDifference <- function(
   }else{
     differ <- Difference_K(mesh1, mesh2, clean, normals)
   }
-  vertices <- t(differ[["vertices"]])
   if(gmp){
-    differ[["gmpVertices"]] <- as.bigq(vertices)
+    vertices <- as.bigq(t(differ[["vertices"]]))
+    differ[["gmpVertices"]] <- vertices
     vertices <- asNumeric(vertices)
+  }else{
+    vertices <- t(differ[["vertices"]])
   }
   differ[["vertices"]] <- vertices
   edges <- unname(t(differ[["edges"]]))
-  differ[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  exteriorEdges <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  differ[["exteriorEdges"]] <- exteriorEdges
+  differ[["exteriorVertices"]] <- which(table(exteriorEdges) != 2L)
   differ[["edges"]] <- edges[, c(1L, 2L)]
   differ[["faces"]] <- do.call(rbind, differ[["faces"]])
-  # if(normals){
-  #   tmesh <- vcgUpdateNormals(tmesh3d(
-  #     vertices = t(vertices),
-  #     indices = t(differ[["faces"]]),
-  #     homogeneous = FALSE
-  #   ))
-  #   differ[["normals"]] <- t(tmesh[["normals"]][-4L, ])
-  # }
+  if(normals){
+    differ[["normals"]] <- t(tmesh[["normals"]])
+  }
   differ
 }
 
@@ -624,7 +645,6 @@ MeshesDifference <- function(
 #'
 #' @importFrom gmp as.bigq asNumeric
 #' @importFrom rgl tmesh3d
-#' @importFrom Rvcg vcgUpdateNormals
 #'
 #' @export
 #'
@@ -682,24 +702,23 @@ MeshesUnion <- function(
   }else{
     umesh <- Intersection_Q(meshes, clean, normals)
   }
-  vertices <- t(umesh[["vertices"]])
   if(gmp){
-    umesh[["gmpVertices"]] <- as.bigq(vertices)
+    vertices <- as.bigq(t(umesh[["vertices"]]))
+    umesh[["gmpVertices"]] <- vertices
     vertices <- asNumeric(vertices)
+  }else{
+    vertices <- t(umesh[["vertices"]])
   }
   umesh[["vertices"]] <- vertices
   edges <- unname(t(umesh[["edges"]]))
-  umesh[["exteriorEdges"]] <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  exteriorEdges <- edges[edges[, 3L] == 1L, c(1L, 2L)]
+  umesh[["exteriorEdges"]] <- exteriorEdges
+  umesh[["exteriorVertices"]] <- which(table(exteriorEdges) != 2L)
   umesh[["edges"]] <- edges[, c(1L, 2L)]
   umesh[["faces"]] <- do.call(rbind, umesh[["faces"]])
-  # if(normals){
-  #   tmesh <- vcgUpdateNormals(tmesh3d(
-  #     vertices = t(umesh[["vertices"]]),
-  #     indices = t(umesh[["faces"]]),
-  #     homogeneous = FALSE
-  #   ))
-  #   umesh[["normals"]] <- t(tmesh[["normals"]][-4L, ])
-  # }
+  if(normals){
+    umesh[["normals"]] <- t(tmesh[["normals"]])
+  }
   umesh
 }
 
