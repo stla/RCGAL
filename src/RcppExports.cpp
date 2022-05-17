@@ -165,170 +165,170 @@ BEGIN_RCPP
 END_RCPP
 }
 // SurfMesh
-Rcpp::List SurfMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
-RcppExport SEXP _RCGAL_SurfMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
+Rcpp::List SurfMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool clean, const bool normals, const double epsilon);
+RcppExport SEXP _RCGAL_SurfMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP cleanSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh(rmeshSEXP);
     Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
     Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfMesh(rmesh, isTriangle, triangulate, merge, normals, epsilon));
+    rcpp_result_gen = Rcpp::wrap(SurfMesh(rmesh, isTriangle, triangulate, clean, normals, epsilon));
     return rcpp_result_gen;
 END_RCPP
 }
 // SurfEMesh
-Rcpp::List SurfEMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
-RcppExport SEXP _RCGAL_SurfEMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
+Rcpp::List SurfEMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool clean, const bool normals, const double epsilon);
+RcppExport SEXP _RCGAL_SurfEMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP cleanSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh(rmeshSEXP);
     Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
     Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfEMesh(rmesh, isTriangle, triangulate, merge, normals, epsilon));
+    rcpp_result_gen = Rcpp::wrap(SurfEMesh(rmesh, isTriangle, triangulate, clean, normals, epsilon));
     return rcpp_result_gen;
 END_RCPP
 }
 // SurfQMesh
-Rcpp::List SurfQMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool merge, const bool normals, const double epsilon);
-RcppExport SEXP _RCGAL_SurfQMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP mergeSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
+Rcpp::List SurfQMesh(const Rcpp::List rmesh, const bool isTriangle, const bool triangulate, const bool clean, const bool normals, const double epsilon);
+RcppExport SEXP _RCGAL_SurfQMesh(SEXP rmeshSEXP, SEXP isTriangleSEXP, SEXP triangulateSEXP, SEXP cleanSEXP, SEXP normalsSEXP, SEXP epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh(rmeshSEXP);
     Rcpp::traits::input_parameter< const bool >::type isTriangle(isTriangleSEXP);
     Rcpp::traits::input_parameter< const bool >::type triangulate(triangulateSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(SurfQMesh(rmesh, isTriangle, triangulate, merge, normals, epsilon));
+    rcpp_result_gen = Rcpp::wrap(SurfQMesh(rmesh, isTriangle, triangulate, clean, normals, epsilon));
     return rcpp_result_gen;
 END_RCPP
 }
 // Intersection2_K
-Rcpp::List Intersection2_K(const Rcpp::List rmeshes, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Intersection2_K(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Intersection2_K(const Rcpp::List rmeshes, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Intersection2_K(SEXP rmeshesSEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Intersection2_K(rmeshes, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Intersection2_K(rmeshes, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Intersection2_EK
-Rcpp::List Intersection2_EK(const Rcpp::List rmeshes, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Intersection2_EK(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Intersection2_EK(const Rcpp::List rmeshes, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Intersection2_EK(SEXP rmeshesSEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Intersection2_EK(rmeshes, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Intersection2_EK(rmeshes, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Intersection_Q
-Rcpp::List Intersection_Q(const Rcpp::List rmeshes, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Intersection_Q(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Intersection_Q(const Rcpp::List rmeshes, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Intersection_Q(SEXP rmeshesSEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Intersection_Q(rmeshes, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Intersection_Q(rmeshes, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Difference_K
-Rcpp::List Difference_K(const Rcpp::List rmesh1, const Rcpp::List rmesh2, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Difference_K(SEXP rmesh1SEXP, SEXP rmesh2SEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Difference_K(const Rcpp::List rmesh1, const Rcpp::List rmesh2, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Difference_K(SEXP rmesh1SEXP, SEXP rmesh2SEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh1(rmesh1SEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh2(rmesh2SEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Difference_K(rmesh1, rmesh2, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Difference_K(rmesh1, rmesh2, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Difference_EK
-Rcpp::List Difference_EK(const Rcpp::List rmesh1, const Rcpp::List rmesh2, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Difference_EK(SEXP rmesh1SEXP, SEXP rmesh2SEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Difference_EK(const Rcpp::List rmesh1, const Rcpp::List rmesh2, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Difference_EK(SEXP rmesh1SEXP, SEXP rmesh2SEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh1(rmesh1SEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh2(rmesh2SEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Difference_EK(rmesh1, rmesh2, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Difference_EK(rmesh1, rmesh2, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Difference_Q
-Rcpp::List Difference_Q(const Rcpp::List rmesh1, const Rcpp::List rmesh2, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Difference_Q(SEXP rmesh1SEXP, SEXP rmesh2SEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Difference_Q(const Rcpp::List rmesh1, const Rcpp::List rmesh2, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Difference_Q(SEXP rmesh1SEXP, SEXP rmesh2SEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh1(rmesh1SEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmesh2(rmesh2SEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Difference_Q(rmesh1, rmesh2, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Difference_Q(rmesh1, rmesh2, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Union_K
-Rcpp::List Union_K(const Rcpp::List rmeshes, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Union_K(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Union_K(const Rcpp::List rmeshes, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Union_K(SEXP rmeshesSEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Union_K(rmeshes, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Union_K(rmeshes, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Union_EK
-Rcpp::List Union_EK(const Rcpp::List rmeshes, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Union_EK(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Union_EK(const Rcpp::List rmeshes, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Union_EK(SEXP rmeshesSEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Union_EK(rmeshes, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Union_EK(rmeshes, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }
 // Union_Q
-Rcpp::List Union_Q(const Rcpp::List rmeshes, const bool merge, const bool normals);
-RcppExport SEXP _RCGAL_Union_Q(SEXP rmeshesSEXP, SEXP mergeSEXP, SEXP normalsSEXP) {
+Rcpp::List Union_Q(const Rcpp::List rmeshes, const bool clean, const bool normals);
+RcppExport SEXP _RCGAL_Union_Q(SEXP rmeshesSEXP, SEXP cleanSEXP, SEXP normalsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type rmeshes(rmeshesSEXP);
-    Rcpp::traits::input_parameter< const bool >::type merge(mergeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clean(cleanSEXP);
     Rcpp::traits::input_parameter< const bool >::type normals(normalsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Union_Q(rmeshes, merge, normals));
+    rcpp_result_gen = Rcpp::wrap(Union_Q(rmeshes, clean, normals));
     return rcpp_result_gen;
 END_RCPP
 }

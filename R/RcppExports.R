@@ -53,51 +53,51 @@ Poisson_reconstruction_cpp <- function(pts, normals, spacing, sm_angle, sm_radiu
     .Call(`_RCGAL_Poisson_reconstruction_cpp`, pts, normals, spacing, sm_angle, sm_radius, sm_distance)
 }
 
-SurfMesh <- function(rmesh, isTriangle, triangulate, merge, normals, epsilon) {
-    .Call(`_RCGAL_SurfMesh`, rmesh, isTriangle, triangulate, merge, normals, epsilon)
+SurfMesh <- function(rmesh, isTriangle, triangulate, clean, normals, epsilon) {
+    .Call(`_RCGAL_SurfMesh`, rmesh, isTriangle, triangulate, clean, normals, epsilon)
 }
 
-SurfEMesh <- function(rmesh, isTriangle, triangulate, merge, normals, epsilon) {
-    .Call(`_RCGAL_SurfEMesh`, rmesh, isTriangle, triangulate, merge, normals, epsilon)
+SurfEMesh <- function(rmesh, isTriangle, triangulate, clean, normals, epsilon) {
+    .Call(`_RCGAL_SurfEMesh`, rmesh, isTriangle, triangulate, clean, normals, epsilon)
 }
 
-SurfQMesh <- function(rmesh, isTriangle, triangulate, merge, normals, epsilon) {
-    .Call(`_RCGAL_SurfQMesh`, rmesh, isTriangle, triangulate, merge, normals, epsilon)
+SurfQMesh <- function(rmesh, isTriangle, triangulate, clean, normals, epsilon) {
+    .Call(`_RCGAL_SurfQMesh`, rmesh, isTriangle, triangulate, clean, normals, epsilon)
 }
 
-Intersection2_K <- function(rmeshes, merge, normals) {
-    .Call(`_RCGAL_Intersection2_K`, rmeshes, merge, normals)
+Intersection2_K <- function(rmeshes, clean, normals) {
+    .Call(`_RCGAL_Intersection2_K`, rmeshes, clean, normals)
 }
 
-Intersection2_EK <- function(rmeshes, merge, normals) {
-    .Call(`_RCGAL_Intersection2_EK`, rmeshes, merge, normals)
+Intersection2_EK <- function(rmeshes, clean, normals) {
+    .Call(`_RCGAL_Intersection2_EK`, rmeshes, clean, normals)
 }
 
-Intersection_Q <- function(rmeshes, merge, normals) {
-    .Call(`_RCGAL_Intersection_Q`, rmeshes, merge, normals)
+Intersection_Q <- function(rmeshes, clean, normals) {
+    .Call(`_RCGAL_Intersection_Q`, rmeshes, clean, normals)
 }
 
-Difference_K <- function(rmesh1, rmesh2, merge, normals) {
-    .Call(`_RCGAL_Difference_K`, rmesh1, rmesh2, merge, normals)
+Difference_K <- function(rmesh1, rmesh2, clean, normals) {
+    .Call(`_RCGAL_Difference_K`, rmesh1, rmesh2, clean, normals)
 }
 
-Difference_EK <- function(rmesh1, rmesh2, merge, normals) {
-    .Call(`_RCGAL_Difference_EK`, rmesh1, rmesh2, merge, normals)
+Difference_EK <- function(rmesh1, rmesh2, clean, normals) {
+    .Call(`_RCGAL_Difference_EK`, rmesh1, rmesh2, clean, normals)
 }
 
-Difference_Q <- function(rmesh1, rmesh2, merge, normals) {
-    .Call(`_RCGAL_Difference_Q`, rmesh1, rmesh2, merge, normals)
+Difference_Q <- function(rmesh1, rmesh2, clean, normals) {
+    .Call(`_RCGAL_Difference_Q`, rmesh1, rmesh2, clean, normals)
 }
 
-Union_K <- function(rmeshes, merge, normals) {
-    .Call(`_RCGAL_Union_K`, rmeshes, merge, normals)
+Union_K <- function(rmeshes, clean, normals) {
+    .Call(`_RCGAL_Union_K`, rmeshes, clean, normals)
 }
 
-Union_EK <- function(rmeshes, merge, normals) {
-    .Call(`_RCGAL_Union_EK`, rmeshes, merge, normals)
+Union_EK <- function(rmeshes, clean, normals) {
+    .Call(`_RCGAL_Union_EK`, rmeshes, clean, normals)
 }
 
-Union_Q <- function(rmeshes, merge, normals) {
-    .Call(`_RCGAL_Union_Q`, rmeshes, merge, normals)
+Union_Q <- function(rmeshes, clean, normals) {
+    .Call(`_RCGAL_Union_Q`, rmeshes, clean, normals)
 }
 

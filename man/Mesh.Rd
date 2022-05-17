@@ -10,6 +10,7 @@ Mesh(
   triangulate = FALSE,
   clean = FALSE,
   normals = FALSE,
+  numbersType = "double",
   epsilon = 0
 )
 }
@@ -27,16 +28,16 @@ vertices, duplicated faces, removed isolated vertices)}
 
 \item{normals}{Boolean, whether to compute the normals}
 
-\item{epsilon}{if the mesh is triangulated or if \code{triangulate=TRUE},
-then \code{epsilon} is used in the detection of exterior edges (see the
-\strong{Value} section); the higher value of \code{epsilon}, the lower
-number of exterior edges}
-
 \item{numbersType}{the type of the numbers used in C++ for the
 computations; must be one of \code{"double"}, \code{"lazyExact"}
 (a type provided by CGAL for exact computations), or \code{"gmp"}
 (exact computations with rational numbers); using exact computations can
 improve the detection of the exterior edges}
+
+\item{epsilon}{if the mesh is triangulated or if \code{triangulate=TRUE},
+then \code{epsilon} is used in the detection of exterior edges (see the
+\strong{Value} section); the higher value of \code{epsilon}, the lower
+number of exterior edges}
 }
 \value{
 A list giving the vertices, the edges, the faces of the mesh, the
