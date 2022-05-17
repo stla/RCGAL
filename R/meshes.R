@@ -181,19 +181,22 @@ checkMesh <- function(vertices, faces, gmp){
 #' @param clean Boolean, whether to clean the mesh (merging duplicated
 #'   vertices, duplicated faces, removed isolated vertices)
 #' @param normals Boolean, whether to compute the normals
+#' @param numbersType the type of the numbers used in C++ for the
+#'   computations; must be one of \code{"double"}, \code{"lazyExact"}
+#'   (a type provided by CGAL for exact computations), or \code{"gmp"}
+#'   (exact computations with rational numbers); using exact computations can
+#'   improve the detection of the exterior edges
 #' @param epsilon if the mesh is triangulated or if \code{triangulate=TRUE},
 #'   then \code{epsilon} is used in the detection of exterior edges (see the
 #'   \strong{Value} section); the higher value of \code{epsilon}, the lower
 #'   number of exterior edges
 #'
-#' @return A list giving the vertices, the edges, the faces of the mesh, and
-#'   optionally the normals. This list has an additional component
-#'   \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
+#' @return A list giving the vertices, the edges, the faces of the mesh, the
+#'   exterior edges, the exterior vertices and optionally the normals. This
+#'   list has two additional components \code{edges0} and \code{normals0} if
+#'   \code{triangulate=TRUE}, giving the edges and the normals before the
 #'   triangulation, unless the mesh is already triangulated, in which case
-#'   the \code{triangulate} option is ignored. If the mesh is already
-#'   triangulated or if \code{triangulate=TRUE}, the output list has an
-#'   additional component \code{exteriorEdges}, giving the exterior edges
-#'   of the mesh.
+#'   the \code{triangulate} option is ignored.
 #'
 #' @export
 #'
@@ -496,8 +499,9 @@ MeshesIntersection <- function(
 #'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
-#' @param clean Boolean, whether to clean the mesh (merging duplicated
-#'   vertices, duplicated faces, removed isolated vertices)
+#' @param clean Boolean, whether to clean the input mesh (merging duplicated
+#'   vertices, duplicated faces, removed isolated vertices) as well as the
+#'   output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
 #' @param numbersType the type of the numbers used in C++ for the
@@ -603,8 +607,9 @@ MeshesDifference <- function(
 #'   (at least) two fields: \code{vertices} and \code{faces}; the `vertices`
 #'   matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 #'   otherwise it must be numeric
-#' @param clean Boolean, whether to clean the mesh (merging duplicated
-#'   vertices, duplicated faces, removed isolated vertices)
+#' @param clean Boolean, whether to clean the input meshes (merging duplicated
+#'   vertices, duplicated faces, removed isolated vertices) as well as the
+#'   output mesh
 #' @param normals Boolean, whether to return the per-vertex normals of the
 #'   output mesh
 #' @param numbersType the type of the numbers used in C++ for the

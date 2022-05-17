@@ -12,8 +12,9 @@ MeshesUnion(meshes, clean = FALSE, normals = FALSE, numbersType = "double")
 matrix must have the \code{bigq} class if \code{numberTypes="gmp"},
 otherwise it must be numeric}
 
-\item{clean}{Boolean, whether to clean the mesh (merging duplicated
-vertices, duplicated faces, removed isolated vertices)}
+\item{clean}{Boolean, whether to clean the input meshes (merging duplicated
+vertices, duplicated faces, removed isolated vertices) as well as the
+output mesh}
 
 \item{normals}{Boolean, whether to return the per-vertex normals of the
 output mesh}

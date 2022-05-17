@@ -31,16 +31,20 @@ vertices, duplicated faces, removed isolated vertices)}
 then \code{epsilon} is used in the detection of exterior edges (see the
 \strong{Value} section); the higher value of \code{epsilon}, the lower
 number of exterior edges}
+
+\item{numbersType}{the type of the numbers used in C++ for the
+computations; must be one of \code{"double"}, \code{"lazyExact"}
+(a type provided by CGAL for exact computations), or \code{"gmp"}
+(exact computations with rational numbers); using exact computations can
+improve the detection of the exterior edges}
 }
 \value{
-A list giving the vertices, the edges, the faces of the mesh, and
-  optionally the normals. This list has an additional component
-  \code{edges0} if \code{triangulate=TRUE}, giving the edges before the
+A list giving the vertices, the edges, the faces of the mesh, the
+  exterior edges, the exterior vertices and optionally the normals. This
+  list has two additional components \code{edges0} and \code{normals0} if
+  \code{triangulate=TRUE}, giving the edges and the normals before the
   triangulation, unless the mesh is already triangulated, in which case
-  the \code{triangulate} option is ignored. If the mesh is already
-  triangulated or if \code{triangulate=TRUE}, the output list has an
-  additional component \code{exteriorEdges}, giving the exterior edges
-  of the mesh.
+  the \code{triangulate} option is ignored.
 }
 \description{
 Make a 3D mesh from given vertices and faces; the returned
