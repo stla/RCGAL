@@ -6,6 +6,11 @@
 
 Wrapping the C++ library **CGAL** in R. Convex hull, Delaunay tessellation, surface reconstruction.
 
+**This package is abandoned!** 
+See [MeshesOperations](https://github.com/stla/MeshesOperations) and 
+[SurfaceReconstruction](https://github.com/stla/SurfaceReconstruction).
+
+
 ## Some examples of Poisson reconstruction
 
 *Toroidal helix:*

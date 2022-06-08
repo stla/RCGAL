@@ -81,24 +81,26 @@ TubularHelixMesh <- function(R, r, w, a, nu, nv, alpha=0.5, twists=2){
 }
 
 # draw ####
-m <- TubularHelixMesh(R=5, r=1.35, w=10, a=0.7, 10*20, 30, alpha=2, twists=1)
+m <- TubularHelixMesh(R=5, r=1, w=8, a=0.6, 10*11, 4*11, alpha=1, twists=1)
 open3d(windowRect = c(50,50,550,550))
 bg3d(rgb(54,57,64, maxColorValue = 255))
 view3d(0,-55)
+shade3d(m, color = "red")
 wire3d(m, color="black")
 
-pts <- t(m$vb[-4L,])
-mesh <- PoissonReconstruction(pts)
+mm <- Rvcg::vcgUniformRemesh(m)
+pts <- t(mm$vb[-4L,])
+mesh <- PoissonReconstruction(pts, normals = getSomeNormals(10))
 open3d(windowRect = c(50,50,562,562))
 view3d(0,-55)
-shade3d(mesh, color = "yellow")
+shade3d(mesh, color = "orange")
 wire3d(mesh, color="black")
 
 library(Rvcg)
-vcgmesh <- vcgUpdateNormals(mesh)
+vcgmesh <- vcgUpdateNormals(mesh, type = 1)
 open3d(windowRect = c(50,50,562,562))
 view3d(0,-55)
-shade3d(vcgmesh, color = "orange")
+shade3d(vcgmesh, color = "green")
 wire3d(vcgmesh, color="black")
 AFSreconstruction(pts)
 
